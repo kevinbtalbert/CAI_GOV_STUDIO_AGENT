@@ -49,6 +49,7 @@ class Input__Agent(BaseModel):
     crew_ai_temperature: Optional[float] = None
     crew_ai_max_iter: Optional[int] = None
     tool_instance_ids: List[str]
+    agent_image_uri: Optional[str] = None
 
 
 class Input__Workflow(BaseModel):

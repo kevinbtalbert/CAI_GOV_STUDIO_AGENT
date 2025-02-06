@@ -2,8 +2,7 @@ import { useAppSelector } from '../lib/hooks/hooks';
 import { selectEditorCurrentStep } from '../workflows/editorSlice';
 import { Avatar, Divider, Layout } from 'antd';
 import { Typography } from 'antd/lib';
-const { Header, Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface StepComponentProps {
   stepNumber: number;

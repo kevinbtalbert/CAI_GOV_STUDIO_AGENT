@@ -10,6 +10,7 @@ import {
 import SearchBar from './WorkflowSearchBar';
 import WorkflowListItem from './WorkflowListItem';
 import { useListDeployedWorkflowsQuery } from '@/app/workflows/deployedWorkflowsApi';
+import { useImageAssetsData } from '../lib/hooks/useAssetData';
 
 const { Text } = Typography;
 
@@ -41,6 +42,12 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
   onDeleteDeployedWorkflow,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+
+  const { imageData: agentIconsData } = useImageAssetsData(agents.map((_a) => _a.agent_image_uri));
+  const { imageData: agentTemplateIconsData } = useImageAssetsData(
+    agentTemplates.map((_a) => _a.agent_image_uri),
+  );
+  const combinedAgentIconsData = { ...agentIconsData, ...agentTemplateIconsData }; // two API calls to reduce load on backend?
 
   // Update the deployment status handling
   const { data: latestDeployments } = useListDeployedWorkflowsQuery(
@@ -143,6 +150,7 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
                       workflow={workflow}
                       deployments={deployments}
                       agents={agents}
+                      agentIconsData={combinedAgentIconsData}
                       editWorkflow={editWorkflow}
                       deleteWorkflow={deleteWorkflow}
                       testWorkflow={testWorkflow}
@@ -184,6 +192,7 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
                     workflow={workflow}
                     deployments={deployedWorkflowMap[workflow.workflow_id] || []}
                     agents={agents}
+                    agentIconsData={combinedAgentIconsData}
                     editWorkflow={editWorkflow}
                     deleteWorkflow={deleteWorkflow}
                     testWorkflow={testWorkflow}
@@ -223,6 +232,7 @@ const WorkflowList: React.FC<WorkflowListProps> = ({
                     key={workflowTemplate.id}
                     workflowTemplate={workflowTemplate}
                     agentTemplates={agentTemplates}
+                    agentIconsData={combinedAgentIconsData}
                     deleteWorkflowTemplate={deleteWorkflowTemplate}
                     sectionType="Template"
                   />

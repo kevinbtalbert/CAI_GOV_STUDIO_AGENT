@@ -113,6 +113,7 @@ export async function GET(request: NextRequest) {
       },
       is_valid: true,
       workflow_id: configuration.workflow.id,
+      agent_image_uri: agent.agent_image_uri || '',
     }));
 
     const extractPlaceholders = (description: string): string[] => {

@@ -30,23 +30,20 @@ import {
   ApiOutlined,
 } from '@ant-design/icons';
 import { useListAgentsQuery } from '../agents/agentApi';
-import { useListGlobalToolTemplatesQuery } from '../tools/toolTemplatesApi';
 import { useListTasksQuery } from '../tasks/tasksApi';
 import { useImageAssetsData } from '@/app/lib/hooks/useAssetData';
 import { useListToolInstancesQuery } from '../tools/toolInstancesApi';
 import { useAppSelector } from '../lib/hooks/hooks';
 import {
-  selectEditorWorkflow,
   selectEditorWorkflowManagerAgentId,
   selectEditorWorkflowAgentIds,
   selectEditorWorkflowTaskIds,
   selectEditorWorkflowProcess,
 } from '../workflows/editorSlice';
-import { DeployedWorkflow } from '@/studio/proto/agent_studio';
+import { AgentMetadata, DeployedWorkflow } from '@/studio/proto/agent_studio';
 import { getStatusColor, getStatusDisplay } from './WorkflowListItem';
 import { useGlobalNotification } from './Notifications';
 import { useGetDefaultModelQuery } from '../models/modelsApi';
-
 const { Title, Text } = Typography;
 
 interface WorkflowDetailsProps {
@@ -66,8 +63,6 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
     error: agentsError,
   } = useListAgentsQuery({});
 
-  const { data: toolTemplates = [], isLoading: toolTemplatesLoading } =
-    useListGlobalToolTemplatesQuery({});
   const {
     data: toolInstances = [],
     isLoading: toolInstancesLoading,
@@ -76,9 +71,10 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
 
   const { data: tasks = [], isLoading: tasksLoading, error: tasksError } = useListTasksQuery({});
 
-  const { imageData } = useImageAssetsData(
-    Object.values(toolInstances).map((instance) => instance.tool_image_uri),
-  );
+  const { imageData } = useImageAssetsData([
+    ...(Object.values(toolInstances).map((instance) => instance.tool_image_uri) ?? []),
+    ...(Object.values(allAgents).map((agent) => agent.agent_image_uri) ?? []),
+  ]);
 
   const managerAgentId = useAppSelector(selectEditorWorkflowManagerAgentId);
   const process = useAppSelector(selectEditorWorkflowProcess);
@@ -89,7 +85,7 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
 
   const { data: defaultModel } = useGetDefaultModelQuery();
 
-  if (agentsLoading || toolTemplatesLoading || toolInstancesLoading) {
+  if (agentsLoading || toolInstancesLoading) {
     return (
       <Layout
         style={{
@@ -132,7 +128,7 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
 
   const showDefaultManagerCheckbox = !managerAgent && Boolean(process === 'hierarchical');
 
-  const renderAgentCard = (agent: any, isManager: boolean = false) => (
+  const renderAgentCard = (agent: AgentMetadata, isManager: boolean = false) => (
     <Layout
       key={agent.id}
       style={{
@@ -168,15 +164,28 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
           <Avatar
             style={{
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-              backgroundColor: isManager ? 'lightgrey' : '#4b85d1',
+              backgroundColor: isManager
+                ? 'lightgrey'
+                : imageData[agent.agent_image_uri]
+                  ? '#b8d6ff'
+                  : '#78b2ff',
               minWidth: '24px',
               minHeight: '24px',
               width: '24px',
               height: '24px',
               flex: '0 0 24px',
+              padding: isManager ? 0 : imageData[agent.agent_image_uri] ? 5 : 0,
             }}
             size={24}
-            icon={isManager ? <UsergroupAddOutlined /> : <UserOutlined />}
+            icon={
+              isManager ? (
+                <UsergroupAddOutlined />
+              ) : imageData[agent.agent_image_uri] ? (
+                <Image src={imageData[agent.agent_image_uri]} />
+              ) : (
+                <UserOutlined />
+              )
+            }
           />
           <Text
             style={{

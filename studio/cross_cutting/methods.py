@@ -181,7 +181,7 @@ def get_asset_data(
 ) -> GetAssetDataResponse:
     unavailable_assets = list()
     asset_data = dict()
-    for asset_uri in request.asset_uri_list:
+    for asset_uri in list(set(request.asset_uri_list or [])):
         asset_path = os.path.join(consts.DYNAMIC_ASSETS_LOCATION, asset_uri)
         if not os.path.exists(asset_path):
             unavailable_assets.append(asset_uri)

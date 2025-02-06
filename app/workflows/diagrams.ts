@@ -1,4 +1,4 @@
-import type { Position, Edge, Node, NodeProps } from '@xyflow/react';
+import type { Edge, Node } from '@xyflow/react';
 
 import {
   ToolTemplate,
@@ -15,6 +15,7 @@ export interface DiagramState {
 
 export interface DiagramStateInput {
   workflowState: WorkflowState;
+  iconsData: { [key: string]: string };
   tasks?: CrewAITaskMetadata[];
   toolInstances?: ToolInstance[];
   toolTemplates?: ToolTemplate[];
@@ -83,6 +84,7 @@ export const createDiagramStateFromWorkflow = (workflowData: DiagramStateInput) 
         label: `${agentName}`,
         name: agentName,
         manager: true,
+        iconData: '',
       },
     });
     yIndex += 150;
@@ -110,6 +112,7 @@ export const createDiagramStateFromWorkflow = (workflowData: DiagramStateInput) 
         data: {
           label: `${agent.name}`,
           name: `${agent.name}`,
+          iconData: workflowData.iconsData[agent.agent_image_uri ?? ''] ?? '',
         },
       });
 
@@ -139,7 +142,7 @@ export const createDiagramStateFromWorkflow = (workflowData: DiagramStateInput) 
             data: {
               label: `Tool: ${toolInstance?.name}`,
               name: toolInstance?.name,
-              icon: toolInstance?.tool_image_uri,
+              iconData: workflowData.iconsData[toolInstance?.tool_image_uri ?? ''] ?? '',
             },
           });
 

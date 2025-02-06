@@ -117,12 +117,15 @@ def api_wrapper(args: Union[dict, str]) -> str:
     elif serve_workflow_parameters.action_type == input_types.DeployedWorkflowActions.GET_ASSET_DATA.value:
         unavailable_assets = list()
         asset_data: Dict[str, str] = dict()
-        for asset_uri in serve_workflow_parameters.get_asset_data_inputs:
-            # Ensure that the asset requested belongs to one of the tool instances
-            tool_instance = next(
+        for asset_uri in list(set(serve_workflow_parameters.get_asset_data_inputs)):
+            # Ensure that the asset requested belongs to one of the tool instances or agents
+            matching_tool_ins = next(
                 (tool for tool in collated_input.tool_instances if tool.tool_image_uri == asset_uri), None
             )
-            if not tool_instance:
+            matching_agent = next(
+                (agent for agent in collated_input.agents if agent.agent_image_uri == asset_uri), None
+            )
+            if (not matching_tool_ins) and (not matching_agent):
                 unavailable_assets.append(asset_uri)
                 continue
             # Ensure that the asset exists

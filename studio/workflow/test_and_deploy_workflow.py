@@ -79,6 +79,11 @@ def _create_collated_input(
                     crew_ai_temperature=agent_db_model.crew_ai_temperature,
                     crew_ai_max_iter=agent_db_model.crew_ai_max_iter,
                     tool_instance_ids=list(agent_db_model.tool_ids) if agent_db_model.tool_ids else [],
+                    agent_image_uri=(
+                        os.path.relpath(agent_db_model.agent_image_path, consts.DYNAMIC_ASSETS_LOCATION)
+                        if agent_db_model.agent_image_path
+                        else ""
+                    ),
                 )
             )
             if agent_db_model.llm_provider_model_id:

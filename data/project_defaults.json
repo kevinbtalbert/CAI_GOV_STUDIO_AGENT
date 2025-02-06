@@ -292,7 +292,7 @@
         "2cbafffb-f874-4505-a7d0-c13990be8bef"
       ],
       "pre_packaged": true,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/internet.png"
     },
     {
       "id": "e4195dfd-fae5-453c-8b66-5367173964ef",
@@ -310,7 +310,7 @@
         "dfedd1d9-6b90-4b89-98a2-6934c8dcc077"
       ],
       "pre_packaged": true,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/jira.png"
     },
     {
       "id": "5db2f37c-e36e-4fa5-95bf-3bfe8bbfc681",

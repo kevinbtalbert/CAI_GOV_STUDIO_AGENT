@@ -32,6 +32,7 @@ interface WorkflowDisplayCardProps {
   agents?: AgentMetadata[];
   deployment?: DeployedWorkflow;
   sectionType: 'Deployed' | 'Draft' | 'Template';
+  agentIconsData: Record<string, string>;
 }
 
 const WorkflowDisplayCard: React.FC<WorkflowDisplayCardProps> = ({
@@ -39,6 +40,7 @@ const WorkflowDisplayCard: React.FC<WorkflowDisplayCardProps> = ({
   agents,
   deployment,
   sectionType,
+  agentIconsData,
 }) => {
   const agentIconsColorPalette = ['#a9ccb9', '#cca9a9', '#c4a9cc', '#ccc7a9'];
 
@@ -93,7 +95,7 @@ const WorkflowDisplayCard: React.FC<WorkflowDisplayCardProps> = ({
             marginTop: 'auto',
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '6px',
+            gap: '8px',
           }}
         >
           {workflow?.crew_ai_workflow_metadata?.agent_id.map((agentId, index) => {
@@ -102,15 +104,33 @@ const WorkflowDisplayCard: React.FC<WorkflowDisplayCardProps> = ({
               <Tooltip key={agent?.id || `agent-${index}`} title={agent?.name || 'Unknown'}>
                 <Button
                   style={{
-                    backgroundColor: agentIconsColorPalette[index % agentIconsColorPalette.length],
+                    backgroundColor: agentIconsData[agent?.agent_image_uri || '']
+                      ? `${agentIconsColorPalette[index % agentIconsColorPalette.length]}80` // 50% opacity
+                      : `${agentIconsColorPalette[index % agentIconsColorPalette.length]}c0`,
                     color: 'black',
                     fontSize: '10px',
-                    height: '20px',
-                    padding: '0 8px',
+                    height: '24px',
+                    width: '28px',
+                    padding: '2px',
                     borderRadius: '4px',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  <UserOutlined style={{ fontSize: '10px' }} />
+                  {!agentIconsData[agent?.agent_image_uri || ''] ? (
+                    <UserOutlined style={{ fontSize: '14px' }} />
+                  ) : (
+                    <img
+                      src={agentIconsData[agent?.agent_image_uri || '']}
+                      alt={agent?.name || 'Unknown'}
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        objectFit: 'cover',
+                        verticalAlign: 'middle',
+                      }}
+                    />
+                  )}
                 </Button>
               </Tooltip>
             );
@@ -124,11 +144,13 @@ const WorkflowDisplayCard: React.FC<WorkflowDisplayCardProps> = ({
 interface WorkflowTemplateDisplayCardProps {
   workflowTemplate?: WorkflowTemplateMetadata;
   agentTemplates?: AgentTemplateMetadata[];
+  agentIconsData: Record<string, string>;
 }
 
 const WorkflowTemplateDisplayCard: React.FC<WorkflowTemplateDisplayCardProps> = ({
   workflowTemplate,
   agentTemplates,
+  agentIconsData,
 }) => {
   const agentIconsColorPalette = ['#a9ccb9', '#cca9a9', '#c4a9cc', '#ccc7a9'];
 
@@ -160,7 +182,7 @@ const WorkflowTemplateDisplayCard: React.FC<WorkflowTemplateDisplayCardProps> = 
             marginTop: 'auto',
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '6px',
+            gap: '8px',
           }}
         >
           {workflowTemplate?.agent_template_ids?.map((agentId, index) => {
@@ -169,15 +191,33 @@ const WorkflowTemplateDisplayCard: React.FC<WorkflowTemplateDisplayCardProps> = 
               <Tooltip key={agent?.id || `agent-${index}`} title={agent?.name || 'Unknown'}>
                 <Button
                   style={{
-                    backgroundColor: agentIconsColorPalette[index % agentIconsColorPalette.length],
+                    backgroundColor: agentIconsData[agent?.agent_image_uri || '']
+                      ? `${agentIconsColorPalette[index % agentIconsColorPalette.length]}80` // 50% opacity
+                      : `${agentIconsColorPalette[index % agentIconsColorPalette.length]}c0`,
                     color: 'black',
                     fontSize: '10px',
-                    height: '20px',
-                    padding: '0 8px',
+                    height: '24px',
+                    width: '28px',
+                    padding: '2px',
                     borderRadius: '4px',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  <UserOutlined style={{ fontSize: '10px' }} />
+                  {!agentIconsData[agent?.agent_image_uri || ''] ? (
+                    <UserOutlined style={{ fontSize: '14px' }} />
+                  ) : (
+                    <img
+                      src={agentIconsData[agent?.agent_image_uri || '']}
+                      alt={agent?.name || 'Unknown'}
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        objectFit: 'cover',
+                        verticalAlign: 'middle',
+                      }}
+                    />
+                  )}
                 </Button>
               </Tooltip>
             );
@@ -194,6 +234,7 @@ interface WorkflowListItemProps {
   agentTemplates?: AgentTemplateMetadata[];
   deployments?: (DeployedWorkflow & { statusTag?: React.ReactNode })[];
   agents?: AgentMetadata[];
+  agentIconsData: Record<string, string>;
   editWorkflow?: (workflowId: string) => void;
   deleteWorkflow?: (workflowId: string) => void;
   deleteWorkflowTemplate?: (workflowTemplateId: string) => void;
@@ -249,6 +290,7 @@ const WorkflowListItem: React.FC<WorkflowListItemProps> = ({
   agentTemplates,
   deployments,
   agents,
+  agentIconsData,
   editWorkflow,
   deleteWorkflow,
   deleteWorkflowTemplate,
@@ -258,7 +300,6 @@ const WorkflowListItem: React.FC<WorkflowListItemProps> = ({
   sectionType,
 }) => {
   const router = useRouter();
-  const [isCloneOpen, setIsCloneOpen] = useState(false);
   const [addWorkflow] = useAddWorkflowMutation();
   const notificationsApi = useGlobalNotification();
   const [addWorkflowTemplate] = useAddWorkflowTemplateMutation();
@@ -356,6 +397,7 @@ const WorkflowListItem: React.FC<WorkflowListItemProps> = ({
               <WorkflowTemplateDisplayCard
                 workflowTemplate={workflowTemplate}
                 agentTemplates={agentTemplates}
+                agentIconsData={agentIconsData}
               />
             </>
           ) : (
@@ -365,6 +407,7 @@ const WorkflowListItem: React.FC<WorkflowListItemProps> = ({
                 agents={agents}
                 deployment={deployments?.[0]}
                 sectionType={sectionType}
+                agentIconsData={agentIconsData}
               />
             </>
           )}

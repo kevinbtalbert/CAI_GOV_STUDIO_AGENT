@@ -92,7 +92,16 @@ def add_workflow_template_from_workflow(
         agent_to_agent_template = {}
         for agent_id in list(workflow.crew_ai_agents):
             agent: db_model.Agent = session.query(db_model.Agent).filter_by(id=agent_id).one()
+            agent_template_image_path = ""
             agent_template_id = str(uuid4())
+            if agent.agent_image_path:
+                _, ext = os.path.splitext(agent.agent_image_path)
+                os.makedirs(consts.AGENT_TEMPLATE_ICONS_LOCATION, exist_ok=True)
+                agent_template_image_path = os.path.join(
+                    consts.AGENT_TEMPLATE_ICONS_LOCATION, f"{agent_template_id}_icon{ext}"
+                )
+                shutil.copy(agent.agent_image_path, agent_template_image_path)
+
             agent_template: db_model.AgentTemplate = db_model.AgentTemplate(
                 id=agent_template_id,
                 allow_delegation=agent.crew_ai_allow_delegation,
@@ -103,6 +112,7 @@ def add_workflow_template_from_workflow(
                 max_iter=agent.crew_ai_max_iter,
                 name=agent.name,
                 pre_packaged=False,
+                agent_image_path=agent_template_image_path,
                 role=agent.crew_ai_role,
                 temperature=agent.crew_ai_temperature,
                 verbose=agent.crew_ai_verbose,

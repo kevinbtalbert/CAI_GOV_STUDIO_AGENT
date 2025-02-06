@@ -19,6 +19,7 @@ import ToolNode from '../diagram/ToolNode';
 import { AgentMetadata, CrewAITaskMetadata, ToolInstance } from '@/studio/proto/agent_studio';
 import { processEvents } from '@/app/lib/workflow';
 import { WorkflowState } from '@/app/workflows/editorSlice';
+import { useImageAssetsData } from '../../lib/hooks/useAssetData';
 
 const nodeTypes: NodeTypes = {
   agent: AgentNode,
@@ -56,9 +57,24 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({
     [setEdges],
   );
 
+  // Get image data for icons
+  const { imageData: iconsData, refetch: refetchIconsData } = useImageAssetsData([
+    ...(toolInstances?.map((t_) => t_.tool_image_uri) ?? []),
+    ...(agents?.map((a_) => a_.agent_image_uri) ?? []),
+  ]);
+
+  // Add effect to refetch icons after 2 seconds if they are not loaded
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      refetchIconsData();
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const diagramState: DiagramState = createDiagramStateFromWorkflow({
       workflowState,
+      iconsData,
       toolInstances,
       agents,
       tasks,

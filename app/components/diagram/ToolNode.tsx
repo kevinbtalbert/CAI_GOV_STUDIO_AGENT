@@ -1,19 +1,16 @@
 import React from 'react';
 import { Handle, Position, NodeProps, Node, NodeToolbar } from '@xyflow/react';
-import { Avatar, Image, Layout, Typography } from 'antd';
-import { FileDoneOutlined, UserOutlined } from '@ant-design/icons';
-import { BaseNode } from '@/components/base-node';
-import { AgentMetadata } from '@/studio/proto/agent_studio';
-import { useImageAssetsData } from '@/app/lib/hooks/useAssetData';
+import { Avatar, Image, Typography } from 'antd';
+import { ToolOutlined } from '@ant-design/icons';
 
-const { Text, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 type InfoType = 'Completion' | 'TaskStart' | 'ToolInput' | 'ToolOutput';
 
 type ToolNode = Node<
   {
     name: string;
-    icon: string;
+    iconData: string;
     active: boolean;
     info?: string;
     infoType?: InfoType;
@@ -22,8 +19,6 @@ type ToolNode = Node<
 >;
 
 export default function ToolNode({ data }: NodeProps<ToolNode>) {
-  const { imageData } = useImageAssetsData([data.icon]);
-
   return (
     <div
       style={{
@@ -77,9 +72,16 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
           bottom: -15,
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', // Optional shadow for floating look,
           backgroundColor: 'white',
+          padding: data.iconData ? 5 : 0,
         }}
         size={24}
-        icon={<Image src={imageData[data.icon]} />}
+        icon={
+          data.iconData ? (
+            <Image src={data.iconData} />
+          ) : (
+            <ToolOutlined style={{ opacity: 0.6, color: 'black' }} />
+          )
+        }
       />
 
       {/* Node Content */}

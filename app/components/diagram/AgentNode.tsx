@@ -1,18 +1,16 @@
 import React from 'react';
 import { Handle, Position, NodeProps, Node, NodeToolbar } from '@xyflow/react';
-import { Avatar, Layout, Typography } from 'antd';
+import { Avatar, Image, Typography } from 'antd';
 import { UsergroupAddOutlined, UserOutlined } from '@ant-design/icons';
-import { BaseNode } from '@/components/base-node';
-import { AgentMetadata } from '@/studio/proto/agent_studio';
-import Markdown from 'react-markdown';
-
-const { Text, Paragraph } = Typography;
+import { useImageAssetsData } from '@/app/lib/hooks/useAssetData';
+const { Paragraph } = Typography;
 
 export type InfoType = 'Completion' | 'TaskStart' | 'ToolInput' | 'ToolOutput';
 
 type AgentNode = Node<
   {
     name: string;
+    iconData: string;
     manager: boolean;
     active: boolean;
     info?: string;
@@ -73,10 +71,19 @@ export default function AgentNode({ data }: NodeProps<AgentNode>) {
           left: -20, // Position avatar overlapping to the left
           top: -20,
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', // Optional shadow for floating look
-          backgroundColor: data.manager ? 'lightgrey' : '#4b85d1',
+          backgroundColor: data.manager ? 'lightgrey' : data.iconData ? '#b8d6ff' : '#78b2ff', // or lightblue
+          padding: data.manager ? 0 : data.iconData ? 8 : 0,
         }}
         size={36}
-        icon={data.manager ? <UsergroupAddOutlined /> : <UserOutlined />}
+        icon={
+          data.manager ? (
+            <UsergroupAddOutlined />
+          ) : data.iconData ? (
+            <Image src={data.iconData} alt={data.name} />
+          ) : (
+            <UserOutlined />
+          )
+        }
       />
 
       {/* Node Content */}
