@@ -1,0 +1,42 @@
+<svg
+  width="50.7"     
+  height="38.3"
+  viewBox="0 0 60 60"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- 1) Smaller arrowhead marker -->
+  <defs>
+    <marker
+      id="arrowhead"
+      markerWidth="4"
+      markerHeight="4"
+      refX="2"
+      refY="2"
+      orient="auto"
+    >
+      <path
+        d="M0,0 L0,4 L4,2 Z"
+        fill="#f7c200"
+      />
+    </marker>
+  </defs>
+
+  <!--
+    2) Path Explanation:
+       - M 60 0  : Move to top-right corner of 60×60.
+       - A 50 50 : Use elliptical arc with rx=50, ry=50
+       - 0 0 0   : rotation=0°, largeArcFlag=0, sweepFlag=0
+                   (the sweepFlag=0 forces the arc to go left first, then down)
+       - 10 50   : End at (10, 50) near bottom-left quadrant
+  -->
+  <path
+    d="M 60 0
+       A 50 50 0 0 0 10 50"
+    fill="none"
+    stroke="#f7c200"
+    stroke-width="2"
+    stroke-dasharray="4 2"
+    marker-end="url(#arrowhead)"
+  />
+</svg>

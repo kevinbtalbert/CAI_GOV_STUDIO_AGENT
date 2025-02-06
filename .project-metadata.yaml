@@ -1,0 +1,60 @@
+name: Agent Studio
+description: |
+  Cloudera AI Agent Studio is a workspace for developing and deploying AI agentic workflows.
+author: Cloudera Inc.
+specification_version: 1.0
+prototype_version: 1.0
+date: "2023-07-22"
+
+runtimes:
+  - editor: PBJ Workbench
+    kernel: Python 3.10
+    edition: Standard
+
+tasks:
+  - type: run_session
+    name: Ensure uv Package Manager
+    script: startup_scripts/ensure-uv-package-manager.py
+    short_summary: Check for the presence of uv package manager and install it if it is not present.
+    kernel: python3
+    cpu: 1
+    memory: 4
+  - type: run_session
+    name: Install Dependencies
+    script: startup_scripts/install-dependencies.py
+    short_summary: Install Dependencies
+    kernel: python3
+    cpu: 1
+    memory: 4
+  - type: run_session
+    name: Initialize Project Defaults
+    script: startup_scripts/uv_initialize-project-defaults.py
+    short_summary: Initialize Project Defaults
+    long_summary: Initialize default database, shipped with this version of the Studio.
+    kernel: python3
+    cpu: 1
+    memory: 4
+  - type: start_application
+    name: "Agent Studio - Agent Ops & Metrics"
+    short_summary: View observability data from agents running on AI studio.
+    bypass_authentication: true
+    subdomain: cai-agent-studio-ops
+    script: startup_scripts/uv_start-agent-ops-server.py
+    long_summary: This application launches an oservability platform for insight and visibility into how agentic crews, agents, and tools are performing during their respective lifecycles.
+    cpu: 1
+    memory: 4
+    environment_variables:
+      TASK_TYPE: START_APPLICATION
+  - type: start_application
+    name: "Agent Studio"
+    short_summary: Start Cloudera AI Agent Studio
+    subdomain: cai-agent-studio
+    script: startup_scripts/run-app.py
+    long_summary: This application launcher a agent studio backend and frontend application.
+    bypass_authentication: true
+    cpu: 1
+    memory: 8
+    is_embedded: true
+    environment_variables:
+      IS_EMBEDDED: true
+      TASK_TYPE: START_APPLICATION

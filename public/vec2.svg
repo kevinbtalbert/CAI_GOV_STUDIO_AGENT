@@ -1,0 +1,39 @@
+<svg
+  width="10"
+  height="38.3"
+  viewBox="0 0 10 60"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- 1) Smaller arrowhead marker -->
+  <defs>
+    <marker
+      id="arrowhead"
+      markerWidth="4"
+      markerHeight="4"
+      refX="2"
+      refY="2"
+      orient="auto"
+    >
+      <path
+        d="M0,0 L0,4 L4,2 Z"
+        fill="#f7c200"
+      />
+    </marker>
+  </defs>
+
+  <!--
+    2) Path Explanation:
+       - M 5 0   : Move to starting point (5,0), centered horizontally in the 10px-wide SVG.
+       - L 5 50  : Draw a straight line down to (5,50).
+  -->
+  <path
+    d="M 5 0
+       L 5 50"
+    fill="none"
+    stroke="#f7c200"
+    stroke-width="2"
+    stroke-dasharray="4 2"
+    marker-end="url(#arrowhead)"
+  />
+</svg>

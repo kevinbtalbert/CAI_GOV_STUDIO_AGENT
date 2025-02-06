@@ -1,0 +1,968 @@
+/**
+Cloudera AI Agent Studio - Simplified Proto
+
+This protobuf definition is tailored to focus on 
+basic operations for Models, Tools, Agents, AgentManager, and Workflow.
+*/
+
+syntax = "proto3";
+
+package agent_studio;
+
+/**
+-----------------------
+gRPC Service Definition
+-----------------------
+*/
+
+// gRPC service for basic Agent Studio operations.
+service AgentStudio {
+  
+  // Model operations
+  rpc ListModels (ListModelsRequest) returns (ListModelsResponse) {}
+  rpc GetModel (GetModelRequest) returns (GetModelResponse) {}
+  rpc AddModel (AddModelRequest) returns (AddModelResponse) {}
+  rpc RemoveModel (RemoveModelRequest) returns (RemoveModelResponse) {}
+  rpc UpdateModel (UpdateModelRequest) returns (UpdateModelResponse) {}
+  rpc TestModel (TestModelRequest) returns (TestModelResponse) {}
+  rpc SetStudioDefaultModel (SetStudioDefaultModelRequest) returns (SetStudioDefaultModelResponse) {}
+  rpc GetStudioDefaultModel (GetStudioDefaultModelRequest) returns (GetStudioDefaultModelResponse) {}
+
+  // Tool Template operations
+  rpc ListToolTemplates (ListToolTemplatesRequest) returns (ListToolTemplatesResponse) {}
+  rpc GetToolTemplate (GetToolTemplateRequest) returns (GetToolTemplateResponse) {}
+  rpc AddToolTemplate (AddToolTemplateRequest) returns (AddToolTemplateResponse) {}
+  rpc UpdateToolTemplate (UpdateToolTemplateRequest) returns (UpdateToolTemplateResponse) {}
+  rpc RemoveToolTemplate (RemoveToolTemplateRequest) returns (RemoveToolTemplateResponse) {}
+
+  // Tool Instance Operations
+  rpc ListToolInstances (ListToolInstancesRequest) returns (ListToolInstancesResponse) {}
+  rpc GetToolInstance (GetToolInstanceRequest) returns (GetToolInstanceResponse) {}
+  rpc CreateToolInstance (CreateToolInstanceRequest) returns (CreateToolInstanceResponse) {}
+  rpc UpdateToolInstance (UpdateToolInstanceRequest) returns (UpdateToolInstanceResponse) {}
+  rpc RemoveToolInstance (RemoveToolInstanceRequest) returns (RemoveToolInstanceResponse) {}
+
+  // Agent operations
+  rpc ListAgents (ListAgentsRequest) returns (ListAgentsResponse) {}
+  rpc GetAgent (GetAgentRequest) returns (GetAgentResponse) {}
+  rpc AddAgent (AddAgentRequest) returns (AddAgentResponse) {}
+  rpc UpdateAgent (UpdateAgentRequest) returns (UpdateAgentResponse) {}
+  rpc RemoveAgent (RemoveAgentRequest) returns (RemoveAgentResponse) {}
+
+  // Test Agents
+  rpc TestAgent (TestAgentRequest) returns (TestAgentResponse) {}
+
+  // Task operations
+  rpc AddTask (AddTaskRequest) returns (AddTaskResponse) {}
+  rpc ListTasks (ListTasksRequest) returns (ListTasksResponse) {}
+  rpc GetTask (GetTaskRequest) returns (GetTaskResponse) {}
+  rpc UpdateTask (UpdateTaskRequest) returns (UpdateTaskResponse) {}
+  rpc RemoveTask (RemoveTaskRequest) returns (RemoveTaskResponse) {}
+
+  // Workflow operations
+  rpc ListWorkflows (ListWorkflowsRequest) returns (ListWorkflowsResponse) {}
+  rpc GetWorkflow (GetWorkflowRequest) returns (GetWorkflowResponse) {}
+  rpc AddWorkflow (AddWorkflowRequest) returns (AddWorkflowResponse) {}
+  rpc UpdateWorkflow (UpdateWorkflowRequest) returns (UpdateWorkflowResponse) {}
+  rpc TestWorkflow (TestWorkflowRequest) returns (TestWorkflowResponse) {}
+  rpc RemoveWorkflow (RemoveWorkflowRequest) returns (RemoveWorkflowResponse) {}
+  
+  // Deployed Workflow Operations
+  rpc DeployWorkflow (DeployWorkflowRequest) returns (DeployWorkflowResponse) {}
+  rpc UndeployWorkflow (UndeployWorkflowRequest) returns (UndeployWorkflowResponse) {}
+  rpc ListDeployedWorkflows (ListDeployedWorkflowsRequest) returns (ListDeployedWorkflowsResponse) {}
+
+  // Utility functions
+  rpc TemporaryFileUpload (stream FileChunk) returns (FileUploadResponse) {}
+  rpc NonStreamingTemporaryFileUpload (NonStreamingTemporaryFileUploadRequest) returns (FileUploadResponse) {}
+  rpc DownloadTemporaryFile (DownloadTemporaryFileRequest) returns (stream FileChunk) {}
+  rpc GetAssetData (GetAssetDataRequest) returns (GetAssetDataResponse) {}
+  rpc GetParentProjectDetails (GetParentProjectDetailsRequest) returns (GetParentProjectDetailsResponse) {}
+  rpc CheckStudioUpgradeStatus (CheckStudioUpgradeStatusRequest) returns (CheckStudioUpgradeStatusResponse) {}
+  rpc UpgradeStudio (UpgradeStudioRequest) returns (UpgradeStudioResponse) {}
+  rpc RestartStudioApplication (RestartStudioApplicationRequest) returns (RestartStudioApplicationResponse) {}
+
+  // Agent templates operations
+  rpc ListAgentTemplates (ListAgentTemplatesRequest) returns (ListAgentTemplatesResponse) {}
+  rpc GetAgentTemplate (GetAgentTemplateRequest) returns (GetAgentTemplateResponse) {}
+  rpc AddAgentTemplate (AddAgentTemplateRequest) returns (AddAgentTemplateResponse) {}
+  rpc UpdateAgentTemplate (UpdateAgentTemplateRequest) returns (UpdateAgentTemplateResponse) {}
+  rpc RemoveAgentTemplate (RemoveAgentTemplateRequest) returns (RemoveAgentTemplateResponse) {}
+
+  // Workflow templates operations
+  rpc ListWorkflowTemplates (ListWorkflowTemplatesRequest) returns (ListWorkflowTemplatesResponse) {}
+  rpc GetWorkflowTemplate (GetWorkflowTemplateRequest) returns (GetWorkflowTemplateResponse) {}
+  rpc AddWorkflowTemplate (AddWorkflowTemplateRequest) returns (AddWorkflowTemplateResponse) {}
+  rpc RemoveWorkflowTemplate (RemoveWorkflowTemplateRequest) returns (RemoveWorkflowTemplateResponse) {}
+
+  // Task templates operations
+  rpc ListTaskTemplates (ListTaskTemplatesRequest) returns (ListTaskTemplatesResponse) {}
+  rpc GetTaskTemplate (GetTaskTemplateRequest) returns (GetTaskTemplateResponse) {}
+  rpc AddTaskTemplate (AddTaskTemplateRequest) returns (AddTaskTemplateResponse) {}
+  rpc RemoveTaskTemplate (RemoveTaskTemplateRequest) returns (RemoveTaskTemplateResponse) {}
+}
+
+/**
+-------------------------------------------
+Request/Response Message Definitions
+-------------------------------------------
+*/
+
+// Shared Model Definition
+message Model {
+  // Unique ID for the model
+  string model_id = 1;
+
+  // Unique name for the model
+  string model_name = 2;
+
+  // Model Name at the provider
+  string provider_model = 3;
+  
+  // Provider of the model (e.g., OpenAI, Anthropic)
+  string model_type = 4;
+
+  // API Base for the model
+  string api_base = 5;
+
+  // Is the model default model for the studio
+  bool is_studio_default = 6;
+}
+
+// Model Messages
+message ListModelsRequest {}
+
+message ListModelsResponse {
+  // Full model details for all models
+  repeated Model model_details = 1;
+}
+
+message GetModelRequest {
+  // ID of the model to retrieve
+  string model_id = 1;
+}
+
+message GetModelResponse {
+  // Full model details for the specific model
+  Model model_details = 1;
+}
+
+message AddModelRequest {
+  // Unique name for the model
+  string model_name = 1;
+
+  // Model Name at the provider
+  string provider_model = 2;
+  
+  // Provider of the model (e.g., OPENAI, OPENAI_COMPATIBLE, AZURE_OPENAI)
+  string model_type = 3;
+
+  // API Base for the model
+  string api_base = 4;
+
+  // API Key for the model
+  string api_key = 5;
+}
+
+message AddModelResponse {
+  // ID of the added model
+  string model_id = 1;
+}
+
+message RemoveModelRequest {
+  // ID of the model to remove
+  string model_id = 1;
+}
+
+message RemoveModelResponse {}
+
+message UpdateModelRequest {
+  // ID of the model to update
+  string model_id = 1;
+  
+  // Unique name for the model
+  string model_name = 2;
+
+  // Model Name at the provider
+  string provider_model = 3;
+
+  // API Base for the model
+  string api_base = 4;
+
+  // API Key for the model
+  string api_key = 5;
+}
+
+message UpdateModelResponse {
+  // ID of the updated model
+  string model_id = 1;
+}
+
+message TestModelRequest {
+  // The unique identifier of the model to be tested
+  string model_id = 1;
+
+  // The role associated with the completion (e.g., user or assistant)
+  string completion_role = 2;
+
+  // The content used for the model's completion test
+  string completion_content = 3;
+}
+
+message TestModelResponse {
+  // The response generated by testing the LLM model
+  string response = 1;
+}
+
+message SetStudioDefaultModelRequest {
+  // ID of the model to set as default
+  string model_id = 1;
+}
+
+message SetStudioDefaultModelResponse {}
+
+message GetStudioDefaultModelRequest {}
+
+message GetStudioDefaultModelResponse {
+  // Is default model configured
+  bool is_default_model_configured = 1;
+  // Full model details for the specific model
+  Model model_details = 2;
+}
+
+// Messages for ListToolTemplates
+message ListToolTemplatesRequest {
+  // Optional workflow template
+  optional string workflow_template_id = 1;
+}
+
+message ListToolTemplatesResponse {
+  repeated ToolTemplate templates = 1; // List of tool templates
+}
+
+// Messages for GetToolTemplate
+message GetToolTemplateRequest {
+  string tool_template_id = 1; // ID of the tool template to retrieve
+}
+
+message GetToolTemplateResponse {
+  ToolTemplate template = 1; // Retrieved tool template
+}
+
+// Messages for AddToolTemplate
+message AddToolTemplateRequest {
+  string tool_template_name = 1; // Name of the new tool template
+  string tmp_tool_image_path = 2; // Image of the tool 
+  optional string workflow_template_id = 3; // Optionally specify a specific workflow template for this tool template
+}
+
+message AddToolTemplateResponse {
+  string tool_template_id = 1; // ID of the added tool template
+}
+
+// Messages for UpdateToolTemplate
+message UpdateToolTemplateRequest {
+  string tool_template_id = 1;
+  string tool_template_name = 2;
+  string tmp_tool_image_path = 3;
+}
+
+message UpdateToolTemplateResponse {
+  string tool_template_id = 1; // ID of the updated tool template
+}
+
+// Messages for RemoveToolTemplate
+message RemoveToolTemplateRequest {
+  string tool_template_id = 1; // ID of the tool template to remove
+}
+
+message RemoveToolTemplateResponse {
+}
+
+// Messages for ListToolInstances
+message ListToolInstancesRequest {
+  // Optional workflow id
+  optional string workflow_id = 1;
+}
+
+message ListToolInstancesResponse {
+  repeated ToolInstance tool_instances = 1;
+}
+
+// Messages for GetToolInstance
+message GetToolInstanceRequest {
+  string tool_instance_id = 1;
+}
+
+message GetToolInstanceResponse {
+  ToolInstance tool_instance = 1;
+}
+
+// Messages for CreateToolInstance
+message CreateToolInstanceRequest {
+  // Mandatory workfow ID to attach to a tool
+  string workflow_id = 1;
+  // Optional name of the tool instance
+  string name = 2;
+  // optional tool template ID to create a tool instance from. If not provided, a generic tool instance is created.
+  optional string tool_template_id = 3;
+}
+
+message CreateToolInstanceResponse {
+  string tool_instance_name = 1;
+  string tool_instance_id = 2;
+}
+
+message UpdateToolInstanceRequest {
+  string tool_instance_id = 1;
+  string name = 2;
+  string description = 3;
+  string tmp_tool_image_path = 4;
+}
+
+message UpdateToolInstanceResponse {
+  string tool_instance_id = 1;
+}
+
+// Messages for RemoveToolInstance
+message RemoveToolInstanceRequest {
+  string tool_instance_id = 1;
+}
+
+message RemoveToolInstanceResponse {}
+
+// Definitions for ToolTemplate and ActivatedTool
+message ToolTemplate {
+  string id = 1;         // Unique identifier of the tool template
+  string name = 2;       // Name of the tool template
+  string python_code = 3; // Python code associated with the template
+  string python_requirements = 4; // Python package requirements for the tool template code
+  string source_folder_path = 5; // Source Folder path inside CML Project where tool template code resides.
+  string tool_metadata = 6; // JSON string containing user parameters info. 
+  bool is_valid = 7; // Is the tool template valid based on whether the python code and requirements file exist.
+  bool pre_built = 8; // Is the tool template pre-packaged with the studio.
+  string tool_image_uri = 9; // Image of the tool 
+  string tool_description = 10; // Detailed description of the tool.
+  optional string workflow_template_id = 11; // optional field specifying the workflow template that this tool template belongs to
+}
+
+message ToolInstance {
+  string id = 1;         // Unique identifier of the tool instance
+  string name = 2;       // Name of the tool instance
+  string workflow_id = 3; // mandatory attach to workflow
+  string python_code = 4; // Python code associated with the tool instance
+  string python_requirements = 5; // Python package requirements for the tool instance code
+  string source_folder_path = 6; // Source Folder path inside CML Project where tool instance code resides.
+  string tool_metadata = 7; // JSON string containing user parameters info. 
+  bool is_valid = 8; // Is the tool instance valid based on whether the python code and requirements file exist.
+  string tool_image_uri = 9; // Image of the tool 
+  string tool_description = 10; // Detailed description of the tool.
+}
+
+// Agent Messages
+message ListAgentsRequest {
+  // Optional workflow id
+  optional string workflow_id = 1;
+}
+
+message ListAgentsResponse {
+  repeated AgentMetadata agents = 1;  // A list of agents with metadata
+}
+
+message GetAgentRequest {
+  string agent_id = 1;  // The unique ID of the agent
+}
+
+message GetAgentResponse {
+  AgentMetadata agent = 1;  // Detailed metadata of the agent
+}
+
+message AddAgentRequest {
+  string name = 1;               // Name of the agent
+  string llm_provider_model_id = 2;  // LLM Provider and Model
+  repeated string tools_id = 3;     // List of tool IDs
+  CrewAIAgentMetadata crew_ai_agent_metadata = 4; // Crew AI agent metadata 
+  optional string template_id = 5; // OPTIONAL build from template
+  string workflow_id = 6; // mandatory attach to workflow
+
+  // Create tool instances from tool template ids
+  repeated string tool_template_ids = 7;
+}
+
+message AddAgentResponse {
+  string agent_id = 1;  // The unique ID of the newly created agent
+}
+
+message UpdateAgentRequest {
+  string agent_id = 1;           // The unique ID of the agent to update
+  string name = 2;               // Name of the agent
+  string llm_provider_model_id = 3;  // LLM Provider and Model
+  repeated string tools_id = 4;     // List of tool IDs
+  CrewAIAgentMetadata crew_ai_agent_metadata = 5; // Crew AI agent metadata 
+
+
+  // Create tool instances from tool template ids
+  repeated string tool_template_ids = 7;
+}
+
+message UpdateAgentResponse {}
+
+message RemoveAgentRequest {
+  string agent_id = 1;  // The unique ID of the agent to remove
+}
+
+message RemoveAgentResponse {}
+
+message AgentMetadata {
+  string id = 1;  // ID of the Agent
+  string name = 2;               // Name of the agent
+  string llm_provider_model_id = 3;  // LLM Provider and Model
+  repeated string tools_id = 4;     // List of tool IDs
+  CrewAIAgentMetadata crew_ai_agent_metadata = 5; // Crew AI agent metadata 
+  bool is_valid = 6;     // Is the activated tool valid based on whether the linked tool & model is still active in the studio.
+  string workflow_id = 7; // mandatory owner workflow
+}
+
+message CrewAIAgentMetadata {
+  string role = 1;                // Role of the agent
+  string backstory = 2;           // Backstory of the agent
+  string goal = 3;                // Goal of the agent
+  bool allow_delegation = 4;      // Allow delegation flag
+  bool verbose = 5;               // Verbose mode flag
+  bool cache = 6;                 // Cache flag
+  float temperature = 7;         // Temperature setting
+  int32 max_iter = 8;            // Maximum iterations
+}
+
+// Request to test an agent with a specific task
+message TestAgentRequest {
+  string agent_id = 1; // Identifier of the agent to test
+  string user_input = 2; // User Input for testing the agent.
+  string context = 3; // Context or Historical data for task execution.
+}
+
+// Response after testing an agent
+message TestAgentResponse {
+  string response = 1; // Actual response from the agent
+}
+
+// Messages for AddWorkflow
+message AddWorkflowRequest {
+  // Name of the workflow
+  optional string name = 1;
+  // Metadata for CrewAI workflow
+  optional CrewAIWorkflowMetadata crew_ai_workflow_metadata = 2;
+  // Workflow is Conversational or not
+  optional bool is_conversational = 3;
+
+  // Optional template from which to create a workflow 
+  // and all of its constituents
+  optional string workflow_template_id = 4;
+}
+
+message AddWorkflowResponse {
+  // ID of the newly created workflow
+  string workflow_id = 1;
+}
+
+// Messages for listing workflows
+message ListWorkflowsRequest {}
+
+message ListWorkflowsResponse {
+  // List of workflows
+  repeated Workflow workflows = 1;
+}
+
+// Messages for retrieving a single workflow
+message GetWorkflowRequest {
+  // ID of the workflow to retrieve
+  string workflow_id = 1;
+}
+
+message GetWorkflowResponse {
+  // Workflow details
+  Workflow workflow = 1;
+}
+
+// Messages for updating workflows
+message UpdateWorkflowRequest {
+  // ID of the workflow to update
+  string workflow_id = 1;
+  // Updated name of the workflow
+  string name = 2;
+  // Updated metadata for CrewAI workflow
+  CrewAIWorkflowMetadata crew_ai_workflow_metadata = 3;
+  // Workflow is Conversational or not
+  bool is_conversational = 4;
+}
+
+message UpdateWorkflowResponse {}
+
+message TestWorkflowToolUserParameters {
+  map<string, string> parameters = 1;
+}
+
+// Messages for testing workflows
+message TestWorkflowRequest {
+  // ID of the workflow to test
+  string workflow_id = 1;
+  // Inputs for workflow execution
+  map<string, string> inputs = 2;
+  // Parameters for the tools for testing workflows. This is a key-value pair
+  // where each key is the tool ID, and the value is another map where the 
+  // key is the user param and the value is the value of the param.
+  map<string, TestWorkflowToolUserParameters> tool_user_parameters = 3;
+}
+
+message TestWorkflowResponse {
+  // Message indicating the result of the test
+  string message = 1;
+  // Trace ID of the test
+  string trace_id = 2;
+}
+
+// Messages for deploying workflows
+message DeployWorkflowRequest {
+  // ID of the workflow to deploy
+  string workflow_id = 1;
+  // Any environment variable to override from activated tools and external agents
+  map<string, string> env_variable_overrides = 2;
+  // Parameters for the tools for testing workflows. This is a key-value pair
+  // where each key is the tool ID, and the value is another map where the 
+  // key is the user param and the value is the value of the param.
+  map<string, TestWorkflowToolUserParameters> tool_user_parameters = 3;
+  // Should the workflow application be accesible without authentication from CDP ?
+  bool bypass_authentication = 4;
+}
+
+message DeployWorkflowResponse {
+  // Deployed Workflow Name
+  string deployed_workflow_name = 1;
+  // Deployed Workflow ID
+  string deployed_workflow_id = 2;
+  // ID of the CML model
+  string cml_deployed_model_id = 3;
+}
+
+message UndeployWorkflowRequest {
+  // ID of the deployed workflow to undeploy
+  string deployed_workflow_id = 1;
+}
+
+message UndeployWorkflowResponse {}
+
+// Messages for listing deployed workflows
+message ListDeployedWorkflowsRequest {}
+
+message ListDeployedWorkflowsResponse {
+  // List of deployed workflows
+  repeated DeployedWorkflow deployed_workflows = 1;
+}
+
+// Messages for removing workflows
+message RemoveWorkflowRequest {
+  // ID of the workflow to remove
+  string workflow_id = 1;
+}
+
+message RemoveWorkflowResponse {}
+
+message DeployedWorkflow {
+  // ID of the deployed workflow
+  string deployed_workflow_id = 1;
+  // ID of the workflow
+  string workflow_id = 2;
+  // Name of the workflow
+  string workflow_name = 3;
+  // Name of the deployed workflow
+  string deployed_workflow_name = 4;
+  // ID of the CML model
+  string cml_deployed_model_id = 5;
+  // Revision of the workflow that was deployed
+  bool is_stale = 6;
+  // Application URL for the deployed workflow
+  string application_url = 7;
+  // Application status for the deployed workflow
+  string application_status = 8;
+  // Deep link to the CML application
+  string application_deep_link = 9;
+  // Deep link to the CML model
+  string model_deep_link = 10;
+}
+
+// Workflow metadata
+message Workflow {
+  // ID of the workflow
+  string workflow_id = 1;
+  // Name of the workflow
+  string name = 2;
+  // Metadata for CrewAI workflow
+  CrewAIWorkflowMetadata crew_ai_workflow_metadata = 3;
+  // Is the workflow valid based on whether the assigned agents & tasks is still active in the studio
+  bool is_valid = 4;
+  // Is the workflow ready to be tested
+  bool is_ready = 5;
+  // Workflow is Conversational or not
+  bool is_conversational = 6;
+  // Workflow state
+  bool is_draft = 7;
+}
+
+message CrewAIWorkflowMetadata {
+  // List of agents involved in the workflow
+  repeated string agent_id = 1;
+  // List of tasks involved in the workflow
+  repeated string task_id = 2;
+  // Optional manager agent metadata
+  string manager_agent_id = 3;
+  // Process description for the workflow
+  string process = 4;
+  // Optional manager LLM Model provider ID
+  optional string manager_llm_model_provider_id = 5;
+}
+
+// Messages for CrewAI tasks
+message AddTaskRequest {
+  // Name of the task
+  string name = 1;
+  // Metadata for the task
+  AddCrewAITaskRequest add_crew_ai_task_request = 2;
+  // mandatory tie to workflow
+  string workflow_id = 3;
+  // optional build from task template
+  optional string template_id = 4;
+}
+
+message AddTaskResponse {
+  // ID of the newly created task
+  string task_id = 1;
+}
+
+message ListTasksRequest {
+  // Optional workflow id
+  optional string workflow_id = 1;
+}
+
+message ListTasksResponse {
+  // List of tasks
+  repeated CrewAITaskMetadata tasks = 1;
+}
+
+message GetTaskRequest {
+  // ID of the task to retrieve
+  string task_id = 1;
+}
+
+message GetTaskResponse {
+  // Task details
+  CrewAITaskMetadata task = 1;
+}
+
+message UpdateTaskRequest {
+  // ID of the task to update
+  string task_id = 1;
+  // Updated metadata for the task
+  UpdateCrewAITaskRequest UpdateCrewAITaskRequest = 2;
+}
+
+message UpdateTaskResponse {}
+
+message RemoveTaskRequest {
+  // ID of the task to remove
+  string task_id = 1;
+}
+
+message RemoveTaskResponse {}
+
+// Task metadata
+message CrewAITaskMetadata {
+  // ID of the task
+  string task_id = 1;
+  // Description of the task
+  string description = 2;
+  // Expected Output of the task
+  string expected_output = 3;
+  // Assigned agent IDs for the task
+  string assigned_agent_id = 4;
+  // Is the task valid based on whether the assigned agent is still active in the studio
+  bool is_valid = 5;
+  // Inputs to the task (computed based on the task description in the backend)
+  repeated string inputs = 6;
+  // mandatory attach to workflow
+  string workflow_id = 7;
+}
+
+// Task metadata
+message UpdateCrewAITaskRequest {
+  // Description of the task
+  string description = 1;
+  // Expected Output of the task
+  string expected_output = 2;
+  // Assigned agent IDs for the task
+  string assigned_agent_id = 3;
+}
+
+// Task metadata
+message AddCrewAITaskRequest {
+  // Description of the task
+  string description = 1;
+  // Expected Output of the task
+  string expected_output = 2;
+  // Assigned agent IDs for the task
+  string assigned_agent_id = 3;
+}
+
+message GetAssetDataRequest {
+  repeated string asset_uri_list = 1;
+}
+
+message GetAssetDataResponse {
+  map<string, bytes> asset_data = 1;
+  repeated string unavailable_assets = 2;
+}
+
+message FileChunk {
+  bytes content = 1;
+  string file_name = 2;
+  bool is_last_chunk = 3;
+}
+
+message NonStreamingTemporaryFileUploadRequest {
+  bytes full_content = 1;
+  string file_name = 2;
+}
+
+message FileUploadResponse {
+  string message = 1;
+  string file_path = 2;
+}
+
+message DownloadTemporaryFileRequest {
+  string file_path = 1;
+}
+
+message GetParentProjectDetailsRequest {}
+
+message GetParentProjectDetailsResponse {
+  string project_base = 1;
+  string studio_subdirectory = 2;
+}
+
+message ListAgentTemplatesRequest {
+  // Optional workflow template id
+  optional string workflow_template_id = 1;
+}
+
+message ListAgentTemplatesResponse {
+  repeated AgentTemplateMetadata agent_templates = 1;
+}
+
+message GetAgentTemplateRequest {
+  string id = 1;
+}
+
+message GetAgentTemplateResponse {
+  AgentTemplateMetadata agent_template = 1;
+}
+
+message AddAgentTemplateRequest {
+  string name = 1;               // Name of the agent
+  string description = 2;
+  repeated string tool_template_ids = 3;     // List of tool template IDs
+  string role = 4;                // Role of the agent
+  string backstory = 5;           // Backstory of the agent
+  string goal = 6;                // Goal of the agent
+  bool allow_delegation = 7;      // Allow delegation flag
+  bool verbose = 8;               // Verbose mode flag
+  bool cache = 9;                 // Cache flag
+  float temperature = 10;         // Temperature setting
+  int32 max_iter = 11;            // Maximum iterations
+  optional string workflow_template_id = 12; // Optional assignment to a workflow template
+}
+
+message AddAgentTemplateResponse {
+  string id = 1;
+}
+
+message UpdateAgentTemplateRequest {
+  string agent_template_id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  repeated string tool_template_ids = 4;
+  optional string role = 5;
+  optional string backstory = 6;
+  optional string goal = 7;
+  optional bool allow_delegation = 8;
+  optional bool verbose = 9;
+  optional bool cache = 10;
+  optional float temperature = 11;
+  optional int32 max_iter = 12;
+}
+
+message UpdateAgentTemplateResponse {
+  string id = 1;
+}
+
+message RemoveAgentTemplateRequest {
+  string id = 1;
+}
+
+message RemoveAgentTemplateResponse {
+}
+
+message AgentTemplateMetadata {
+  string id = 1;  // ID of the Agent
+  string name = 2;               // Name of the agent
+  string description = 3;
+  repeated string tool_template_ids = 4;     // List of tool template IDs
+  string role = 5;                // Role of the agent
+  string backstory = 6;           // Backstory of the agent
+  string goal = 7;                // Goal of the agent
+  bool allow_delegation = 8;      // Allow delegation flag
+  bool verbose = 9;               // Verbose mode flag
+  bool cache = 10;                 // Cache flag
+  float temperature = 11;         // Temperature setting
+  int32 max_iter = 12;            // Maximum iterations
+  // Optional assignment to a workflow template
+  optional string workflow_template_id = 13;
+  bool pre_packaged = 14;
+}
+
+
+message ListWorkflowTemplatesRequest {
+
+}
+
+message ListWorkflowTemplatesResponse {
+  repeated WorkflowTemplateMetadata workflow_templates = 1;
+}
+
+message GetWorkflowTemplateRequest {
+  string id = 1;
+}
+
+message GetWorkflowTemplateResponse {
+  WorkflowTemplateMetadata workflow_template = 1;
+}
+
+message AddWorkflowTemplateRequest {
+  // Name of the workflow
+  optional string name = 1;
+  // Description of the template
+  optional string description = 2;
+  // type of workflow
+  optional string process = 3;
+  repeated string agent_template_ids = 4;
+  repeated string task_template_ids = 5;
+  optional string manager_agent_template_id = 6;
+  optional bool use_default_manager = 7;
+  // Workflow is Conversational or not
+  optional bool is_conversational = 8;
+  // Optionally add a workflow template from a 
+  // pre-existing workflow. This will create new agent templates,
+  // tool templates and task templates but will do so by explicitly
+  // tying the new templates to the new workflow template. These 
+  // dedicated template resources to not appear as global templates.
+  optional string workflow_id = 9;
+}
+
+message AddWorkflowTemplateResponse {
+  string id = 1;
+}
+
+message RemoveWorkflowTemplateRequest {
+  string id = 1;
+}
+
+message RemoveWorkflowTemplateResponse {
+}
+
+// Workflow metadata
+message WorkflowTemplateMetadata {
+  // ID of the workflow
+  string id = 1;
+  // Name of the workflow
+  string name = 2;
+  // Description of the template
+  string description = 3;
+  // type of workflow
+  string process = 4;
+  repeated string agent_template_ids = 5;
+  repeated string task_template_ids = 6;
+  string manager_agent_template_id = 7;
+  bool use_default_manager = 8;
+  // Workflow is Conversational or not
+  bool is_conversational = 9;
+  // Is the template shipped as part of the studio
+  bool pre_packaged = 10;
+}
+
+
+message ListTaskTemplatesRequest {
+  // optional workflow id
+  optional string workflow_template_id = 1;
+}
+
+message ListTaskTemplatesResponse {
+  repeated TaskTemplateMetadata task_templates = 1;
+}
+
+message GetTaskTemplateRequest {
+  string id = 1;
+}
+
+message GetTaskTemplateResponse {
+  TaskTemplateMetadata task_template = 1;
+}
+
+message AddTaskTemplateRequest {
+  string name = 1;
+  string description = 2;
+  string expected_output = 3;
+  string assigned_agent_template_id = 4;
+  optional string workflow_template_id = 5; // attach to a workflow
+}
+
+message AddTaskTemplateResponse {
+  string id = 1;
+}
+
+message RemoveTaskTemplateRequest {
+  string id = 1;
+}
+
+message RemoveTaskTemplateResponse {
+}
+
+// Task metadata
+message TaskTemplateMetadata {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string expected_output = 4;
+  string assigned_agent_template_id = 5;
+  // Optional assignment to a workflow template
+  optional string workflow_template_id = 6;
+}
+
+message CheckStudioUpgradeStatusRequest {
+}
+
+message CheckStudioUpgradeStatusResponse {
+  string local_commit = 1;
+  string remote_commit = 2;
+  bool out_of_date = 3;
+}
+
+
+message UpgradeStudioRequest {
+}
+
+message UpgradeStudioResponse {
+}
+
+message RestartStudioApplicationRequest {
+}
+
+message RestartStudioApplicationResponse {
+}

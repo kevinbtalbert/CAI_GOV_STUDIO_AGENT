@@ -1,0 +1,41 @@
+Deutsche Telekom:Telekom Data Intelligence Hub enabling customers to capitalize on data insights
+1000 active DIH users
+Key Highlights
+Category
+Telecommunications
+
+Location
+Headquarters: Bonn, Germany
+
+Impact
+Developed a unique Telekom Data Intelligence Hub where data can be shared without losing data sovereignty
+Allow customers to analyze, interpret and harness data, presenting opportunity to monetize the insights gained
+The Telekom Data Intelligence Hub provides access to cutting-edge analytics technology for (SME) corporations without Capex investment
+Enables access to foreign datasets in the most secure way to monetize your datasets
+Data can be moved from sandbox to production insights in a matter of weeks
+Additional Resources
+Download PDF version
+
+Deutsche Telekom is a German telecommunications company and the largest telecommunications provider in Europe by revenues. Formed in 1995,and with locations in over 20 countries, the company operates several subsidiaries worldwide, including the mobile communications brand T-Mobile.
+
+Challenge
+
+Over recent years Communication service providers have transformed themselves into purveyors of digital experience offering a range of compelling new services, content, and solutions to both consumer and enterprise customers. According to IDC, only a tiny fraction of the digital universe is being utilized, and in the next two years up to 33 percent of the ‘digital universe’ will consist of untapped data and information. This presents an opportunity for telecom businesses to engage with their enterprise customers to analyze, interpret and harness data that could be used to drive growth and develop innovative business models.
+
+To offer its customers these groundbreaking insights, Telekom created a Data Intelligence Hub 
+a global data marketplace for securely sharing, analyzing and working with data across diverse industries. By working with Cloudera and its partner, Ultra Tendency, Telekom built a solution to securely and efficiently exchange, process, and analyze data using a spectrum of proven analytical tools. With this platform, the company can fulfill its vision of developing new data-driven services and applications for machine learning and artificial intelligence, positioning themselves as an enabler of innovation.
+
+From working with their customers Telekom knew that there was a need for sharing data, insights, and its use cases in a secure and compliant way. The company wanted to innovate on a way to help its customers analyze, interpret, and harness data that could be used to drive growth and develop innovative business models. The main issue customers were facing was how to access the data and use it properly to generate shareholder value while securing data sovereignty.
+Solution
+“We needed a comprehensive data platform to provide the backbone of an in-house built solution that would meet stringent security requirements of the International Data Spaces Association (IDSA). It also needed to take into account the data protection standards, data trust architecture, decentralized data management and subscriber certification to keep our customers’ data safe and ensure our customers retain full control of their data,” said Sven Löffler: Business Development Executive, IoT Data Analytics & Data Economy, Deutsche Telekom IoT GmbH“.
+To build the Telekom Data Intelligence Hub based on a secure infrastructure, the team needed to have data processing capabilities. Ultra Tendency, the only Cloudera Gold partner in the CEMEA and international system integrator dedicated to Big Data, Microservices, Streaming and Cloud Computing, served as the development arm of Deutsche Telekom. They provided strategic counsel on the best tools and strategies to implement in order to ensure the fruition of the Data Intelligence Hub goals. The Telekom team selected Cloudera enterprise data platform, along with the Cloudera data science workbench as a scalable machine learning environment to achieve these processing capabilities.
+Furthermore, Telekom was able to leverage the technology from the Telekom Data Intelligence Hub and create an internal platform for the company to benefit from the technology internally.
+“The Telekom Data Intelligence Hub is a product that we developed for Deutsche Telekom IoT’ external facing customers. We were then able to leverage this technology to create a platform, which Europe’s largest Telco uses to analyze their own data internally across all European subsidiaries. As the Hub, which uses Cloudera technology, manages all of the content in a very secure way, it is adhering to necessary government regulations, GDPR and high security standards, that we face concerning managing data”, concluded Dr. Robert Neumann, Chief Executive Officer, Ultra Tendency
+
+Results
+Telekom’s Data Intelligence Hub now gives back control to data owners who typically lose control of the data the second it leaves their hands. With the Hub, organizations can assign specific people the rights to use data for specific use cases, for a limited time, and revoke those rights when necessary.
+
+With Cloudera as the backbone of the Telekom Data Intelligence Hub and Ultra Tendency as the development and deployment partner, Deutsche Telekom is confident that in the future it can bring different customers and partners together to exchange data and insights to truly capitalize on its belief in a decentralized architecture. Having insights and analysis from the masses of data available will not only propel its customers success but the company as well.
+
+“One of our design goals always was to keep the resource footprint of the data intelligence for our customers small, so they would not have to pay for resources, and Cloudera fits perfectly with that goal. “By using Cloudera and Ultra Tendency, we are shaping an ecosystem and enabling the data economy market, helping our clients to develop data driven use cases to monetize their assets and insights. The secure platform also enables us to control and validate who access and consumes these insights while keeping data sovereignty”
+-Sven Löffler: Business Development Executive, IoT Data Analytics & Data Economy, Deutsche Telekom IoT GmbH “
