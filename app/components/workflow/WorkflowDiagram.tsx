@@ -81,7 +81,7 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({
     });
     setNodes((prevState) => diagramState.nodes);
     setEdges((prevState) => diagramState.edges);
-  }, [workflowState, toolInstances, agents, tasks]);
+  }, [workflowState, toolInstances, agents, tasks, iconsData]);
 
   useEffect(() => {
     setTimeout(() => {
