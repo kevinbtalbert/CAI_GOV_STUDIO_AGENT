@@ -109,6 +109,23 @@ h6,
   }
 }
 
+
+@keyframes pulse-in-out {
+  0% {
+    /* transform: scale(1); */
+    box-shadow: 0 0 4px rgba(0, 50, 255, 0.3);
+  }
+  50% {
+    /* transform: scale(1.05); */
+    box-shadow: 0 0 12px rgba(0, 50, 255, 0.99);
+  }
+  100% {
+    /* transform: scale(1); */
+    box-shadow: 0 0 4px rgba(0, 50, 255, 0.3);
+  }
+}
+
+
 .Vector-3 {
   width: 50.7px;
   height: 38.3px;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { Avatar, Layout, Typography } from 'antd';
 import { FileDoneOutlined, UserOutlined } from '@ant-design/icons';
@@ -16,8 +16,12 @@ type TaskNode = Node<
 >;
 
 export default function TaskNode({ data }: NodeProps<TaskNode>) {
-  return (
+  const [isHovered, setIsHovered] = useState(false);
+    
+    return (
     <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         position: 'relative',
         display: 'flex',
@@ -27,9 +31,9 @@ export default function TaskNode({ data }: NodeProps<TaskNode>) {
         background: '#f3f3f3',
         borderRadius: '8px',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        border: data.active ? '5px solid #007bff' : 'none',
-        animation: data.active ? 'pulse 1.5s infinite' : 'none',
-        maxWidth: 150,
+        border: isHovered ? '2px solid rgb(3, 149, 46)' : '2px solid rgba(0,0,0,0)',
+        animation: data.active ? 'pulse-in-out 1.0s infinite ease-in-out' : 'none',
+        maxWidth: 180,
         backgroundColor: 'lightgreen',
       }}
     >
@@ -54,7 +58,7 @@ export default function TaskNode({ data }: NodeProps<TaskNode>) {
       >
         <Paragraph
           ellipsis={{ rows: 2 }}
-          style={{ padding: 0, margin: 0, fontSize: 8, fontWeight: 400 }}
+          style={{ padding: 0, margin: 0, fontSize: 12, fontWeight: 400 }}
         >
           {data.name}
         </Paragraph>

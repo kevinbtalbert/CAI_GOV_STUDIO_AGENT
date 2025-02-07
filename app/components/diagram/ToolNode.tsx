@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Handle, Position, NodeProps, Node, NodeToolbar } from '@xyflow/react';
 import { Avatar, Image, Typography } from 'antd';
 import { ToolOutlined } from '@ant-design/icons';
@@ -19,8 +19,12 @@ type ToolNode = Node<
 >;
 
 export default function ToolNode({ data }: NodeProps<ToolNode>) {
-  return (
+  const [isHovered, setIsHovered] = useState(false);
+    
+    return (
     <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         position: 'relative',
         display: 'flex',
@@ -30,9 +34,9 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
         background: '#f3f3f3',
         borderRadius: '8px',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        border: data.active ? '5px solid #007bff' : 'none',
-        animation: data.active ? 'pulse 1.5s infinite' : 'none',
-        maxWidth: 150,
+        border: isHovered ? '2px solid rgb(47, 47, 47)' : '2px solid rgba(0,0,0,0)',
+        animation: data.active ? 'pulse-in-out 1.0s infinite ease-in-out' : 'none',
+        maxWidth: 180,
         backgroundColor: 'lightgray',
       }}
     >
@@ -54,12 +58,12 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
               style={{
                 padding: 0,
                 margin: 0,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: 300,
                 color: 'white',
               }}
             >
-              {data.info}
+              {isHovered ? data.info : 'Using Tool...'}
             </Paragraph>
           </NodeToolbar>
         </>
@@ -93,7 +97,7 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
       >
         <Paragraph
           ellipsis={{ rows: 2 }}
-          style={{ padding: 0, margin: 0, fontSize: 8, fontWeight: 400 }}
+          style={{ padding: 0, margin: 0, fontSize: 12, fontWeight: 400 }}
         >
           {data.name}
         </Paragraph>

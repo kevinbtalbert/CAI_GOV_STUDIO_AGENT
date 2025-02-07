@@ -110,10 +110,11 @@ export const processEvents = (
         const toolName = event.attributes.tool.name;
         const toolInstance = toolInstances.find((ti) => ti.name === toolName)!;
         if (toolName !== 'Delegate work to coworker' && toolName !== 'Ask question to coworker') {
+          const inputValue = JSON.parse(event.attributes.input.value);
           toolInstance &&
             activeNodes.push({
               id: toolInstance.id,
-              info: event.attributes.input.value,
+              info: inputValue.calling,
               infoType: 'ToolInput',
             });
         }

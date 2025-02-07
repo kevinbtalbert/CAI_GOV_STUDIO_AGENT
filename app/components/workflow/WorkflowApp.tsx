@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Layout, Spin, Typography, Slider, Alert, Button } from 'antd';
+import { Layout, Spin, Typography, Slider, Alert, Button, Tooltip } from 'antd';
 import WorkflowAppInputsView from './WorkflowAppInputsView';
 import { useAppDispatch, useAppSelector } from '@/app/lib/hooks/hooks';
 import {
@@ -356,26 +356,28 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
 
         {/* Monitoring Button when monitoring is hidden */}
         {!showMonitoring && (
-          <Button
-            icon={<DashboardOutlined style={{ color: 'white' }} />}
-            type="text"
-            onClick={() => setShowMonitoring(true)}
-            style={{
-              position: 'absolute',
-              top: '16px',
-              right: '16px',
-              background: '#1890ff',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-              borderRadius: '50%',
-              width: '32px',
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: 'none',
-            }}
-            className="monitoring-button"
-          />
+          <Tooltip title="Show Visual & Logs">
+            <Button
+              icon={<DashboardOutlined style={{ color: 'white' }} />}
+              type="text"
+              onClick={() => setShowMonitoring(true)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#1890ff',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+              }}
+              className="monitoring-button"
+            />
+          </Tooltip>
         )}
 
         {/* Right side - Monitoring View */}
@@ -395,25 +397,27 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
             }}
           >
             {/* Close button for monitoring view */}
-            <Button
-              icon={<CloseOutlined />}
-              type="text"
-              onClick={() => setShowMonitoring(false)}
-              style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                zIndex: 1,
-                background: 'white',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                borderRadius: '50%',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            />
+            <Tooltip title="Close Visual & Logs">
+              <Button
+                icon={<CloseOutlined />}
+                type="text"
+                onClick={() => setShowMonitoring(false)}
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  zIndex: 1,
+                  background: 'white',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              />
+            </Tooltip>
 
             <WorkflowDiagramView
               workflowState={{
@@ -436,13 +440,15 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
 
             <Layout
               style={{
-                backgroundColor: 'lightgrey',
+                backgroundColor: 'transparent',
                 margin: '12px',
                 padding: '16px',
                 border: '1px solid #grey',
                 borderRadius: '5px',
                 flexShrink: 0,
                 flexGrow: 1,
+                paddingLeft: 48,
+                paddingRight: 48,
               }}
             >
               <Title level={5}>Playback</Title>
