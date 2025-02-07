@@ -14,6 +14,7 @@ type ToolNode = Node<
     active: boolean;
     info?: string;
     infoType?: InfoType;
+    isMostRecent?: boolean;
   },
   'task'
 >;
@@ -36,11 +37,11 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         border: isHovered ? '2px solid rgb(47, 47, 47)' : '2px solid rgba(0,0,0,0)',
         animation: data.active ? 'pulse-in-out 1.0s infinite ease-in-out' : 'none',
-        maxWidth: 180,
+        maxWidth: 200,
         backgroundColor: 'lightgray',
       }}
     >
-      {data.info && (
+      {data.info && (data.isMostRecent || isHovered) && (
         <>
           <NodeToolbar
             isVisible={true}
@@ -58,7 +59,7 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
               style={{
                 padding: 0,
                 margin: 0,
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: 300,
                 color: 'white',
               }}
@@ -73,12 +74,12 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
       <Avatar
         style={{
           position: 'absolute',
-          bottom: -15,
+          bottom: -25,
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', // Optional shadow for floating look,
           backgroundColor: 'white',
           padding: data.iconData ? 5 : 0,
         }}
-        size={24}
+        size={36}
         icon={
           data.iconData ? (
             <Image src={data.iconData} />
@@ -93,11 +94,12 @@ export default function ToolNode({ data }: NodeProps<ToolNode>) {
         style={{
           textAlign: 'center',
           fontWeight: 'regular',
+          padding: 0,
         }}
       >
         <Paragraph
           ellipsis={{ rows: 2 }}
-          style={{ padding: 0, margin: 0, fontSize: 12, fontWeight: 400 }}
+          style={{ padding: 0, margin: 0, fontSize: 14, fontWeight: 400 }}
         >
           {data.name}
         </Paragraph>

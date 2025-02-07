@@ -22,6 +22,8 @@ import {
 import { marked } from 'marked';
 import showdown from 'showdown';
 
+const { TextArea } = Input;
+
 interface ChatMessagesProps {
   messages: { role: 'user' | 'assistant'; content: string }[];
   handleTestWorkflow: () => void;
@@ -226,8 +228,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           marginTop: 'auto',
         }}
       >
-        <Input
+        <TextArea
           placeholder="Type your message"
+          autoSize={{ minRows: 1, maxRows: 10 }}
           value={userInput}
           onChange={(e) => dispatch(updatedChatUserInput(e.target.value))}
           onPressEnter={handleTestWorkflow}

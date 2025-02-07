@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Handle, Position, NodeProps, Node } from '@xyflow/react';
+import { Handle, Position, NodeProps, Node, useReactFlow } from '@xyflow/react';
 import { Avatar, Layout, Typography } from 'antd';
 import { FileDoneOutlined, UserOutlined } from '@ant-design/icons';
 import { BaseNode } from '@/components/base-node';
@@ -11,6 +11,7 @@ type TaskNode = Node<
   {
     name: string;
     active: boolean;
+    isMostRecent?: boolean;
   },
   'task'
 >;
@@ -33,7 +34,7 @@ export default function TaskNode({ data }: NodeProps<TaskNode>) {
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         border: isHovered ? '2px solid rgb(3, 149, 46)' : '2px solid rgba(0,0,0,0)',
         animation: data.active ? 'pulse-in-out 1.0s infinite ease-in-out' : 'none',
-        maxWidth: 180,
+        maxWidth: 200,
         backgroundColor: 'lightgreen',
       }}
     >
@@ -41,11 +42,11 @@ export default function TaskNode({ data }: NodeProps<TaskNode>) {
       <Avatar
         style={{
           position: 'absolute',
-          top: -20,
+          top: -24,
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', // Optional shadow for floating look,
           backgroundColor: '#26bd67',
         }}
-        size={24}
+        size={36}
         icon={<FileDoneOutlined />}
       />
 
@@ -54,11 +55,12 @@ export default function TaskNode({ data }: NodeProps<TaskNode>) {
         style={{
           textAlign: 'center',
           fontWeight: 'regular',
+          padding: 0,
         }}
       >
         <Paragraph
           ellipsis={{ rows: 2 }}
-          style={{ padding: 0, margin: 0, fontSize: 12, fontWeight: 400 }}
+          style={{ padding: 0, margin: 0, fontSize: 14, fontWeight: 400 }}
         >
           {data.name}
         </Paragraph>

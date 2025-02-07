@@ -95,12 +95,12 @@ export const createDiagramStateFromWorkflow = (workflowData: DiagramStateInput) 
   let totalXWidth = 0;
   workflowData.workflowState.workflowMetadata.agentIds?.forEach((agent_id, index) => {
     const agent = workflowData.agents?.find((agent) => agent.id === agent_id);
-    agent && (totalXWidth += 200 * Math.max(0, agent?.tools_id.length - 1));
-    agent && (totalXWidth += 200);
+    agent && (totalXWidth += 220 * Math.max(0, agent?.tools_id.length - 1));
+    agent && (totalXWidth += 220);
   });
 
   // Add agent nodes
-  let xIndexOffset = -0.5 * totalXWidth + 0.5 * 200;
+  let xIndexOffset = -0.5 * totalXWidth + 0.5 * 220;
   workflowData.workflowState.workflowMetadata.agentIds?.forEach((agent_id, index) => {
     const agent = workflowData.agents?.find((agent) => agent.id === agent_id);
     agent &&
@@ -153,11 +153,11 @@ export const createDiagramStateFromWorkflow = (workflowData: DiagramStateInput) 
             target: `${toolInstance?.id}`,
           });
 
-          xIndexOffset += 200;
+          xIndexOffset += 220;
         }
       });
       if (agent.tools_id.length == 0) {
-        xIndexOffset += 200;
+        xIndexOffset += 220;
       }
     }
   });

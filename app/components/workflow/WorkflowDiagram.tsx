@@ -85,7 +85,7 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({
 
   useEffect(() => {
     setTimeout(() => {
-      fitView({ padding: 0.2 });
+      fitView({ padding: 0.1 });
     }, 0); // Ensure it's called after the state update
   }, [nodes, edges]);
 
@@ -113,6 +113,7 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({
               ...node.data,
               active: true,
               info: activeNode.info,
+              isMostRecent: activeNode.isMostRecent,
             },
           };
         } else {
@@ -122,6 +123,7 @@ const WorkflowDiagram: React.FC<WorkflowDiagramProps> = ({
               ...node.data,
               active: false,
               info: undefined,
+              isMostRecent: false,
             },
           };
         }

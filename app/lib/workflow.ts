@@ -13,6 +13,7 @@ export interface ActiveNodeState {
   id: string;
   info?: string;
   infoType?: InfoType;
+  isMostRecent?: boolean;
 }
 
 type ProcessedState = {
@@ -134,6 +135,10 @@ export const processEvents = (
       }
     }
   });
+
+  if (activeNodes.length > 0) {
+    activeNodes[activeNodes.length-1].isMostRecent = true;
+  }
 
   return { activeNodes };
 };

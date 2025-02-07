@@ -15,6 +15,7 @@ type AgentNode = Node<
     active: boolean;
     info?: string;
     infoType?: InfoType;
+    isMostRecent?: boolean;
   },
   'agent'
 >;
@@ -36,11 +37,11 @@ export default function AgentNode({ data }: NodeProps<AgentNode>) {
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         border: isHovered ? '2px solid #007bff' : '2px solid rgba(0,0,0,0)',
         animation: data.active ? 'pulse-in-out 1.0s infinite ease-in-out' : 'none',
-        maxWidth: 180,
+        maxWidth: 200,
         backgroundColor: data.manager ? 'white' : 'lightblue',
       }}
     >
-      {data.info && (
+      {data.info && (data.isMostRecent || isHovered) && (
         <>
           <NodeToolbar
             isVisible={true}
@@ -58,7 +59,7 @@ export default function AgentNode({ data }: NodeProps<AgentNode>) {
               style={{
                 padding: 0,
                 margin: 0,
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: 300,
                 color: 'white',
               }}
@@ -72,13 +73,13 @@ export default function AgentNode({ data }: NodeProps<AgentNode>) {
       <Avatar
         style={{
           position: 'absolute',
-          left: -20, // Position avatar overlapping to the left
-          top: -20,
+          left: -30, // Position avatar overlapping to the left
+          top: -30,
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', // Optional shadow for floating look
           backgroundColor: data.manager ? 'lightgrey' : data.iconData ? '#b8d6ff' : '#78b2ff', // or lightblue
           padding: data.manager ? 0 : data.iconData ? 8 : 0,
         }}
-        size={36}
+        size={48}
         icon={
           data.manager ? (
             <UsergroupAddOutlined />
@@ -95,11 +96,12 @@ export default function AgentNode({ data }: NodeProps<AgentNode>) {
         style={{
           textAlign: 'center',
           fontWeight: 'regular',
+          padding: 0,
         }}
       >
         <Paragraph
           ellipsis={{ rows: 2 }}
-          style={{ padding: 0, margin: 0, fontSize: 12, fontWeight: 400 }}
+          style={{ padding: 0, margin: 0, fontSize: 14, fontWeight: 400 }}
         >
           {data.name}
         </Paragraph>
