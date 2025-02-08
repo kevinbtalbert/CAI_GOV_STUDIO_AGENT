@@ -187,7 +187,8 @@
       "id": "861ffb3e-73e7-4a47-99d3-8b7d3df20c43",
       "name": "FSI conversational task",
       "description": "Respond to the user's message: '{user_input}'. Conversation history:\n{context}. Format your messages using markdown and use tables if relevant. When images are provided, attempt to embed them with markdown.",
-      "expected_output": "Provide a response that aligns with the conversation history."
+      "expected_output": "Provide a response that aligns with the conversation history.",
+      "assigned_agent_template_id": "3616ba1a-b05c-47b0-a79b-c1a6ba7cea8d"
     },
     {
       "id": "5498d885-4e4c-4ff7-b17e-e53f0e5beab1",
@@ -553,6 +554,22 @@
       "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cloudera.png"
     },
     {
+      "id": "3616ba1a-b05c-47b0-a79b-c1a6ba7cea8d",
+      "name": "FSI Portfolio Manager",
+      "description": "",
+      "role": "FSI Portfolio Manager",
+      "backstory": "You are a manager capable of delegating tasks related to portfolio management and optimization.",
+      "goal": "Delegate the user request properly and forward relevant execution information to the user.",
+      "allow_delegation": true,
+      "verbose": false,
+      "cache": true,
+      "temperature": 0.1,
+      "max_iter": 10,
+      "tool_template_ids": [],
+      "pre_packaged": true,
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cloudera.png"
+    },
+    {
       "id": "5a033be9-b70c-4820-988b-0f50a0334cd9",
       "name": "Senior Research Analyst",
       "description": "Senior Research Analyst",
@@ -813,8 +830,8 @@
       "task_template_ids": [
         "c68bc9b4-078a-4782-a49d-0d94c7c872c5"
       ],
-      "manager_agent_template_id": "",
-      "use_default_manager": true,
+      "manager_agent_template_id": "3616ba1a-b05c-47b0-a79b-c1a6ba7cea8d",
+      "use_default_manager": false,
       "is_conversational": true,
       "pre_packaged": true
     }
