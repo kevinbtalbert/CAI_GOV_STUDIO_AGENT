@@ -184,6 +184,12 @@
       "expected_output": "Provide a response that aligns with the conversation history."
     },
     {
+      "id": "861ffb3e-73e7-4a47-99d3-8b7d3df20c43",
+      "name": "FSI conversational task",
+      "description": "Respond to the user's message: '{user_input}'. Conversation history:\n{context}. Format your messages using markdown and use tables if relevant. When images are provided, attempt to embed them with markdown.",
+      "expected_output": "Provide a response that aligns with the conversation history."
+    },
+    {
       "id": "5498d885-4e4c-4ff7-b17e-e53f0e5beab1",
       "name": "Calculation task",
       "workflow_template_id": "acce204a-f085-4962-820c-131b1b7b2a40",
@@ -403,7 +409,6 @@
       "cache": true,
       "temperature": 0.1,
       "max_iter": 10,
-      "workflow_template_id":"po90dff2-703a-43f0-847d-e2647595dde2",
       "tool_template_ids": [],
       "pre_packaged": true,
       "agent_image_path": ""
@@ -437,7 +442,6 @@
       "temperature": 0.1,
       "max_iter": 10,
       "tool_template_ids": ["2159600d-p09c-5524-af42-9911e05dd017","2159600d-p09c-5524-af32-9922e05dd017" ],
-      "workflow_template_id":"po90dff2-703a-43f0-847d-e2647595dde2",
       "pre_packaged": true,
       "agent_image_path": ""
     },
@@ -454,7 +458,6 @@
       "temperature": 0.1,
       "max_iter": 10,
       "tool_template_ids": [ "5759600d-a09c-4624-af42-6911f05dd817","0d65d035-30ff-45a8-98c6-be307feba1af"],
-      "workflow_template_id":"po90dff2-703a-43f0-847d-e2647595dde2",
       "pre_packaged": true,
       "agent_image_path": ""
     },
@@ -475,7 +478,7 @@
       "temperature": 0.1,
       "max_iter": 1,
       "pre_packaged": true,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cdf-agent.png"
     },
     {
       "id": "7454f27b-9758-4b52-9c96-c8b1ae315c1e",
@@ -492,9 +495,8 @@
       "cache": false,
       "temperature": 0.1,
       "max_iter": 0,
-      "workflow_template_id": "4274629b-159e-4434-b779-93442528f71e",
       "pre_packaged": false,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cdw-agent.png"
     },
     {
       "id": "3d11b7ce-cdb3-4a9a-ad77-feac1b4f196e",
@@ -512,7 +514,6 @@
       "cache": false,
       "temperature": 0.1,
       "max_iter": 0,
-      "workflow_template_id": "4274629b-159e-4434-b779-93442528f71e",
       "pre_packaged": false,
       "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/communications_icon.png"
     },
@@ -532,9 +533,8 @@
       "cache": false,
       "temperature": 0.1,
       "max_iter": 0,
-      "workflow_template_id": "4274629b-159e-4434-b779-93442528f71e",
       "pre_packaged": false,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cdv_icon.png"
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/viz-agent.png"
     },
     {
       "id": "3616ba1a-b05c-47b0-a79b-c1a6ba7cea8e",
@@ -567,7 +567,6 @@
       "cache": false,
       "temperature": 0.10000000149011612,
       "max_iter": 0,
-      "workflow_template_id": "a77aed0a-7d43-48ec-9495-8728dd97e66d",
       "pre_packaged": true,
       "agent_image_path": ""
     },
@@ -584,7 +583,6 @@
       "cache": false,
       "temperature": 0.10000000149011612,
       "max_iter": 0,
-      "workflow_template_id": "a77aed0a-7d43-48ec-9495-8728dd97e66d",
       "pre_packaged": true,
       "agent_image_path": ""
     },
@@ -601,7 +599,6 @@
       "cache": false,
       "temperature": 0.10000000149011612,
       "max_iter": 0,
-      "workflow_template_id": "a77aed0a-7d43-48ec-9495-8728dd97e66d",
       "pre_packaged": true,
       "agent_image_path": ""
     },
@@ -621,9 +618,8 @@
       "cache": false,
       "temperature": 0.1,
       "max_iter": 0,
-      "workflow_template_id": "6eccbfa6-66f9-418a-bc6c-74516ac8219d",
       "pre_packaged": true,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/profile-agent.png"
     },
     {
       "id": "879f13f2-d84a-43d3-baf3-1f41116efc18",
@@ -640,9 +636,8 @@
       "cache": false,
       "temperature": 0.1,
       "max_iter": 0,
-      "workflow_template_id": "6eccbfa6-66f9-418a-bc6c-74516ac8219d",
       "pre_packaged": true,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/research-agent.png"
     },
     {
       "id": "7a0e3869-79bb-445a-a1cd-56f85727bd28",
@@ -659,9 +654,8 @@
       "cache": false,
       "temperature": 0.100000001490116,
       "max_iter": 0,
-      "workflow_template_id": "6eccbfa6-66f9-418a-bc6c-74516ac8219d",
       "pre_packaged": true,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/optimizer-agent.png"
     },
     {
       "id": "2b53cad3-81be-447c-8819-f9cdea1310c0",
@@ -678,9 +672,8 @@
       "cache": false,
       "temperature": 0.100000001490116,
       "max_iter": 0,
-      "workflow_template_id": "6eccbfa6-66f9-418a-bc6c-74516ac8219d",
       "pre_packaged": false,
-      "agent_image_path": ""
+      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/history-agent.png"
     }
   ],
   "workflow_templates": [
@@ -820,10 +813,10 @@
       "task_template_ids": [
         "c68bc9b4-078a-4782-a49d-0d94c7c872c5"
       ],
-      "manager_agent_template_id": "",
-      "use_default_manager": true,
+      "manager_agent_template_id": "861ffb3e-73e7-4a47-99d3-8b7d3df20c43",
+      "use_default_manager": false,
       "is_conversational": true,
-      "pre_packaged": false
+      "pre_packaged": true
     }
   ],
   "tool_instances": [],

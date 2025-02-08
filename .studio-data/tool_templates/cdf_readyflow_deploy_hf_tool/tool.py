@@ -103,8 +103,8 @@ class HF_S3_Readyflow_Tool(StudioBaseTool):
         create_run_readyflow_cmd.extend(["--parameter-groups", "file://%s"%readyflow_params_path])
 
         # For development testing purposes only
-        if os.environ["CDP_ALT_ENDPOINT"]:
-            create_run_readyflow_cmd.extend(["--endpoint-url", "https://console.cdp.mow-int.cloudera.com/"])
+        if "CDP_ALT_ENDPOINT" in os.environ:
+            create_run_readyflow_cmd.extend(["--endpoint-url", "os.environ["CDP_ALT_ENDPOINT"]"])
             create_run_readyflow_cmd.extend(["--no-verify-tls"])
         
         cmd_path = "/tmp/readyflow_%s_cmd.json" % uid

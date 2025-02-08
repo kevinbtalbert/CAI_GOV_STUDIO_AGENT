@@ -62,10 +62,6 @@ class PortfolioOptimizationTool(StudioBaseTool):
     def _run(self, max_drawdown: float, stocks_ticker: list[str], amount: int = 100000) -> dict:
         time_series = pd.read_csv('/tmp/ts.csv')
         time_series = time_series.loc[:,~time_series.columns.str.contains('^Unnamed')]
-        time_series= time_series.rename(columns={ df.columns[0]: "Date" })
-        float_cols = [col for col in time_series.columns if col != 'Date']
-        time_series[string_cols] = time_series[float_cols].astype(float)
-
         time_series = time_series.astype('int64') 
         stocks_ticker =time_series.columns
         num_stocks = len(stocks_ticker)
