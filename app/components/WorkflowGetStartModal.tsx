@@ -732,7 +732,7 @@ const WorkflowGetStartModal: React.FC<WorkflowGetStartModalProps> = ({
                 name="workflowName"
                 rules={[{ required: true, message: 'Workflow name is required' }]}
               >
-                <Input />
+                <Input onPressEnter={handleCreateWorkflow} />
               </Form.Item>
             </Form>
 

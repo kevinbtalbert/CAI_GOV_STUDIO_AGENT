@@ -325,8 +325,8 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
             )
           ) : !workflow?.is_ready ? (
             renderAlert(
-              'Workflow Not Ready for Testing',
-              'This workflow is still being configured...',
+              'Getting your workflow ready.',
+              'This workflow is still being configured. This might take a few minutes.',
               'loading',
             )
           ) : !((workflow.crew_ai_workflow_metadata?.agent_id?.length ?? 0) > 0) ? (

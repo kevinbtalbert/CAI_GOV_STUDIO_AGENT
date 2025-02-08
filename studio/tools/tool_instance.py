@@ -114,8 +114,8 @@ def _create_tool_instance_impl(request: CreateToolInstanceRequest, session: DbSe
 def update_tool_instance(
     request: UpdateToolInstanceRequest,
     cml: CMLServiceApi,
-    dao: AgentStudioDao = None,
-    preexisting_db_session: DbSession = None,
+    dao: Optional[AgentStudioDao] = None,
+    preexisting_db_session: Optional[DbSession] = None,
 ) -> UpdateToolInstanceResponse:
     """
     Update a tool instance
@@ -165,8 +165,8 @@ def _update_tool_instance_impl(request: UpdateToolInstanceRequest, session: DbSe
 def get_tool_instance(
     request: GetToolInstanceRequest,
     cml: CMLServiceApi,
-    dao: AgentStudioDao = None,
-    preexisting_db_session: DbSession = None,
+    dao: Optional[AgentStudioDao] = None,
+    preexisting_db_session: Optional[DbSession] = None,
 ) -> GetToolInstanceResponse:
     """
     Get a tool instance by id
@@ -227,8 +227,8 @@ def _get_tool_instance_impl(request: GetToolInstanceRequest, session: DbSession)
 def list_tool_instances(
     request: ListToolInstancesRequest,
     cml: CMLServiceApi,
-    dao: AgentStudioDao = None,
-    preexisting_db_session: DbSession = None,
+    dao: Optional[AgentStudioDao] = None,
+    preexisting_db_session: Optional[DbSession] = None,
 ) -> ListToolInstancesResponse:
     """
     List all tool instances
@@ -290,11 +290,20 @@ def _list_tool_instances_impl(request: ListToolInstancesRequest, session: DbSess
     return ListToolInstancesResponse(tool_instances=tool_instances_response)
 
 
+def _delete_tool_instance_directory(source_folder_path: str):
+    try:
+        if os.path.exists(source_folder_path):
+            shutil.rmtree(source_folder_path)
+            print(f"Deleted tool instance directory: {source_folder_path}")
+    except Exception as e:
+        print(f"Failed to delete tool instance directory: {e}")
+
+
 def remove_tool_instance(
     request: RemoveToolInstanceRequest,
     cml: CMLServiceApi,
-    dao: AgentStudioDao = None,
-    preexisting_db_session: DbSession = None,
+    dao: Optional[AgentStudioDao] = None,
+    preexisting_db_session: Optional[DbSession] = None,
 ) -> RemoveToolInstanceResponse:
     """
     Remove a tool instance by id
@@ -318,11 +327,10 @@ def _remove_tool_instance_impl(request: RemoveToolInstanceRequest, session: DbSe
     if not tool_instance:
         raise ValueError(f"Tool Instance with id '{request.tool_instance_id}' not found")
 
-    try:
-        if os.path.exists(tool_instance.source_folder_path):
-            shutil.rmtree(tool_instance.source_folder_path)
-    except Exception as e:
-        print(f"Failed to delete tool instance directory: {e}")
+    get_thread_pool().submit(
+        _delete_tool_instance_directory,
+        tool_instance.source_folder_path,
+    )
 
     if tool_instance.tool_image_path:
         try:

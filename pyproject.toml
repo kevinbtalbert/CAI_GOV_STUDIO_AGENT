@@ -21,7 +21,7 @@ dependencies = [
     "pydantic==2.10.6",
     "pysqlite3-binary==0.5.4; platform_system == 'Linux'",
     "sqlalchemy==2.0.36",
-    "uv==0.5.25",
+    "uv==0.5.29",
     "alembic==1.14.1",
 ]
 

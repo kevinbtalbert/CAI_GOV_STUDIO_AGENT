@@ -1,12 +1,13 @@
 import os
 import re
 import ast
+import shutil
 import venv
 from textwrap import dedent, indent
 import subprocess
 import threading
 import hashlib
-from typing import Dict, Tuple, List, Optional
+from typing import Dict, Tuple, List, Optional, Literal
 from crewai.tools import BaseTool
 
 from studio.cross_cutting.input_types import Input__ToolInstance
@@ -280,10 +281,25 @@ def is_venv_prepared_for_tool(source_folder_path: str, requirements_file_name: s
     return requirements_hash == previous_hash
 
 
-def prepare_virtual_env_for_tool(source_folder_path: str, requirements_file_name: str):
+def _prepare_virtual_env_for_tool_impl(
+    source_folder_path: str, requirements_file_name: str, with_: Literal["venv", "uv"]
+):
     venv_dir = os.path.join(source_folder_path, ".venv")
+    uv_bin = shutil.which("uv")
+
     try:
-        venv.create(venv_dir, with_pip=True)
+        if with_ == "uv":
+            uv_venv_setup_command = [uv_bin, "venv", venv_dir]
+            out = subprocess.run(
+                uv_venv_setup_command,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            print(f"stdout for uv venv setup for tool {source_folder_path}: {out.stdout}")
+            print(f"stderr for uv venv setup for tool {source_folder_path}: {out.stderr}")
+        else:
+            venv.create(venv_dir, with_pip=True)
     except Exception as e:
         print(f"Error creating virtual environment for tool directory {source_folder_path}: {e.with_traceback()}")
         return
@@ -296,27 +312,33 @@ def prepare_virtual_env_for_tool(source_folder_path: str, requirements_file_name
             previous_hash = hash_file.read().strip()
 
     # Calculate the hash of the requirements file
-    with open(os.path.join(source_folder_path, requirements_file_name), "r") as requirements_file:
+    requirements_file_path = os.path.join(source_folder_path, requirements_file_name)
+    with open(requirements_file_path, "r") as requirements_file:
         requirements_content = requirements_file.read()
         requirements_hash = hashlib.md5(requirements_content.encode()).hexdigest()
 
     # If the hash has changed, install the requirements
     try:
         if requirements_hash != previous_hash:
-            python_executable = os.path.join(venv_dir, "bin", "python")
-            out = subprocess.run(
-                [
-                    python_executable,
+            if with_ == "uv":
+                pip_install_command = [uv_bin, "pip", "install", "-r", requirements_file_path]
+            else:
+                python_exe = os.path.join(venv_dir, "bin", "python")
+                pip_install_command = [
+                    python_exe,
                     "-m",
                     "pip",
                     "install",
                     "--no-user",
                     "-r",
-                    os.path.join(source_folder_path, requirements_file_name),
-                ],
+                    requirements_file_path,
+                ]
+            out = subprocess.run(
+                pip_install_command,
                 check=True,
                 capture_output=True,
                 text=True,
+                env={"VIRTUAL_ENV": venv_dir} if with_ == "uv" else None,
             )
             print(f"stdout for pip install for tool {source_folder_path}: {out.stdout}")
             print(f"stderr for pip install for tool {source_folder_path}: {out.stderr}")
@@ -325,7 +347,11 @@ def prepare_virtual_env_for_tool(source_folder_path: str, requirements_file_name
                 hash_file.write(requirements_hash)
     except subprocess.CalledProcessError as e:
         # We're not raising error as this will bring down the whole studio, as it's running in a thread
-        print(f"Error installing venv requirements for tool directory {source_folder_path}: {e}")
+        print(f"Error installing venv requirements for tool directory {source_folder_path}: {e.with_traceback()}")
+
+
+def prepare_virtual_env_for_tool(source_folder_path: str, requirements_file_name: str):
+    return _prepare_virtual_env_for_tool_impl(source_folder_path, requirements_file_name, "uv")
 
 
 def extract_tool_description(code: str) -> str:
