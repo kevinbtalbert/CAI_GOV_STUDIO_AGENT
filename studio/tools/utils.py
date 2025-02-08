@@ -351,7 +351,7 @@ def _prepare_virtual_env_for_tool_impl(
 
 
 def prepare_virtual_env_for_tool(source_folder_path: str, requirements_file_name: str):
-    return _prepare_virtual_env_for_tool_impl(source_folder_path, requirements_file_name, "uv")
+    return _prepare_virtual_env_for_tool_impl(source_folder_path, requirements_file_name, "venv")
 
 
 def extract_tool_description(code: str) -> str:
