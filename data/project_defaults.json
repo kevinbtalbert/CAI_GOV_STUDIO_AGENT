@@ -813,8 +813,8 @@
       "task_template_ids": [
         "c68bc9b4-078a-4782-a49d-0d94c7c872c5"
       ],
-      "manager_agent_template_id": "861ffb3e-73e7-4a47-99d3-8b7d3df20c43",
-      "use_default_manager": false,
+      "manager_agent_template_id": "",
+      "use_default_manager": true,
       "is_conversational": true,
       "pre_packaged": true
     }
