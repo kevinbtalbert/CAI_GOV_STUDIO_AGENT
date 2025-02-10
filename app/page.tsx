@@ -49,30 +49,40 @@ const HomePage: React.FC = () => {
           flexDirection: 'column',
         }}
       >
-        <Layout style={{
-          background: 'transparent',
-          padding: 0,
-          marginBottom: 12,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexGrow: 0,
-          flexShrink: 0
-        }}>
-          <Title level={1} ellipsis style={{flexGrow: 1}}>{wflowData.workflow.name}</Title>
-          <Layout style={{
-            backgroundColor: '#132329',
-            opacity: 0.7,
-            borderRadius: 4,
-            flexDirection: 'column',
-            justifyContent: 'center',
+        <Layout
+          style={{
+            background: 'transparent',
+            padding: 0,
+            marginBottom: 12,
+            flexDirection: 'row',
             alignItems: 'center',
+            justifyContent: 'space-between',
             flexGrow: 0,
             flexShrink: 0,
-            padding: 12,
-          }}>
-            <Text className="font-sans" style={{fontSize: 12, fontWeight: 200, color: 'white'}}>built with</Text>
-            <Text className="font-sans" style={{fontSize: 16, fontWeight: 200, color: 'white'}}>Cloudera <b>Agent Studio</b></Text>
+          }}
+        >
+          <Title level={1} ellipsis style={{ flexGrow: 1 }}>
+            {wflowData.workflow.name}
+          </Title>
+          <Layout
+            style={{
+              backgroundColor: '#132329',
+              opacity: 0.7,
+              borderRadius: 4,
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexGrow: 0,
+              flexShrink: 0,
+              padding: 12,
+            }}
+          >
+            <Text className="font-sans" style={{ fontSize: 12, fontWeight: 200, color: 'white' }}>
+              built with
+            </Text>
+            <Text className="font-sans" style={{ fontSize: 16, fontWeight: 200, color: 'white' }}>
+              Cloudera <b>Agent Studio</b>
+            </Text>
           </Layout>
         </Layout>
         <WorkflowDataView workflowData={wflowData} />

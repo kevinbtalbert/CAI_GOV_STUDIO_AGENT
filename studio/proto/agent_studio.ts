@@ -111,6 +111,8 @@ export interface TestModelRequest {
   completion_role: string;
   /** The content used for the model's completion test */
   completion_content: string;
+  temperature: number;
+  max_tokens: number;
 }
 
 export interface TestModelResponse {
@@ -1873,7 +1875,7 @@ export const UpdateModelResponse: MessageFns<UpdateModelResponse> = {
 };
 
 function createBaseTestModelRequest(): TestModelRequest {
-  return { model_id: "", completion_role: "", completion_content: "" };
+  return { model_id: "", completion_role: "", completion_content: "", temperature: 0, max_tokens: 0 };
 }
 
 export const TestModelRequest: MessageFns<TestModelRequest> = {
@@ -1886,6 +1888,12 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
     }
     if (message.completion_content !== "") {
       writer.uint32(26).string(message.completion_content);
+    }
+    if (message.temperature !== 0) {
+      writer.uint32(37).float(message.temperature);
+    }
+    if (message.max_tokens !== 0) {
+      writer.uint32(40).int32(message.max_tokens);
     }
     return writer;
   },
@@ -1921,6 +1929,22 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
           message.completion_content = reader.string();
           continue;
         }
+        case 4: {
+          if (tag !== 37) {
+            break;
+          }
+
+          message.temperature = reader.float();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.max_tokens = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1935,6 +1959,8 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
       model_id: isSet(object.model_id) ? globalThis.String(object.model_id) : "",
       completion_role: isSet(object.completion_role) ? globalThis.String(object.completion_role) : "",
       completion_content: isSet(object.completion_content) ? globalThis.String(object.completion_content) : "",
+      temperature: isSet(object.temperature) ? globalThis.Number(object.temperature) : 0,
+      max_tokens: isSet(object.max_tokens) ? globalThis.Number(object.max_tokens) : 0,
     };
   },
 
@@ -1949,6 +1975,12 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
     if (message.completion_content !== "") {
       obj.completion_content = message.completion_content;
     }
+    if (message.temperature !== 0) {
+      obj.temperature = message.temperature;
+    }
+    if (message.max_tokens !== 0) {
+      obj.max_tokens = Math.round(message.max_tokens);
+    }
     return obj;
   },
 
@@ -1960,6 +1992,8 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
     message.model_id = object.model_id ?? "";
     message.completion_role = object.completion_role ?? "";
     message.completion_content = object.completion_content ?? "";
+    message.temperature = object.temperature ?? 0;
+    message.max_tokens = object.max_tokens ?? 0;
     return message;
   },
 };

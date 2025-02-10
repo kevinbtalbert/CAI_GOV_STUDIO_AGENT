@@ -37,7 +37,7 @@ export interface CreateAgentState {
 export interface AgentViewState {
   isOpen?: boolean;
   addAgentStep?: 'Select' | 'Details' | 'Create';
-  agentId?: string;
+  agent?: AgentMetadata;
   createAgent: CreateAgentState;
 }
 
@@ -135,42 +135,16 @@ export const editorSlice = createSlice({
       state.agentView.addAgentStep = action.payload;
     },
 
-    updatedEditorAgentViewAgentId: (state, action: PayloadAction<string | undefined>) => {
-      state.agentView.agentId = action.payload;
+    updatedEditorAgentViewAgent: (state, action: PayloadAction<AgentMetadata | undefined>) => {
+      state.agentView.agent = action.payload;
     },
 
     updatedEditorAgentViewOpen: (state, action: PayloadAction<boolean | undefined>) => {
       state.agentView.isOpen = action.payload;
     },
 
-    updatedEditorAgentViewCreateAgentName: (state, action: PayloadAction<string | undefined>) => {
-      state.agentView.createAgent.name = action.payload;
-    },
-
-    updatedEditorAgentViewCreateAgentRole: (state, action: PayloadAction<string | undefined>) => {
-      state.agentView.createAgent.role = action.payload;
-    },
-
-    updatedEditorAgentViewCreateAgentBackstory: (
-      state,
-      action: PayloadAction<string | undefined>,
-    ) => {
-      state.agentView.createAgent.backstory = action.payload;
-    },
-
-    updatedEditorAgentViewCreateAgentGoal: (state, action: PayloadAction<string | undefined>) => {
-      state.agentView.createAgent.goal = action.payload;
-    },
-
     updatedEditorAgentViewCreateAgentState: (state, action: PayloadAction<CreateAgentState>) => {
       state.agentView.createAgent = action.payload;
-    },
-
-    addedEditorWorkflowAgent: (state, action: PayloadAction<string>) => {
-      state.workflow.workflowMetadata.agentIds = [
-        ...(state.workflow.workflowMetadata.agentIds ?? []),
-        action.payload,
-      ];
     },
 
     addedEditorWorkflowTask: (state, action: PayloadAction<string>) => {
@@ -241,13 +215,8 @@ export const {
   updatedEditorWorkflowTaskIds,
   updatedEditorAgentViewStep,
   updatedEditorAgentViewOpen,
-  updatedEditorAgentViewAgentId,
-  updatedEditorAgentViewCreateAgentName,
-  updatedEditorAgentViewCreateAgentRole,
-  updatedEditorAgentViewCreateAgentBackstory,
-  updatedEditorAgentViewCreateAgentGoal,
+  updatedEditorAgentViewAgent,
   updatedEditorAgentViewCreateAgentState,
-  addedEditorWorkflowAgent,
   addedEditorWorkflowTask,
   addedEditorToolInstanceToAgent,
   updatedEditorAgentViewCreateAgentToolTemplates,
@@ -277,7 +246,7 @@ export const selectEditorWorkflowAgentIds = (state: RootState) =>
 export const selectEditorWorkflowTaskIds = (state: RootState) =>
   state.editor.workflow.workflowMetadata.taskIds;
 export const selectEditorAgentViewStep = (state: RootState) => state.editor.agentView.addAgentStep;
-export const selectEditorAgentViewAgentId = (state: RootState) => state.editor.agentView.agentId;
+export const selectEditorAgentViewAgent = (state: RootState) => state.editor.agentView.agent;
 export const selectEditorAgentViewIsOpen = (state: RootState) => state.editor.agentView.isOpen;
 export const selectEditorAgentViewCreateAgentName = (state: RootState) =>
   state.editor.agentView.createAgent.name;

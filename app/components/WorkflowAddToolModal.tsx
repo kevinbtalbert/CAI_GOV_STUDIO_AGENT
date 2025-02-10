@@ -59,11 +59,11 @@ const { Text } = Typography;
 const { TextArea } = Input;
 
 interface WorkflowAddToolModalProps {
-  visible: boolean;
+  open: boolean;
   onCancel: () => void;
 }
 
-const WorkflowAddToolModal: React.FC<WorkflowAddToolModalProps> = ({ visible, onCancel }) => {
+const WorkflowAddToolModal: React.FC<WorkflowAddToolModalProps> = ({ open, onCancel }) => {
   const { data: toolTemplates = [], refetch } = useListGlobalToolTemplatesQuery({});
   const { data: parentProjectDetails } = useGetParentProjectDetailsQuery({});
   const [selectedToolTemplate, setSelectedToolTemplate] = useState<string | null>(null);
@@ -853,7 +853,7 @@ const WorkflowAddToolModal: React.FC<WorkflowAddToolModalProps> = ({ visible, on
 
   return (
     <Modal
-      open={visible}
+      open={open}
       title="Create or Edit Tools"
       onCancel={onCancel}
       centered

@@ -18,8 +18,8 @@ type TaskNode = Node<
 
 export default function TaskNode({ data }: NodeProps<TaskNode>) {
   const [isHovered, setIsHovered] = useState(false);
-    
-    return (
+
+  return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

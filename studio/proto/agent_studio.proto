@@ -207,6 +207,9 @@ message TestModelRequest {
 
   // The content used for the model's completion test
   string completion_content = 3;
+
+  float temperature = 4;
+  int32 max_tokens = 5;
 }
 
 message TestModelResponse {

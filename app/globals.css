@@ -109,7 +109,6 @@ h6,
   }
 }
 
-
 @keyframes pulse-in-out {
   0% {
     /* transform: scale(1); */
@@ -124,7 +123,6 @@ h6,
     box-shadow: 0 0 4px rgba(0, 50, 255, 0.3);
   }
 }
-
 
 .Vector-3 {
   width: 50.7px;

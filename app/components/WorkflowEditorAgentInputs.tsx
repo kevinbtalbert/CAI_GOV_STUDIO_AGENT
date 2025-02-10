@@ -8,6 +8,7 @@ import {
   selectEditorWorkflowTaskIds,
   updatedEditorAgentViewOpen,
   updatedEditorAgentViewStep,
+  updatedEditorAgentViewAgent,
   updatedEditorWorkflowAgentIds,
   updatedEditorWorkflowIsConversational,
   updatedEditorWorkflowManagerAgentId,
@@ -202,6 +203,7 @@ const WorkflowAgentsComponent: React.FC = () => {
           onClick={() => {
             dispatch(updatedEditorAgentViewOpen(true));
             dispatch(updatedEditorAgentViewStep('Select'));
+            dispatch(updatedEditorAgentViewAgent(undefined));
           }}
           style={{
             width: '100%',
@@ -393,6 +395,15 @@ const WorkflowAgentsComponent: React.FC = () => {
                       alignItems: 'center',
                     }}
                   >
+                    <Button
+                      type="link"
+                      icon={<EditOutlined style={{ color: 'gray' }} />}
+                      onClick={() => {
+                        dispatch(updatedEditorAgentViewOpen(true));
+                        dispatch(updatedEditorAgentViewStep('Select'));
+                        dispatch(updatedEditorAgentViewAgent(agent));
+                      }}
+                    />
                     <Popconfirm
                       title={`Are you sure you want to delete agent ${agent.name}?`}
                       onConfirm={() => handleDeleteAgent(agent.id, agent.name)}

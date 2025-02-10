@@ -21,8 +21,8 @@ type ToolNode = Node<
 
 export default function ToolNode({ data }: NodeProps<ToolNode>) {
   const [isHovered, setIsHovered] = useState(false);
-    
-    return (
+
+  return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

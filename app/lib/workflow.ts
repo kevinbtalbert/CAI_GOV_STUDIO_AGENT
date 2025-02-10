@@ -137,7 +137,7 @@ export const processEvents = (
   });
 
   if (activeNodes.length > 0) {
-    activeNodes[activeNodes.length-1].isMostRecent = true;
+    activeNodes[activeNodes.length - 1].isMostRecent = true;
   }
 
   return { activeNodes };

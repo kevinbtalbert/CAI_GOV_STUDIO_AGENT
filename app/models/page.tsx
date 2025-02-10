@@ -127,6 +127,8 @@ const ModelsPageContent = () => {
           model_id: modelId,
           completion_role: 'user',
           completion_content: testMessage,
+          temperature: 0.1,
+          max_tokens: 20,
         }).unwrap();
 
         if (response.startsWith('Model Test Failed')) {
@@ -206,6 +208,8 @@ const ModelsPageContent = () => {
         model_id: selectedModel.model_id,
         completion_role: 'user',
         completion_content: message,
+        temperature: 0.7,
+        max_tokens: 50,
       }).unwrap();
       setTestResponse(response);
 

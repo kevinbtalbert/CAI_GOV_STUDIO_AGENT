@@ -150,8 +150,8 @@ def model_test(request: TestModelRequest, cml: CMLServiceApi = None, dao: AgentS
                     "content": request.completion_content,
                 }
             ],
-            "temperature": 0.7,
-            "max_tokens": 50,
+            "temperature": request.temperature,
+            "max_tokens": request.max_tokens,
         }
 
         # Send the request to the LiteLLM server and handle the response

@@ -6,7 +6,7 @@ import Editor from '@monaco-editor/react';
 const { TextArea } = Input;
 
 interface WorkflowViewToolModalProps {
-  visible: boolean;
+  open: boolean;
   onCancel: () => void;
   toolDetails: {
     name: string;
@@ -17,13 +17,13 @@ interface WorkflowViewToolModalProps {
 }
 
 const WorkflowViewToolModal: React.FC<WorkflowViewToolModalProps> = ({
-  visible,
+  open,
   onCancel,
   toolDetails,
 }) => {
   return (
     <Modal
-      visible={visible}
+      open={open}
       title="Tool Details"
       onCancel={onCancel}
       centered

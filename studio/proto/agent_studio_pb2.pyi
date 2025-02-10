@@ -122,18 +122,24 @@ class UpdateModelResponse(_message.Message):
     def __init__(self, model_id: _Optional[str] = ...) -> None: ...
 
 class TestModelRequest(_message.Message):
-    __slots__ = ("model_id", "completion_role", "completion_content")
+    __slots__ = ("model_id", "completion_role", "completion_content", "temperature", "max_tokens")
     MODEL_ID_FIELD_NUMBER: _ClassVar[int]
     COMPLETION_ROLE_FIELD_NUMBER: _ClassVar[int]
     COMPLETION_CONTENT_FIELD_NUMBER: _ClassVar[int]
+    TEMPERATURE_FIELD_NUMBER: _ClassVar[int]
+    MAX_TOKENS_FIELD_NUMBER: _ClassVar[int]
     model_id: str
     completion_role: str
     completion_content: str
+    temperature: float
+    max_tokens: int
     def __init__(
         self,
         model_id: _Optional[str] = ...,
         completion_role: _Optional[str] = ...,
         completion_content: _Optional[str] = ...,
+        temperature: _Optional[float] = ...,
+        max_tokens: _Optional[int] = ...,
     ) -> None: ...
 
 class TestModelResponse(_message.Message):

@@ -22,7 +22,7 @@ type AgentNode = Node<
 
 export default function AgentNode({ data }: NodeProps<AgentNode>) {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
