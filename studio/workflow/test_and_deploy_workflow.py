@@ -186,8 +186,6 @@ def test_workflow(
                 tool_id: {k: v for k, v in user_param_kv.parameters.items()}
                 for tool_id, user_param_kv in request.tool_user_parameters.items()
             }
-            crewai_objects = workflow_utils.create_crewai_objects(collated_input, tool_user_params_kv, "test", session)
-            crew = list(crewai_objects.crews.values())[0]
 
             current_time = datetime.now()
             formatted_time = current_time.strftime("%b %d, %H:%M:%S.%f")[:-3]
@@ -210,7 +208,14 @@ def test_workflow(
 
                 # Start crew execution in a separate thread with the parent context
                 thread = threading.Thread(
-                    target=lambda: workflow_utils.run_workflow_with_context(crew, dict(request.inputs), parent_context)
+                    target=lambda: workflow_utils.run_workflow_with_context(
+                        collated_input, 
+                        tool_user_params_kv, 
+                        "test", 
+                        session,
+                        dict(request.inputs), 
+                        parent_context
+                    )
                 )
                 thread.start()
 

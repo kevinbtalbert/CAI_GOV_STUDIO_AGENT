@@ -118,7 +118,7 @@ def _get_crewai_agent(
         allow_delegation=agent.crew_ai_allow_delegation,
         verbose=agent.crew_ai_verbose,
         cache=agent.crew_ai_cache,
-        max_iter=agent.crew_ai_max_iter,
+        max_iter=10 if agent.crew_ai_max_iter <= 0 else agent.crew_ai_max_iter,
         tools=crewai_tools or None,
         llm=llm_model,
     )
@@ -237,9 +237,23 @@ async def run_workflow_task(
     await loop.run_in_executor(None, workflow_task)
 
 
-def run_workflow_with_context(crew, inputs, parent_context: Context):
+def run_workflow_with_context(
+    collated_input, 
+    tool_user_params_kv, 
+    crew_object_mode, 
+    session,
+    inputs, 
+    parent_context: Context
+):
     """Run workflow with the parent OpenTelemetry context"""
     # Attach the parent context
+    crewai_objects = create_crewai_objects(
+        collated_input, 
+        tool_user_params_kv, 
+        crew_object_mode, 
+        session)
+    crew = list(crewai_objects.crews.values())[0]
+            
     token = attach(parent_context)
     try:
         return crew.kickoff(inputs=inputs)
