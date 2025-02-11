@@ -37,7 +37,7 @@ def get_crewai_llm_object_proxied(language_model: Input__LanguageModel, preexist
     if not model:
         raise ValueError(f"Model with ID '{language_model.model_id}' not found.")
     return CrewAILLM(
-        model=f"openai/{model.model_name}",
+        model=f"litellm_proxy/{model.model_name}",
         base_url=f"http://0.0.0.0:{consts.DEFAULT_LITELLM_SERVER_PORT}/v1",
         api_key="dummy-api-key",
     )

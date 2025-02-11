@@ -13,11 +13,11 @@ from studio.ops import instrument_workflow, reset_instrumentation
 import studio.cross_cutting.input_types as input_types
 from studio.models.utils import get_studio_default_model_id
 import studio.cross_cutting.utils as cc_utils
+from studio.cross_cutting.global_thread_pool import get_thread_pool
 import studio.workflow.utils as workflow_utils
 import studio.consts as consts
 from studio.ops import get_ops_endpoint
 from datetime import datetime
-import threading
 from opentelemetry.context import get_current
 import requests
 
@@ -207,17 +207,15 @@ def test_workflow(
                 parent_context = get_current()
 
                 # Start crew execution in a separate thread with the parent context
-                thread = threading.Thread(
-                    target=lambda: workflow_utils.run_workflow_with_context(
-                        collated_input, 
-                        tool_user_params_kv, 
-                        "test", 
-                        session,
-                        dict(request.inputs), 
-                        parent_context
-                    )
+                get_thread_pool().submit(
+                    workflow_utils.run_workflow_with_context,
+                    collated_input,
+                    tool_user_params_kv,
+                    "test",
+                    session,
+                    dict(request.inputs),
+                    parent_context,
                 )
-                thread.start()
 
             return TestWorkflowResponse(
                 message="",  # Return empty message since execution is async

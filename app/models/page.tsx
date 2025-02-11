@@ -129,6 +129,7 @@ const ModelsPageContent = () => {
           completion_content: testMessage,
           temperature: 0.1,
           max_tokens: 20,
+          timeout: 2,
         }).unwrap();
 
         if (response.startsWith('Model Test Failed')) {
@@ -210,6 +211,7 @@ const ModelsPageContent = () => {
         completion_content: message,
         temperature: 0.7,
         max_tokens: 50,
+        timeout: 3,
       }).unwrap();
       setTestResponse(response);
 

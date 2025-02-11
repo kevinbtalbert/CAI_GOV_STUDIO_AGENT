@@ -113,6 +113,8 @@ export interface TestModelRequest {
   completion_content: string;
   temperature: number;
   max_tokens: number;
+  /** Timeout in seconds */
+  timeout: number;
 }
 
 export interface TestModelResponse {
@@ -1875,7 +1877,7 @@ export const UpdateModelResponse: MessageFns<UpdateModelResponse> = {
 };
 
 function createBaseTestModelRequest(): TestModelRequest {
-  return { model_id: "", completion_role: "", completion_content: "", temperature: 0, max_tokens: 0 };
+  return { model_id: "", completion_role: "", completion_content: "", temperature: 0, max_tokens: 0, timeout: 0 };
 }
 
 export const TestModelRequest: MessageFns<TestModelRequest> = {
@@ -1894,6 +1896,9 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
     }
     if (message.max_tokens !== 0) {
       writer.uint32(40).int32(message.max_tokens);
+    }
+    if (message.timeout !== 0) {
+      writer.uint32(48).int32(message.timeout);
     }
     return writer;
   },
@@ -1945,6 +1950,14 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
           message.max_tokens = reader.int32();
           continue;
         }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.timeout = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1961,6 +1974,7 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
       completion_content: isSet(object.completion_content) ? globalThis.String(object.completion_content) : "",
       temperature: isSet(object.temperature) ? globalThis.Number(object.temperature) : 0,
       max_tokens: isSet(object.max_tokens) ? globalThis.Number(object.max_tokens) : 0,
+      timeout: isSet(object.timeout) ? globalThis.Number(object.timeout) : 0,
     };
   },
 
@@ -1981,6 +1995,9 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
     if (message.max_tokens !== 0) {
       obj.max_tokens = Math.round(message.max_tokens);
     }
+    if (message.timeout !== 0) {
+      obj.timeout = Math.round(message.timeout);
+    }
     return obj;
   },
 
@@ -1994,6 +2011,7 @@ export const TestModelRequest: MessageFns<TestModelRequest> = {
     message.completion_content = object.completion_content ?? "";
     message.temperature = object.temperature ?? 0;
     message.max_tokens = object.max_tokens ?? 0;
+    message.timeout = object.timeout ?? 0;
     return message;
   },
 };

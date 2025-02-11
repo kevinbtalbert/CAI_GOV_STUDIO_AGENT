@@ -191,6 +191,7 @@ If the user's description is not clear, just do not generate the requested XML. 
         completion_content: generatePrompt(userDescription, relevantToolInstances),
         temperature: 0.1,
         max_tokens: 1000,
+        timeout: 10,
       }).unwrap();
 
       setParsedSuggestions(parseXMLResponse(response));

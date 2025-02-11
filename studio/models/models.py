@@ -156,7 +156,12 @@ def model_test(request: TestModelRequest, cml: CMLServiceApi = None, dao: AgentS
 
         # Send the request to the LiteLLM server and handle the response
         try:
-            response = requests.post(completions_url, headers=headers, json=payload, timeout=2)
+            response = requests.post(
+                completions_url,
+                headers=headers,
+                json=payload,
+                timeout=float(request.timeout) if request.timeout else None,
+            )
             if response.status_code == 200:
                 completion = (
                     response.json().get("choices", [{}])[0].get("message", {}).get("content", "No content returned")
