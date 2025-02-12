@@ -35,7 +35,7 @@ class StockTickerHistoryLookupTool(StudioBaseTool):
         # Get stock data for each ticker
         for ticker in tickers_list:
             stock = yf.Ticker(ticker)
-            hist = stock.history(period="1y")
+            hist = stock.history(period="3y")
             # Extract dates and closing prices
             if not hist.empty:
                 dates = hist.index.strftime('%Y-%m-%d').tolist()

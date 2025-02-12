@@ -79,8 +79,9 @@ class PortfolioOptimizationTool(StudioBaseTool):
         
         # Compute the backtest for the weight of the stock together
         backtest = (time_series.pct_change() + 1).cumprod()
-        print(backtest)
+
         backtest = backtest.multiply(optimized_portfolio["recommended_allocation"], axis=1).multiply(amount)
+        backtest.to_csv('/tmp/backtest-ts.csv', index=True)
         optimized_portfolio["backtest"] = backtest
         temp =backtest.sum(axis=1)
         peak = temp.expanding(min_periods=1).max()
