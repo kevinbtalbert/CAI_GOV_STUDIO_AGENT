@@ -29,10 +29,10 @@ class CustomerPortfolioLookupTool(StudioBaseTool):
     def _run(self, customer_id) -> str:
         # Placeholder for actual portfolio data retrieval
         portfolio_data = {
-            portfolio_makeup = {
+            "portfolio_makeup": {
                 "stocks": ["AAPL", "GOOGL", "MSFT", "ADBE"],
                 "percent": ["0.2", "0.4", "0.3", "0.1" ]
-            }
+            },
             "total_value": 100000
         }
         return json.dumps(portfolio_data)

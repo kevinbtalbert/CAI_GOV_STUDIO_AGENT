@@ -237,14 +237,9 @@ async def run_workflow_task(
     await loop.run_in_executor(None, workflow_task)
 
 
-def run_workflow_with_context(
-    collated_input, tool_user_params_kv, crew_object_mode, session, inputs, parent_context: Context
-):
+def run_workflow_with_context(crew: Crew, inputs, parent_context: Context):
     """Run workflow with the parent OpenTelemetry context"""
     # Attach the parent context
-    crewai_objects = create_crewai_objects(collated_input, tool_user_params_kv, crew_object_mode, session)
-    crew = list(crewai_objects.crews.values())[0]
-
     token = attach(parent_context)
     try:
         print(f"Running workflow {crew.name} with context")
