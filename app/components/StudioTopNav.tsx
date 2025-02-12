@@ -1,22 +1,48 @@
 'use client';
 
 import React from 'react';
-import { Image, Layout, Menu, Typography } from 'antd';
+import { Layout, Menu, Typography, Popover } from 'antd';
 import { useRouter, usePathname } from 'next/navigation';
 import '../globals.css';
+import FeedbackContent from './FeedbackContent';
 
 const { Text, Title } = Typography;
 const { Header } = Layout;
 
-const menuItems = [
-  { key: '/workflows', label: 'Agentic Workflows' },
-  { key: '/tools', label: 'Tools Catalog' },
-  { key: '/models', label: 'LLMs' },
-];
-
 const StudioTopNav: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
+
+  const menuItems = [
+    { key: '/workflows', label: 'Agentic Workflows' },
+    { key: '/tools', label: 'Tools Catalog' },
+    { key: '/models', label: 'LLMs' },
+    {
+      key: '/feedback',
+      label: (
+        <Popover
+          content={<FeedbackContent />}
+          trigger="click"
+          title={
+            <div style={{ textAlign: 'center' }}>
+              <Text style={{ fontSize: 16, fontWeight: 500, background: 'transparent' }}>
+                Please Provide Feedback
+              </Text>
+            </div>
+          }
+        >
+          Feedback
+        </Popover>
+      ),
+    },
+  ];
+
+  const menuItemActions: Record<string, () => void> = {
+    '/workflows': () => router.push('/workflows'),
+    '/tools': () => router.push('/tools'),
+    '/models': () => router.push('/models'),
+    '/feedback': () => {},
+  };
 
   const getSelectedKey = () => {
     // Sort by key length in descending order to prioritize longer matches
@@ -68,7 +94,7 @@ const StudioTopNav: React.FC = () => {
           mode="horizontal"
           selectedKeys={[getSelectedKey()]} // Highlight the current route
           items={menuItems}
-          onClick={(e) => router.push(e.key)} // Navigate using Next.js router
+          onClick={(e) => menuItemActions[e.key]()} // Navigate using Next.js router
           style={{
             flex: 1,
             fontWeight: 'normal',
