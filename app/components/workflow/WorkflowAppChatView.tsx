@@ -19,7 +19,6 @@ import {
 } from '@/app/workflows/workflowAppSlice';
 import { PauseCircleOutlined, SendOutlined } from '@ant-design/icons';
 import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
-import { LocalStorageState } from '@/app/lib/localStorage';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -33,6 +32,10 @@ import ChatMessages from '../ChatMessages';
 import axios from 'axios';
 import { selectWorkflowModelUrl } from '@/app/lib/globalSettingsSlice';
 import { selectRenderMode } from '@/app/lib/globalSettingsSlice';
+import {
+  selectWorkflowConfiguration,
+  selectWorkflowGenerationConfig,
+} from '@/app/workflows/editorSlice';
 
 const { Title, Text } = Typography;
 
@@ -49,6 +52,8 @@ const WorkflowAppChatView: React.FC<WorkflowAppChatViewProps> = ({ workflow, tas
   const renderMode = useAppSelector(selectRenderMode);
   const workflowModelUrl = useAppSelector(selectWorkflowModelUrl);
   const crewOutput = useAppSelector(selectWorkflowCrewOutput);
+  const workflowGenerationConfig = useAppSelector(selectWorkflowGenerationConfig);
+  const workflowConfiguration = useAppSelector(selectWorkflowConfiguration);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messages = useAppSelector(selectWorkflowAppChatMessages);
@@ -93,15 +98,14 @@ const WorkflowAppChatView: React.FC<WorkflowAppChatViewProps> = ({ workflow, tas
 
     let traceId: string | undefined = undefined;
     if (renderMode === 'studio') {
-      const rawState = localStorage.getItem('state')!;
-      const localStorageState: LocalStorageState = JSON.parse(rawState)!;
       const response = await testWorkflow({
         workflow_id: workflow.workflow_id,
         inputs: {
           user_input: userInput || '', // TODO: fail on blank?
           context: JSON.stringify(context),
         },
-        tool_user_parameters: localStorageState?.workflowParameters?.[workflow.workflow_id] || {},
+        tool_user_parameters: workflowConfiguration?.toolConfigurations || {},
+        generation_config: JSON.stringify(workflowGenerationConfig),
       }).unwrap();
       traceId = response.trace_id;
     } else {

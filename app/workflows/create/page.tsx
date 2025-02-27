@@ -3,7 +3,6 @@
 // app/contact/page.tsx
 import React, { Suspense, useEffect, useState } from 'react';
 import { Layout, Spin } from 'antd';
-import Content from 'antd/lib/layout';
 import { useRouter, useSearchParams } from 'next/navigation';
 import WorkflowEditorAgentView from '@/app/components/WorkflowEditorAgentView';
 import { Typography } from 'antd/lib';
@@ -13,6 +12,7 @@ import {
   selectEditorCurrentStep,
   selectEditorWorkflowId,
   selectEditorWorkflowName,
+  updatedWorkflowConfiguration,
 } from '../editorSlice';
 import WorkflowApp from '@/app/components/workflow/WorkflowApp';
 import WorkflowStepView from '@/app/components/WorkflowStepView';
@@ -32,6 +32,7 @@ import { useListToolInstancesQuery } from '@/app/tools/toolInstancesApi';
 import { useListTasksQuery } from '@/app/tasks/tasksApi';
 import { useListAgentsQuery } from '@/app/agents/agentApi';
 import { clearedWorkflowApp } from '../workflowAppSlice';
+import { readWorkflowConfigurationFromLocalStorage } from '@/app/lib/localStorage';
 
 const { Title } = Typography;
 
@@ -39,6 +40,9 @@ const CreateWorkflowContent: React.FC = () => {
   // If we are editing an existing workflow, let's check. This is the
   // ONLY TIME that we should use our search param. After this, the workflowId
   // will be stored in Redux and that Redux workflowId should be used.
+  //
+  // TODO: add consistency to how we route in pages. Most of Agent Studio routes
+  // with slug paths, not search params. We should consider migrating to path routing here as well.
   const searchParams = useSearchParams();
   const workflowId = useAppSelector(selectEditorWorkflowId);
   const workflowName = useAppSelector(selectEditorWorkflowName);
@@ -51,17 +55,28 @@ const CreateWorkflowContent: React.FC = () => {
   const { data: tasks } = useListTasksQuery({});
   const { data: agents } = useListAgentsQuery({});
 
-  // Clear the existing workflow app if there is any data
+  // Clear the existing workflow app upon first load. Note: the "Workflow App"
+  // in the context of the workflow editor is just the Test page (for now, until
+  // we get customizable frontend apps to be an option)
   useEffect(() => {
     dispatch(clearedWorkflowApp());
   }, []);
 
-  // We can be routed here via search params. If that's the case, populate the
+  // We are routed here via search params. If that's the case, populate the
   // initial workflow editor with all of the information that we need.
   useEffect(() => {
+    // Initially populate the redux editor state with this workflow. Also
+    // preset all workflow configurations, which are stored in local storage.
     const populateWorkflow = async (workflowId: string) => {
+      // Update aspects about our workflow to redux.
       const workflow: Workflow = await getWorkflow({ workflow_id: workflowId }).unwrap();
       dispatch(updatedEditorWorkflowFromExisting(workflow));
+
+      // Load workflow configuration from local storage.
+      const workflowConfiguration = readWorkflowConfigurationFromLocalStorage(workflowId);
+
+      // Initialize redux state with this configuration.
+      dispatch(updatedWorkflowConfiguration(workflowConfiguration));
     };
 
     const searchWorkflowId = searchParams.get('workflowId');

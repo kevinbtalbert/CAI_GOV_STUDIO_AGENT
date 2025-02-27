@@ -3,6 +3,8 @@ import {
   selectEditorCurrentStep,
   selectEditorWorkflow,
   selectEditorWorkflowIsConversational,
+  selectWorkflowConfiguration,
+  selectWorkflowGenerationConfig,
   updatedEditorStep,
   updatedEditorWorkflowId,
 } from '../workflows/editorSlice';
@@ -36,8 +38,6 @@ import {
 } from '../workflows/workflowsApi';
 import { createAddRequestFromEditor, createUpdateRequestFromEditor } from '../lib/workflow';
 import { useGlobalNotification } from './Notifications';
-import { useAddTaskMutation } from '../tasks/tasksApi';
-import { LocalStorageState } from '../lib/localStorage';
 import { useAppDispatch, useAppSelector } from '../lib/hooks/hooks';
 import { useListDeployedWorkflowsQuery } from '../workflows/deployedWorkflowsApi';
 import { useListTasksQuery } from '../tasks/tasksApi';
@@ -72,6 +72,8 @@ const WorkflowNavigation: React.FC = () => {
   const [hasUnassignedTasks, setHasUnassignedTasks] = useState<boolean>(false);
   const [addWorkflowTemplate] = useAddWorkflowTemplateMutation();
   const { data: defaultModel } = useGetDefaultModelQuery();
+  const workflowGenerationConfig = useAppSelector(selectWorkflowGenerationConfig);
+  const workflowConfiguration = useAppSelector(selectWorkflowConfiguration);
 
   const hasExistingDeployment = deployedWorkflows.some(
     (dw) => dw.workflow_id === workflowState.workflowId,
@@ -129,8 +131,6 @@ const WorkflowNavigation: React.FC = () => {
     setIsDeploying(true);
     try {
       const workflowId = workflowState.workflowId!;
-      const rawState = localStorage.getItem('state')!;
-      const localStorageState: LocalStorageState = JSON.parse(rawState)!;
 
       if (saveWorkflowAsTemplate) {
         const addedWorkflowTemplateId = await addWorkflowTemplate({
@@ -150,12 +150,8 @@ const WorkflowNavigation: React.FC = () => {
       await deployWorkflow({
         workflow_id: workflowState.workflowId!,
         env_variable_overrides: {},
-        tool_user_parameters:
-          localStorageState &&
-          localStorageState.workflowParameters &&
-          localStorageState.workflowParameters[workflowId]
-            ? localStorageState.workflowParameters[workflowId]
-            : {},
+        tool_user_parameters: workflowConfiguration?.toolConfigurations || {},
+        generation_config: JSON.stringify(workflowGenerationConfig),
         bypass_authentication: bypassAuthenticationForDeployedApplication,
       }).unwrap();
 

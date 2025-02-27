@@ -519,6 +519,11 @@ export interface TestWorkflowRequest {
    * key is the user param and the value is the value of the param.
    */
   tool_user_parameters: { [key: string]: TestWorkflowToolUserParameters };
+  /**
+   * Serialized JSON generation config parameters for all LLM calls in this workflow.
+   * In the future, users may want to customize temperatures/max_new_tokens for each agent.
+   */
+  generation_config: string;
 }
 
 export interface TestWorkflowRequest_InputsEntry {
@@ -552,6 +557,11 @@ export interface DeployWorkflowRequest {
   tool_user_parameters: { [key: string]: TestWorkflowToolUserParameters };
   /** Should the workflow application be accesible without authentication from CDP ? */
   bypass_authentication: boolean;
+  /**
+   * Serialized JSON generation config parameters for all LLM calls in this workflow.
+   * In the future, users may want to customize temperatures/max_new_tokens for each agent.
+   */
+  generation_config: string;
 }
 
 export interface DeployWorkflowRequest_EnvVariableOverridesEntry {
@@ -6105,7 +6115,7 @@ export const TestWorkflowToolUserParameters_ParametersEntry: MessageFns<
 };
 
 function createBaseTestWorkflowRequest(): TestWorkflowRequest {
-  return { workflow_id: "", inputs: {}, tool_user_parameters: {} };
+  return { workflow_id: "", inputs: {}, tool_user_parameters: {}, generation_config: "" };
 }
 
 export const TestWorkflowRequest: MessageFns<TestWorkflowRequest> = {
@@ -6119,6 +6129,9 @@ export const TestWorkflowRequest: MessageFns<TestWorkflowRequest> = {
     Object.entries(message.tool_user_parameters).forEach(([key, value]) => {
       TestWorkflowRequest_ToolUserParametersEntry.encode({ key: key as any, value }, writer.uint32(26).fork()).join();
     });
+    if (message.generation_config !== "") {
+      writer.uint32(34).string(message.generation_config);
+    }
     return writer;
   },
 
@@ -6159,6 +6172,14 @@ export const TestWorkflowRequest: MessageFns<TestWorkflowRequest> = {
           }
           continue;
         }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.generation_config = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6186,6 +6207,7 @@ export const TestWorkflowRequest: MessageFns<TestWorkflowRequest> = {
           {},
         )
         : {},
+      generation_config: isSet(object.generation_config) ? globalThis.String(object.generation_config) : "",
     };
   },
 
@@ -6212,6 +6234,9 @@ export const TestWorkflowRequest: MessageFns<TestWorkflowRequest> = {
         });
       }
     }
+    if (message.generation_config !== "") {
+      obj.generation_config = message.generation_config;
+    }
     return obj;
   },
 
@@ -6235,6 +6260,7 @@ export const TestWorkflowRequest: MessageFns<TestWorkflowRequest> = {
       }
       return acc;
     }, {});
+    message.generation_config = object.generation_config ?? "";
     return message;
   },
 };
@@ -6475,7 +6501,13 @@ export const TestWorkflowResponse: MessageFns<TestWorkflowResponse> = {
 };
 
 function createBaseDeployWorkflowRequest(): DeployWorkflowRequest {
-  return { workflow_id: "", env_variable_overrides: {}, tool_user_parameters: {}, bypass_authentication: false };
+  return {
+    workflow_id: "",
+    env_variable_overrides: {},
+    tool_user_parameters: {},
+    bypass_authentication: false,
+    generation_config: "",
+  };
 }
 
 export const DeployWorkflowRequest: MessageFns<DeployWorkflowRequest> = {
@@ -6492,6 +6524,9 @@ export const DeployWorkflowRequest: MessageFns<DeployWorkflowRequest> = {
     });
     if (message.bypass_authentication !== false) {
       writer.uint32(32).bool(message.bypass_authentication);
+    }
+    if (message.generation_config !== "") {
+      writer.uint32(42).string(message.generation_config);
     }
     return writer;
   },
@@ -6541,6 +6576,14 @@ export const DeployWorkflowRequest: MessageFns<DeployWorkflowRequest> = {
           message.bypass_authentication = reader.bool();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.generation_config = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6571,6 +6614,7 @@ export const DeployWorkflowRequest: MessageFns<DeployWorkflowRequest> = {
       bypass_authentication: isSet(object.bypass_authentication)
         ? globalThis.Boolean(object.bypass_authentication)
         : false,
+      generation_config: isSet(object.generation_config) ? globalThis.String(object.generation_config) : "",
     };
   },
 
@@ -6600,6 +6644,9 @@ export const DeployWorkflowRequest: MessageFns<DeployWorkflowRequest> = {
     if (message.bypass_authentication !== false) {
       obj.bypass_authentication = message.bypass_authentication;
     }
+    if (message.generation_config !== "") {
+      obj.generation_config = message.generation_config;
+    }
     return obj;
   },
 
@@ -6626,6 +6673,7 @@ export const DeployWorkflowRequest: MessageFns<DeployWorkflowRequest> = {
       return acc;
     }, {});
     message.bypass_authentication = object.bypass_authentication ?? false;
+    message.generation_config = object.generation_config ?? "";
     return message;
   },
 };

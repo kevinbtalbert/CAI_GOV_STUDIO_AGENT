@@ -1,7 +1,12 @@
 import { AgentMetadata, CrewAIWorkflowMetadata, Workflow } from '@/studio/proto/agent_studio';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../lib/store';
-import { WorkflowParameters } from '../lib/localStorage';
+import {
+  WorkflowConfiguration,
+  WorkflowGenerationConfig,
+  WorkflowToolConfiguration,
+} from '../lib/types';
+import { DEFAULT_GENERATION_CONFIG } from '../lib/constants';
 
 // We store workflow information right in the editor. ts-proto compiles
 // everything to be non-optional in protobuf messages, but we need
@@ -41,11 +46,16 @@ export interface AgentViewState {
   createAgent: CreateAgentState;
 }
 
+export interface WorkflowConfigurationState {
+  toolConfigurations: Record<string, WorkflowToolConfiguration>;
+  generationConfig: WorkflowGenerationConfig;
+}
+
 interface EditorState {
   currentStep?: 'Agents' | 'Tasks' | 'Configure' | 'Test' | 'Deploy';
   workflow: WorkflowState;
   agentView: AgentViewState;
-  workflowParameters: WorkflowParameters;
+  workflowConfiguration: WorkflowConfigurationState;
 }
 
 const initialState: EditorState = {
@@ -59,7 +69,10 @@ const initialState: EditorState = {
   agentView: {
     createAgent: {},
   },
-  workflowParameters: {},
+  workflowConfiguration: {
+    toolConfigurations: {},
+    generationConfig: {},
+  },
 };
 
 export interface UpdateWorkflowParameters {
@@ -183,17 +196,36 @@ export const editorSlice = createSlice({
       );
     },
 
-    updatedWorkflowParameter: (state, action: PayloadAction<UpdateWorkflowParameters>) => {
-      const { workflowId, toolInstanceId, parameterName, value } = action.payload;
+    updatedWorkflowToolParameter: (state, action: PayloadAction<UpdateWorkflowParameters>) => {
+      const { toolInstanceId, parameterName, value } = action.payload;
 
-      state.workflowParameters[workflowId] ??= {};
-      state.workflowParameters[workflowId][toolInstanceId] ??= { parameters: {} };
+      state.workflowConfiguration ??= {
+        toolConfigurations: {},
+        generationConfig: {
+          ...DEFAULT_GENERATION_CONFIG,
+        },
+      };
 
-      state.workflowParameters[workflowId][toolInstanceId].parameters[parameterName] = value;
+      state.workflowConfiguration.toolConfigurations[toolInstanceId] ??= {
+        parameters: {},
+      };
+
+      state.workflowConfiguration.toolConfigurations[toolInstanceId].parameters[parameterName] =
+        value;
     },
 
-    updatedWorkflowParameters: (state, action: PayloadAction<WorkflowParameters>) => {
-      state.workflowParameters = action.payload;
+    updatedWorkflowConfiguration: (state, action: PayloadAction<WorkflowConfiguration>) => {
+      state.workflowConfiguration = {
+        ...state.workflowConfiguration,
+        ...action.payload,
+      };
+    },
+
+    updatedWorkflowGenerationConfig: (state, action: PayloadAction<WorkflowGenerationConfig>) => {
+      state.workflowConfiguration.generationConfig = {
+        ...state.workflowConfiguration.generationConfig,
+        ...action.payload,
+      };
     },
 
     resetEditor: (state) => {
@@ -221,8 +253,9 @@ export const {
   addedEditorToolInstanceToAgent,
   updatedEditorAgentViewCreateAgentToolTemplates,
   addedEditorToolTemplateToAgent,
-  updatedWorkflowParameter,
-  updatedWorkflowParameters,
+  updatedWorkflowConfiguration,
+  updatedWorkflowToolParameter,
+  updatedWorkflowGenerationConfig,
   removedEditorToolTemplateFromAgent,
   removedEditorWorkflowTask,
   resetEditor,
@@ -262,7 +295,9 @@ export const selectEditorAgentViewCreateAgentToolTemplates = (state: RootState) 
   state.editor.agentView.createAgent.toolTemplateIds;
 export const selectEditorAgentViewCreateAgentState = (state: RootState): CreateAgentState =>
   state.editor.agentView.createAgent;
-export const selectWorkflowParameters = (state: RootState): WorkflowParameters =>
-  state.editor.workflowParameters;
+export const selectWorkflowConfiguration = (state: RootState): WorkflowConfiguration =>
+  state.editor.workflowConfiguration;
+export const selectWorkflowGenerationConfig = (state: RootState): WorkflowGenerationConfig =>
+  state.editor.workflowConfiguration.generationConfig;
 
 export default editorSlice.reducer;

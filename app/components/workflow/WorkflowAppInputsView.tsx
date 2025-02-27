@@ -15,7 +15,6 @@ import {
 } from '@/app/workflows/workflowAppSlice';
 import { PauseCircleOutlined, SendOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
-import { LocalStorageState } from '@/app/lib/localStorage';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -31,6 +30,10 @@ import html2canvas from 'html2canvas';
 import { marked } from 'marked';
 import showdown from 'showdown';
 import { selectRenderMode, selectWorkflowModelUrl } from '@/app/lib/globalSettingsSlice';
+import {
+  selectWorkflowConfiguration,
+  selectWorkflowGenerationConfig,
+} from '@/app/workflows/editorSlice';
 
 const { Title, Text } = Typography;
 
@@ -54,6 +57,8 @@ const WorkflowAppInputsView: React.FC<WorkflowAppInputsViewProps> = ({ workflow,
   const [testWorkflow] = useTestWorkflowMutation();
   const renderMode = useAppSelector(selectRenderMode);
   const workflowModelUrl = useAppSelector(selectWorkflowModelUrl);
+  const workflowGenerationConfig = useAppSelector(selectWorkflowGenerationConfig);
+  const workflowConfiguration = useAppSelector(selectWorkflowConfiguration);
 
   // Add effect to clear crew output when workflow changes
   useEffect(() => {
@@ -86,12 +91,11 @@ const WorkflowAppInputsView: React.FC<WorkflowAppInputsViewProps> = ({ workflow,
 
     let traceId: string | undefined = undefined;
     if (renderMode === 'studio') {
-      const rawState = localStorage.getItem('state')!;
-      const localStorageState: LocalStorageState = JSON.parse(rawState)!;
       const response = await testWorkflow({
         workflow_id: workflow.workflow_id,
         inputs: finalInputs, // Use finalInputs instead of inputs
-        tool_user_parameters: localStorageState?.workflowParameters?.[workflow.workflow_id] || {},
+        tool_user_parameters: workflowConfiguration?.toolConfigurations || {},
+        generation_config: JSON.stringify(workflowGenerationConfig),
       }).unwrap();
       traceId = response.trace_id;
     } else {

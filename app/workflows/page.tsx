@@ -81,7 +81,7 @@ const UpgradeModal: React.FC = () => {
   );
 };
 
-const ContactPage: React.FC = () => {
+const WorkflowsPage: React.FC = () => {
   const { data: workflows, refetch: refetchWorkflows } = useListWorkflowsQuery({});
   const { data: deployedWorkflowInstances, refetch: refetchDeployedWorkflowInstances } =
     useListDeployedWorkflowsQuery({});
@@ -411,4 +411,4 @@ const ContactPage: React.FC = () => {
   );
 };
 
-export default ContactPage;
+export default WorkflowsPage;

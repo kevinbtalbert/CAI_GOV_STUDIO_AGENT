@@ -715,7 +715,7 @@ class TestWorkflowToolUserParameters(_message.Message):
     def __init__(self, parameters: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class TestWorkflowRequest(_message.Message):
-    __slots__ = ("workflow_id", "inputs", "tool_user_parameters")
+    __slots__ = ("workflow_id", "inputs", "tool_user_parameters", "generation_config")
     class InputsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -737,14 +737,17 @@ class TestWorkflowRequest(_message.Message):
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     TOOL_USER_PARAMETERS_FIELD_NUMBER: _ClassVar[int]
+    GENERATION_CONFIG_FIELD_NUMBER: _ClassVar[int]
     workflow_id: str
     inputs: _containers.ScalarMap[str, str]
     tool_user_parameters: _containers.MessageMap[str, TestWorkflowToolUserParameters]
+    generation_config: str
     def __init__(
         self,
         workflow_id: _Optional[str] = ...,
         inputs: _Optional[_Mapping[str, str]] = ...,
         tool_user_parameters: _Optional[_Mapping[str, TestWorkflowToolUserParameters]] = ...,
+        generation_config: _Optional[str] = ...,
     ) -> None: ...
 
 class TestWorkflowResponse(_message.Message):
@@ -756,7 +759,13 @@ class TestWorkflowResponse(_message.Message):
     def __init__(self, message: _Optional[str] = ..., trace_id: _Optional[str] = ...) -> None: ...
 
 class DeployWorkflowRequest(_message.Message):
-    __slots__ = ("workflow_id", "env_variable_overrides", "tool_user_parameters", "bypass_authentication")
+    __slots__ = (
+        "workflow_id",
+        "env_variable_overrides",
+        "tool_user_parameters",
+        "bypass_authentication",
+        "generation_config",
+    )
     class EnvVariableOverridesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -779,16 +788,19 @@ class DeployWorkflowRequest(_message.Message):
     ENV_VARIABLE_OVERRIDES_FIELD_NUMBER: _ClassVar[int]
     TOOL_USER_PARAMETERS_FIELD_NUMBER: _ClassVar[int]
     BYPASS_AUTHENTICATION_FIELD_NUMBER: _ClassVar[int]
+    GENERATION_CONFIG_FIELD_NUMBER: _ClassVar[int]
     workflow_id: str
     env_variable_overrides: _containers.ScalarMap[str, str]
     tool_user_parameters: _containers.MessageMap[str, TestWorkflowToolUserParameters]
     bypass_authentication: bool
+    generation_config: str
     def __init__(
         self,
         workflow_id: _Optional[str] = ...,
         env_variable_overrides: _Optional[_Mapping[str, str]] = ...,
         tool_user_parameters: _Optional[_Mapping[str, TestWorkflowToolUserParameters]] = ...,
         bypass_authentication: bool = ...,
+        generation_config: _Optional[str] = ...,
     ) -> None: ...
 
 class DeployWorkflowResponse(_message.Message):

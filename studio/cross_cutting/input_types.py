@@ -18,6 +18,7 @@ class Input__LanguageModel(BaseModel):
     model_id: str
     model_name: str
     config: Optional[Input__LanguageModelConfig] = None
+    generation_config: Dict
 
 
 class Input__ToolInstance(BaseModel):

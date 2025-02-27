@@ -518,6 +518,9 @@ message TestWorkflowRequest {
   // where each key is the tool ID, and the value is another map where the 
   // key is the user param and the value is the value of the param.
   map<string, TestWorkflowToolUserParameters> tool_user_parameters = 3;
+  // Serialized JSON generation config parameters for all LLM calls in this workflow.
+  // In the future, users may want to customize temperatures/max_new_tokens for each agent.
+  string generation_config = 4;
 }
 
 message TestWorkflowResponse {
@@ -539,6 +542,9 @@ message DeployWorkflowRequest {
   map<string, TestWorkflowToolUserParameters> tool_user_parameters = 3;
   // Should the workflow application be accesible without authentication from CDP ?
   bool bypass_authentication = 4;
+  // Serialized JSON generation config parameters for all LLM calls in this workflow.
+  // In the future, users may want to customize temperatures/max_new_tokens for each agent.
+  string generation_config = 5;
 }
 
 message DeployWorkflowResponse {

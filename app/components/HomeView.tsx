@@ -1,5 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
-import { initialState, LocalStorageState } from '../lib/localStorage';
+import {
+  readViewSettingsFromLocalStorage,
+  writeViewSettingsToLocalStorage,
+} from '../lib/localStorage';
 import { Avatar, Button, Checkbox, Image, Input, Layout, Typography } from 'antd';
 import '../globals.css';
 import {
@@ -11,6 +16,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import { ViewSettings } from '../lib/types';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -53,18 +59,13 @@ const HomeViewBannerCard: React.FC<HomeViewBannerCardProps> = ({ title, icon, co
 const HomeViewBannerContent: React.FC = () => {
   const router = useRouter();
 
-  const handleGetStarted = (dontShowAgain: boolean) => {
-    const rawState = localStorage.getItem('state');
-    const localState: LocalStorageState = rawState ? JSON.parse(rawState) : initialState;
-    console.log(localState);
-    const newLocalState: LocalStorageState = {
-      ...localState,
-      viewSettings: {
-        ...localState.viewSettings,
-        displayIntroPage: !dontShowAgain,
-      },
+  const handleDontShowAgain = (dontShowAgain: boolean) => {
+    const viewSettings: ViewSettings = readViewSettingsFromLocalStorage() || {};
+    const updatedViewSettings: ViewSettings = {
+      ...viewSettings,
+      displayIntroPage: !dontShowAgain,
     };
-    localStorage.setItem('state', JSON.stringify(newLocalState));
+    writeViewSettingsToLocalStorage(updatedViewSettings);
   };
 
   return (
@@ -160,7 +161,7 @@ const HomeViewBannerContent: React.FC = () => {
         >
           Get Started
         </Button>
-        <Checkbox onChange={(e) => handleGetStarted(e.target.checked)}>
+        <Checkbox onChange={(e) => handleDontShowAgain(e.target.checked)}>
           Don't show me this again
         </Checkbox>
       </Layout>

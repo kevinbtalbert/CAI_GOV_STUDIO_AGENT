@@ -14,17 +14,28 @@ import studio.cross_cutting.input_types as input_types
 from studio.models.utils import get_studio_default_model_id
 import studio.cross_cutting.utils as cc_utils
 from studio.cross_cutting.global_thread_pool import get_thread_pool
+from studio.proto.utils import is_field_set
 import studio.workflow.utils as workflow_utils
 import studio.consts as consts
 from studio.ops import get_ops_endpoint
 from datetime import datetime
 from opentelemetry.context import get_current
 import requests
+from google.protobuf.json_format import MessageToDict
+import json
 
 
 def _create_collated_input(
     request: Union[TestWorkflowRequest, DeployWorkflowRequest], cml: CMLServiceApi = None, dao: AgentStudioDao = None
 ) -> input_types.CollatedInput:
+    # For now, we only allow one a singular generation config
+    # shared across all LLMs. This can be updated in the future
+    # if we need it to be.
+    llm_generation_config = consts.DEFAULT_GENERATION_CONFIG
+    if is_field_set(request, "generation_config"):
+        request_dict = MessageToDict(request, preserving_proto_field_name=True)
+        llm_generation_config.update(json.loads(request_dict["generation_config"]))
+
     with dao.get_session() as session:
         workflow = session.query(db_model.Workflow).filter(db_model.Workflow.id == request.workflow_id).first()
         if not workflow:
@@ -76,7 +87,7 @@ def _create_collated_input(
                     crew_ai_allow_delegation=agent_db_model.crew_ai_allow_delegation,
                     crew_ai_verbose=agent_db_model.crew_ai_verbose,
                     crew_ai_cache=agent_db_model.crew_ai_cache,
-                    crew_ai_temperature=agent_db_model.crew_ai_temperature,
+                    # crew_ai_temperature=agent_db_model.crew_ai_temperature,  # NOTE: temperature from schema is unused
                     crew_ai_max_iter=agent_db_model.crew_ai_max_iter,
                     tool_instance_ids=list(agent_db_model.tool_ids) if agent_db_model.tool_ids else [],
                     agent_image_uri=(
@@ -131,6 +142,7 @@ def _create_collated_input(
                         api_base=language_model_db_model.api_base or None,
                         api_key=language_model_db_model.api_key or None,
                     ),
+                    generation_config=llm_generation_config,
                 )
             )
 

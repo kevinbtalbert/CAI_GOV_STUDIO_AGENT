@@ -5,26 +5,28 @@ import 'antd/dist/reset.css';
 import WorkflowDataView from './components/WorkflowDataView';
 import { Layout, Spin, Typography } from 'antd';
 import { useGetWorkflowDataQuery } from './workflows/workflowAppApi';
-import { initialState, LocalStorageState } from './lib/localStorage';
+import { LocalStorageState, ViewSettings } from './lib/types';
 import HomeView from './components/HomeView';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from './lib/hooks/hooks';
 import { setRenderMode, setWorkflowModelUrl } from './lib/globalSettingsSlice';
+import { INITIAL_LOCAL_STORAGE_STAGE } from './lib/constants';
+import { readLocalStorageState, readViewSettingsFromLocalStorage } from './lib/localStorage';
 
 const { Title, Text } = Typography;
 
 const HomePage: React.FC = () => {
   const { data: wflowData, isLoading } = useGetWorkflowDataQuery();
-  const [localStore, setLocalStore] = useState<LocalStorageState>();
+  const [viewSettings, setViewSettings] = useState<ViewSettings>();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  /**
+   * If we haven't initialized local storage state yet, then we need to
+   * set some initial values
+   */
   useEffect(() => {
-    setLocalStore(
-      window.localStorage.getItem('state')
-        ? JSON.parse(window.localStorage.getItem('state')!)
-        : initialState,
-    );
+    setViewSettings(readViewSettingsFromLocalStorage());
   }, []);
 
   if (isLoading === true) {
@@ -90,7 +92,7 @@ const HomePage: React.FC = () => {
     );
   }
 
-  if (!localStore) {
+  if (!viewSettings) {
     // Show a loading spinner while local store data is being fetched
     return (
       <div
@@ -101,7 +103,7 @@ const HomePage: React.FC = () => {
     );
   }
 
-  if (localStore.viewSettings?.displayIntroPage === false) {
+  if (viewSettings.displayIntroPage === false) {
     // Show a loading spinner while we wait for workflows page.
     router.push('/workflows');
     return (

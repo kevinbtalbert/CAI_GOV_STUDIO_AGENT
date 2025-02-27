@@ -114,3 +114,14 @@ pydantic==2.10.6
 # Please mention the tool specific python packages requirements below:
 
 """
+
+
+DEFAULT_GENERATION_CONFIG = {
+    "do_sample": True,
+    "temperature": 0.7,
+    "max_new_tokens": 4096,
+    "top_p": 1,
+    "top_k": 50,
+    "num_beams": 1,
+    "max_length": None,  # Explicity set max_length to Null to compensate for max_new_tokens
+}
