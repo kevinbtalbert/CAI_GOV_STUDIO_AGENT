@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Metadata } from '@grpc/grpc-js';
 import { AgentStudioClient } from '@/studio/proto/agent_studio';
 import { credentials } from '@grpc/grpc-js';
 
@@ -19,7 +18,7 @@ export async function POST(request: NextRequest) {
   return handleRequest(request, 'POST');
 }
 
-async function handleRequest(request: NextRequest, method: string) {
+async function handleRequest(request: NextRequest, method: string): Promise<NextResponse> {
   const addr = `${process.env.AGENT_STUDIO_SERVICE_IP}:${process.env.AGENT_STUDIO_SERVICE_PORT}`;
   const client = new AgentStudioClient(addr, credentials.createInsecure());
 
@@ -54,6 +53,46 @@ async function handleRequest(request: NextRequest, method: string) {
         full_content: bytes,
         file_name: body.file_name,
       };
+    }
+
+    /*
+      -- Special handling for file download requests --
+      Since this is a streaming response, we need to handle it differently.
+      We'll wrap the gRPC stream in a Web ReadableStream for efficient streaming.
+    */
+    if (slug === 'downloadTemporaryFile') {
+      const stream = client.downloadTemporaryFile(body);
+      let filename = body.file_path?.split('/').pop() ?? 'downloaded-file';
+
+      // Wrap the gRPC stream in a Web ReadableStream
+      const readableStream = new ReadableStream({
+        start(controller) {
+          stream.on('data', (chunk) => {
+            if (chunk.file_name) {
+              filename = chunk.file_name;
+            }
+
+            // Send raw bytes (Uint8Array) to the client
+            controller.enqueue(chunk.content);
+          });
+
+          stream.on('end', () => {
+            controller.close();
+          });
+
+          stream.on('error', (err) => {
+            console.error('gRPC stream error:', err);
+            controller.error(err);
+          });
+        },
+      });
+
+      return new NextResponse(readableStream, {
+        headers: {
+          'Content-Type': 'application/octet-stream',
+          'Content-Disposition': `attachment; filename="${filename}"`,
+        },
+      });
     }
 
     const grpcMethod = (client as any)[slug].bind(client);

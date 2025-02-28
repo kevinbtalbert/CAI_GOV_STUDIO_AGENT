@@ -989,6 +989,15 @@ export interface WorkflowTemplateMetadata {
   pre_packaged: boolean;
 }
 
+export interface ExportWorkflowTemplateRequest {
+  /** ID of the workflow template to export */
+  id: string;
+}
+
+export interface ExportWorkflowTemplateResponse {
+  file_path: string;
+}
+
 export interface ListTaskTemplatesRequest {
   /** optional workflow id */
   workflow_template_id?: string | undefined;
@@ -11523,6 +11532,122 @@ export const WorkflowTemplateMetadata: MessageFns<WorkflowTemplateMetadata> = {
   },
 };
 
+function createBaseExportWorkflowTemplateRequest(): ExportWorkflowTemplateRequest {
+  return { id: "" };
+}
+
+export const ExportWorkflowTemplateRequest: MessageFns<ExportWorkflowTemplateRequest> = {
+  encode(message: ExportWorkflowTemplateRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ExportWorkflowTemplateRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseExportWorkflowTemplateRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ExportWorkflowTemplateRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: ExportWorkflowTemplateRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ExportWorkflowTemplateRequest>): ExportWorkflowTemplateRequest {
+    return ExportWorkflowTemplateRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ExportWorkflowTemplateRequest>): ExportWorkflowTemplateRequest {
+    const message = createBaseExportWorkflowTemplateRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseExportWorkflowTemplateResponse(): ExportWorkflowTemplateResponse {
+  return { file_path: "" };
+}
+
+export const ExportWorkflowTemplateResponse: MessageFns<ExportWorkflowTemplateResponse> = {
+  encode(message: ExportWorkflowTemplateResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.file_path !== "") {
+      writer.uint32(10).string(message.file_path);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ExportWorkflowTemplateResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseExportWorkflowTemplateResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.file_path = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ExportWorkflowTemplateResponse {
+    return { file_path: isSet(object.file_path) ? globalThis.String(object.file_path) : "" };
+  },
+
+  toJSON(message: ExportWorkflowTemplateResponse): unknown {
+    const obj: any = {};
+    if (message.file_path !== "") {
+      obj.file_path = message.file_path;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ExportWorkflowTemplateResponse>): ExportWorkflowTemplateResponse {
+    return ExportWorkflowTemplateResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ExportWorkflowTemplateResponse>): ExportWorkflowTemplateResponse {
+    const message = createBaseExportWorkflowTemplateResponse();
+    message.file_path = object.file_path ?? "";
+    return message;
+  },
+};
+
 function createBaseListTaskTemplatesRequest(): ListTaskTemplatesRequest {
   return { workflow_template_id: undefined };
 }
@@ -13070,6 +13195,17 @@ export const AgentStudioService = {
       Buffer.from(RemoveWorkflowTemplateResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => RemoveWorkflowTemplateResponse.decode(value),
   },
+  exportWorkflowTemplate: {
+    path: "/agent_studio.AgentStudio/ExportWorkflowTemplate",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ExportWorkflowTemplateRequest) =>
+      Buffer.from(ExportWorkflowTemplateRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ExportWorkflowTemplateRequest.decode(value),
+    responseSerialize: (value: ExportWorkflowTemplateResponse) =>
+      Buffer.from(ExportWorkflowTemplateResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => ExportWorkflowTemplateResponse.decode(value),
+  },
   /** Task templates operations */
   listTaskTemplates: {
     path: "/agent_studio.AgentStudio/ListTaskTemplates",
@@ -13179,6 +13315,7 @@ export interface AgentStudioServer extends UntypedServiceImplementation {
   getWorkflowTemplate: handleUnaryCall<GetWorkflowTemplateRequest, GetWorkflowTemplateResponse>;
   addWorkflowTemplate: handleUnaryCall<AddWorkflowTemplateRequest, AddWorkflowTemplateResponse>;
   removeWorkflowTemplate: handleUnaryCall<RemoveWorkflowTemplateRequest, RemoveWorkflowTemplateResponse>;
+  exportWorkflowTemplate: handleUnaryCall<ExportWorkflowTemplateRequest, ExportWorkflowTemplateResponse>;
   /** Task templates operations */
   listTaskTemplates: handleUnaryCall<ListTaskTemplatesRequest, ListTaskTemplatesResponse>;
   getTaskTemplate: handleUnaryCall<GetTaskTemplateRequest, GetTaskTemplateResponse>;
@@ -14017,6 +14154,21 @@ export interface AgentStudioClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: RemoveWorkflowTemplateResponse) => void,
+  ): ClientUnaryCall;
+  exportWorkflowTemplate(
+    request: ExportWorkflowTemplateRequest,
+    callback: (error: ServiceError | null, response: ExportWorkflowTemplateResponse) => void,
+  ): ClientUnaryCall;
+  exportWorkflowTemplate(
+    request: ExportWorkflowTemplateRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ExportWorkflowTemplateResponse) => void,
+  ): ClientUnaryCall;
+  exportWorkflowTemplate(
+    request: ExportWorkflowTemplateRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ExportWorkflowTemplateResponse) => void,
   ): ClientUnaryCall;
   /** Task templates operations */
   listTaskTemplates(

@@ -1,4 +1,6 @@
-from typing import List
+import tempfile
+import json
+from typing import List, Dict
 from uuid import uuid4
 from google.protobuf.json_format import MessageToDict
 
@@ -259,3 +261,119 @@ def remove_workflow_template(
         # Finally, remove the workflow template
         session.delete(workflow_template)
         return RemoveWorkflowTemplateResponse()
+
+
+def export_workflow_template(
+    request: ExportWorkflowTemplateRequest, cml: CMLServiceApi = None, dao: AgentStudioDao = None
+) -> ExportWorkflowTemplateResponse:
+    with dao.get_session() as session:
+        try:
+            workflow_template: db_model.WorkflowTemplate = (
+                session.query(db_model.WorkflowTemplate).filter_by(id=request.id).one_or_none()
+            )
+            if not workflow_template:
+                raise ValueError(f"Workflow template with ID '{request.id}' does not exist.")
+            agent_template_ids = (
+                list(workflow_template.agent_template_ids) if workflow_template.agent_template_ids else []
+            )
+            if workflow_template.manager_agent_template_id:
+                agent_template_ids.append(workflow_template.manager_agent_template_id)
+            task_template_ids = list(workflow_template.task_template_ids) if workflow_template.task_template_ids else []
+
+            agent_templates: list[db_model.AgentTemplate] = (
+                session.query(db_model.AgentTemplate).filter(db_model.AgentTemplate.id.in_(agent_template_ids)).all()
+            )
+            tool_template_ids: List[str] = []
+            for agent_template in agent_templates:
+                if agent_template.tool_template_ids:
+                    tool_template_ids.extend(agent_template.tool_template_ids)
+            tool_templates: list[db_model.ToolTemplate] = (
+                session.query(db_model.ToolTemplate).filter(db_model.ToolTemplate.id.in_(tool_template_ids)).all()
+            )
+            task_templates: list[db_model.TaskTemplate] = (
+                session.query(db_model.TaskTemplate).filter(db_model.TaskTemplate.id.in_(task_template_ids)).all()
+            )
+
+            # Change UUIDs to different UUIDs
+            uuid_change_map: Dict[str, str] = dict()
+            uuid_change_map[workflow_template.id] = str(uuid4())
+            workflow_template.id = uuid_change_map[workflow_template.id]
+            workflow_template.pre_packaged = False
+            for tool_template in tool_templates:
+                uuid_change_map[tool_template.id] = str(uuid4())
+                tool_template.id = uuid_change_map[tool_template.id]
+                tool_template.pre_built = False
+                tool_template.workflow_template_id = workflow_template.id
+            for agent_template in agent_templates:
+                uuid_change_map[agent_template.id] = str(uuid4())
+                agent_template.id = uuid_change_map[agent_template.id]
+                agent_template.pre_packaged = False
+                agent_template.workflow_template_id = workflow_template.id
+                if agent_template.tool_template_ids:
+                    agent_template.tool_template_ids = [uuid_change_map[id] for id in agent_template.tool_template_ids]
+            for task_template in task_templates:
+                uuid_change_map[task_template.id] = str(uuid4())
+                task_template.id = uuid_change_map[task_template.id]
+                task_template.workflow_template_id = workflow_template.id
+                if task_template.assigned_agent_template_id:
+                    task_template.assigned_agent_template_id = uuid_change_map[task_template.assigned_agent_template_id]
+
+            if workflow_template.manager_agent_template_id:
+                workflow_template.manager_agent_template_id = uuid_change_map[
+                    workflow_template.manager_agent_template_id
+                ]
+            if workflow_template.agent_template_ids:
+                workflow_template.agent_template_ids = [
+                    uuid_change_map[id] for id in workflow_template.agent_template_ids
+                ]
+            if workflow_template.task_template_ids:
+                workflow_template.task_template_ids = [
+                    uuid_change_map[id] for id in workflow_template.task_template_ids
+                ]
+
+            # prepare the json file
+            template_dict = {
+                "template_version": "0.0.1",
+                "workflow_template": workflow_template.to_dict(),
+                "agent_templates": [agent_template.to_dict() for agent_template in agent_templates],
+                "tool_templates": [tool_template.to_dict() for tool_template in tool_templates],
+                "task_templates": [task_template.to_dict() for task_template in task_templates],
+            }
+
+            # Create a temporary directory for the export
+            os.makedirs(consts.TEMP_FILES_LOCATION, exist_ok=True)
+            with tempfile.TemporaryDirectory(prefix="workflow_template_", dir=consts.TEMP_FILES_LOCATION) as temp_dir:
+                template_file_path = os.path.join(temp_dir, "workflow_template.json")
+                with open(template_file_path, "w") as f:
+                    json.dump(template_dict, f, indent=2)
+
+                # Create directory for tool templates & dynamic assets
+                os.makedirs(os.path.join(temp_dir, consts.TOOL_TEMPLATE_CATALOG_LOCATION), exist_ok=True)
+                os.makedirs(os.path.join(temp_dir, consts.TOOL_TEMPLATE_ICONS_LOCATION), exist_ok=True)
+                os.makedirs(os.path.join(temp_dir, consts.AGENT_TEMPLATE_ICONS_LOCATION), exist_ok=True)
+
+                # Copy tool templates
+                for tool_template in tool_templates:
+                    shutil.copytree(
+                        tool_template.source_folder_path, os.path.join(temp_dir, tool_template.source_folder_path)
+                    )
+                    if tool_template.tool_image_path:
+                        shutil.copy(
+                            tool_template.tool_image_path, os.path.join(temp_dir, tool_template.tool_image_path)
+                        )
+
+                # Copy agent templates
+                for agent_template in agent_templates:
+                    if agent_template.agent_image_path:
+                        shutil.copy(
+                            agent_template.agent_image_path, os.path.join(temp_dir, agent_template.agent_image_path)
+                        )
+
+                # Create a zip file
+                zip_file_path = os.path.join(consts.TEMP_FILES_LOCATION, os.path.basename(temp_dir))
+                shutil.make_archive(zip_file_path, "zip", temp_dir)
+
+                # Return the zip file
+                return ExportWorkflowTemplateResponse(file_path=zip_file_path + ".zip")
+        finally:
+            session.rollback()  # This is a read-only operation. Rollback any transactions.

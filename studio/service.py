@@ -3,6 +3,7 @@ from studio.workflow.workflow_templates import (
     get_workflow_template,
     add_workflow_template,
     remove_workflow_template,
+    export_workflow_template,
 )
 from studio.task.task_templates import list_task_templates, get_task_template, add_task_template, remove_task_template
 from studio.agents.agent_templates import (
@@ -443,3 +444,6 @@ class AgentStudioApp(AgentStudioServicer):
 
     def RemoveWorkflowTemplate(self, request, context):
         return remove_workflow_template(request, self.cml, dao=self.dao)
+
+    def ExportWorkflowTemplate(self, request, context):
+        return export_workflow_template(request, self.cml, dao=self.dao)

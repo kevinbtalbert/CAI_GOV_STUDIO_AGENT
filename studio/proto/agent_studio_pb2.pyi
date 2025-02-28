@@ -1515,6 +1515,18 @@ class WorkflowTemplateMetadata(_message.Message):
         pre_packaged: bool = ...,
     ) -> None: ...
 
+class ExportWorkflowTemplateRequest(_message.Message):
+    __slots__ = ("id",)
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    def __init__(self, id: _Optional[str] = ...) -> None: ...
+
+class ExportWorkflowTemplateResponse(_message.Message):
+    __slots__ = ("file_path",)
+    FILE_PATH_FIELD_NUMBER: _ClassVar[int]
+    file_path: str
+    def __init__(self, file_path: _Optional[str] = ...) -> None: ...
+
 class ListTaskTemplatesRequest(_message.Message):
     __slots__ = ("workflow_template_id",)
     WORKFLOW_TEMPLATE_ID_FIELD_NUMBER: _ClassVar[int]

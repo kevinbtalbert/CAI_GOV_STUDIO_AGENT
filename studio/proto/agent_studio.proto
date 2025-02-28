@@ -94,6 +94,7 @@ service AgentStudio {
   rpc GetWorkflowTemplate (GetWorkflowTemplateRequest) returns (GetWorkflowTemplateResponse) {}
   rpc AddWorkflowTemplate (AddWorkflowTemplateRequest) returns (AddWorkflowTemplateResponse) {}
   rpc RemoveWorkflowTemplate (RemoveWorkflowTemplateRequest) returns (RemoveWorkflowTemplateResponse) {}
+  rpc ExportWorkflowTemplate (ExportWorkflowTemplateRequest) returns (ExportWorkflowTemplateResponse) {}
 
   // Task templates operations
   rpc ListTaskTemplates (ListTaskTemplatesRequest) returns (ListTaskTemplatesResponse) {}
@@ -910,6 +911,15 @@ message WorkflowTemplateMetadata {
   bool is_conversational = 9;
   // Is the template shipped as part of the studio
   bool pre_packaged = 10;
+}
+
+message ExportWorkflowTemplateRequest {
+  // ID of the workflow template to export
+  string id = 1;
+}
+
+message ExportWorkflowTemplateResponse {
+  string file_path = 1;
 }
 
 

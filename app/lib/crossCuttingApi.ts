@@ -4,6 +4,7 @@ import {
   GetAssetDataResponse,
   GetParentProjectDetailsRequest,
   GetParentProjectDetailsResponse,
+  DownloadTemporaryFileRequest,
 } from '@/studio/proto/agent_studio';
 
 import { apiSlice } from '../api/apiSlice';

@@ -20,6 +20,8 @@ import {
   AddWorkflowTemplateRequest,
   AddWorkflowTemplateResponse,
   RemoveWorkflowTemplateRequest,
+  ExportWorkflowTemplateRequest,
+  ExportWorkflowTemplateResponse,
 } from '@/studio/proto/agent_studio';
 
 import { apiSlice } from '../api/apiSlice';
@@ -157,6 +159,16 @@ export const workflowsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['WorkflowTemplate', 'AgentTemplate', 'ToolTemplate', 'TaskTemplate'],
     }),
+    exportWorkflowTemplate: builder.mutation<string, ExportWorkflowTemplateRequest>({
+      query: (request) => ({
+        url: '/grpc/exportWorkflowTemplate',
+        method: 'POST',
+        body: request,
+      }),
+      transformResponse: (response: ExportWorkflowTemplateResponse) => {
+        return response.file_path;
+      },
+    }),
   }),
 });
 
@@ -174,4 +186,5 @@ export const {
   useGetWorkflowTemplateByIdQuery,
   useAddWorkflowTemplateMutation,
   useRemoveWorkflowTemplateMutation,
+  useExportWorkflowTemplateMutation,
 } = workflowsApi;

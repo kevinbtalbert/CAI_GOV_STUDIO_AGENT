@@ -377,6 +377,12 @@ class AgentStudioStub(object):
             response_deserializer=studio_dot_proto_dot_agent__studio__pb2.RemoveWorkflowTemplateResponse.FromString,
             _registered_method=True,
         )
+        self.ExportWorkflowTemplate = channel.unary_unary(
+            "/agent_studio.AgentStudio/ExportWorkflowTemplate",
+            request_serializer=studio_dot_proto_dot_agent__studio__pb2.ExportWorkflowTemplateRequest.SerializeToString,
+            response_deserializer=studio_dot_proto_dot_agent__studio__pb2.ExportWorkflowTemplateResponse.FromString,
+            _registered_method=True,
+        )
         self.ListTaskTemplates = channel.unary_unary(
             "/agent_studio.AgentStudio/ListTaskTemplates",
             request_serializer=studio_dot_proto_dot_agent__studio__pb2.ListTaskTemplatesRequest.SerializeToString,
@@ -742,6 +748,12 @@ class AgentStudioServicer(object):
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
+    def ExportWorkflowTemplate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
     def ListTaskTemplates(self, request, context):
         """Task templates operations"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -1043,6 +1055,11 @@ def add_AgentStudioServicer_to_server(servicer, server):
             servicer.RemoveWorkflowTemplate,
             request_deserializer=studio_dot_proto_dot_agent__studio__pb2.RemoveWorkflowTemplateRequest.FromString,
             response_serializer=studio_dot_proto_dot_agent__studio__pb2.RemoveWorkflowTemplateResponse.SerializeToString,
+        ),
+        "ExportWorkflowTemplate": grpc.unary_unary_rpc_method_handler(
+            servicer.ExportWorkflowTemplate,
+            request_deserializer=studio_dot_proto_dot_agent__studio__pb2.ExportWorkflowTemplateRequest.FromString,
+            response_serializer=studio_dot_proto_dot_agent__studio__pb2.ExportWorkflowTemplateResponse.SerializeToString,
         ),
         "ListTaskTemplates": grpc.unary_unary_rpc_method_handler(
             servicer.ListTaskTemplates,
@@ -2719,6 +2736,36 @@ class AgentStudio(object):
             "/agent_studio.AgentStudio/RemoveWorkflowTemplate",
             studio_dot_proto_dot_agent__studio__pb2.RemoveWorkflowTemplateRequest.SerializeToString,
             studio_dot_proto_dot_agent__studio__pb2.RemoveWorkflowTemplateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True,
+        )
+
+    @staticmethod
+    def ExportWorkflowTemplate(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            "/agent_studio.AgentStudio/ExportWorkflowTemplate",
+            studio_dot_proto_dot_agent__studio__pb2.ExportWorkflowTemplateRequest.SerializeToString,
+            studio_dot_proto_dot_agent__studio__pb2.ExportWorkflowTemplateResponse.FromString,
             options,
             channel_credentials,
             insecure,

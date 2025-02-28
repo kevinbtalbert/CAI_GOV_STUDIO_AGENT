@@ -10,6 +10,8 @@ import {
   CopyOutlined,
   AppstoreOutlined,
   ApiOutlined,
+  DownloadOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,11 +21,16 @@ import {
   WorkflowTemplateMetadata,
   AgentTemplateMetadata,
 } from '@/studio/proto/agent_studio';
-import { useAddWorkflowMutation, useAddWorkflowTemplateMutation } from '../workflows/workflowsApi';
+import {
+  useAddWorkflowMutation,
+  useAddWorkflowTemplateMutation,
+  useExportWorkflowTemplateMutation,
+} from '../workflows/workflowsApi';
 import { useGlobalNotification } from './Notifications';
 import { useAppDispatch } from '../lib/hooks/hooks';
 import { resetEditor } from '../workflows/editorSlice';
 import { clearedWorkflowApp } from '../workflows/workflowAppSlice';
+import { downloadAndSaveFile, downloadFile } from '../lib/fileDownload';
 
 const { Text } = Typography;
 
@@ -303,6 +310,8 @@ const WorkflowListItem: React.FC<WorkflowListItemProps> = ({
   const [addWorkflow] = useAddWorkflowMutation();
   const notificationsApi = useGlobalNotification();
   const [addWorkflowTemplate] = useAddWorkflowTemplateMutation();
+  const [exportWorkflowTemplate] = useExportWorkflowTemplateMutation();
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false);
   const dispatch = useAppDispatch();
 
   const handleCardClick = () => {
@@ -325,6 +334,26 @@ const WorkflowListItem: React.FC<WorkflowListItemProps> = ({
       });
     } catch (error) {
       console.error('Error deploying workflow:', error);
+    }
+  };
+
+  const handleDownloadWorkflowTemplate = async () => {
+    try {
+      setDownloadingTemplate(true);
+      const tmp_file_path = await exportWorkflowTemplate({
+        id: workflowTemplate!.id,
+      }).unwrap();
+      console.log('tmp_file_path', tmp_file_path);
+      await downloadAndSaveFile(tmp_file_path);
+      setDownloadingTemplate(false);
+    } catch (error) {
+      console.error('Error downloading workflow template:', error);
+      notificationsApi.error({
+        message: 'Error in downloading workflow template',
+        description: (error as Error).message,
+        placement: 'topRight',
+      });
+      setDownloadingTemplate(false);
     }
   };
 
@@ -499,6 +528,21 @@ const WorkflowListItem: React.FC<WorkflowListItemProps> = ({
                     style={{ border: 'none' }}
                     icon={<CopyOutlined style={{ opacity: 0.45 }} />}
                     onClick={handleCreateWorkflowFromTemplate}
+                  />
+                </Tooltip>
+                <Divider style={{ flexGrow: 0, margin: '12px 0px' }} type="vertical" />
+                <Tooltip title="Download Workflow Template">
+                  <Button
+                    style={{ border: 'none' }}
+                    icon={
+                      !downloadingTemplate ? (
+                        <DownloadOutlined style={{ opacity: 0.45 }} />
+                      ) : (
+                        <LoadingOutlined style={{ opacity: 0.45 }} />
+                      )
+                    }
+                    onClick={handleDownloadWorkflowTemplate}
+                    disabled={downloadingTemplate}
                   />
                 </Tooltip>
                 {!workflowTemplate?.pre_packaged && (
