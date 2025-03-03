@@ -998,6 +998,15 @@ export interface ExportWorkflowTemplateResponse {
   file_path: string;
 }
 
+export interface ImportWorkflowTemplateRequest {
+  /** Absolute path of the zip file to import */
+  file_path: string;
+}
+
+export interface ImportWorkflowTemplateResponse {
+  id: string;
+}
+
 export interface ListTaskTemplatesRequest {
   /** optional workflow id */
   workflow_template_id?: string | undefined;
@@ -11648,6 +11657,122 @@ export const ExportWorkflowTemplateResponse: MessageFns<ExportWorkflowTemplateRe
   },
 };
 
+function createBaseImportWorkflowTemplateRequest(): ImportWorkflowTemplateRequest {
+  return { file_path: "" };
+}
+
+export const ImportWorkflowTemplateRequest: MessageFns<ImportWorkflowTemplateRequest> = {
+  encode(message: ImportWorkflowTemplateRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.file_path !== "") {
+      writer.uint32(10).string(message.file_path);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ImportWorkflowTemplateRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseImportWorkflowTemplateRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.file_path = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ImportWorkflowTemplateRequest {
+    return { file_path: isSet(object.file_path) ? globalThis.String(object.file_path) : "" };
+  },
+
+  toJSON(message: ImportWorkflowTemplateRequest): unknown {
+    const obj: any = {};
+    if (message.file_path !== "") {
+      obj.file_path = message.file_path;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ImportWorkflowTemplateRequest>): ImportWorkflowTemplateRequest {
+    return ImportWorkflowTemplateRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ImportWorkflowTemplateRequest>): ImportWorkflowTemplateRequest {
+    const message = createBaseImportWorkflowTemplateRequest();
+    message.file_path = object.file_path ?? "";
+    return message;
+  },
+};
+
+function createBaseImportWorkflowTemplateResponse(): ImportWorkflowTemplateResponse {
+  return { id: "" };
+}
+
+export const ImportWorkflowTemplateResponse: MessageFns<ImportWorkflowTemplateResponse> = {
+  encode(message: ImportWorkflowTemplateResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ImportWorkflowTemplateResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseImportWorkflowTemplateResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ImportWorkflowTemplateResponse {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: ImportWorkflowTemplateResponse): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ImportWorkflowTemplateResponse>): ImportWorkflowTemplateResponse {
+    return ImportWorkflowTemplateResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ImportWorkflowTemplateResponse>): ImportWorkflowTemplateResponse {
+    const message = createBaseImportWorkflowTemplateResponse();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
 function createBaseListTaskTemplatesRequest(): ListTaskTemplatesRequest {
   return { workflow_template_id: undefined };
 }
@@ -13206,6 +13331,17 @@ export const AgentStudioService = {
       Buffer.from(ExportWorkflowTemplateResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ExportWorkflowTemplateResponse.decode(value),
   },
+  importWorkflowTemplate: {
+    path: "/agent_studio.AgentStudio/ImportWorkflowTemplate",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ImportWorkflowTemplateRequest) =>
+      Buffer.from(ImportWorkflowTemplateRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => ImportWorkflowTemplateRequest.decode(value),
+    responseSerialize: (value: ImportWorkflowTemplateResponse) =>
+      Buffer.from(ImportWorkflowTemplateResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => ImportWorkflowTemplateResponse.decode(value),
+  },
   /** Task templates operations */
   listTaskTemplates: {
     path: "/agent_studio.AgentStudio/ListTaskTemplates",
@@ -13316,6 +13452,7 @@ export interface AgentStudioServer extends UntypedServiceImplementation {
   addWorkflowTemplate: handleUnaryCall<AddWorkflowTemplateRequest, AddWorkflowTemplateResponse>;
   removeWorkflowTemplate: handleUnaryCall<RemoveWorkflowTemplateRequest, RemoveWorkflowTemplateResponse>;
   exportWorkflowTemplate: handleUnaryCall<ExportWorkflowTemplateRequest, ExportWorkflowTemplateResponse>;
+  importWorkflowTemplate: handleUnaryCall<ImportWorkflowTemplateRequest, ImportWorkflowTemplateResponse>;
   /** Task templates operations */
   listTaskTemplates: handleUnaryCall<ListTaskTemplatesRequest, ListTaskTemplatesResponse>;
   getTaskTemplate: handleUnaryCall<GetTaskTemplateRequest, GetTaskTemplateResponse>;
@@ -14169,6 +14306,21 @@ export interface AgentStudioClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ExportWorkflowTemplateResponse) => void,
+  ): ClientUnaryCall;
+  importWorkflowTemplate(
+    request: ImportWorkflowTemplateRequest,
+    callback: (error: ServiceError | null, response: ImportWorkflowTemplateResponse) => void,
+  ): ClientUnaryCall;
+  importWorkflowTemplate(
+    request: ImportWorkflowTemplateRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ImportWorkflowTemplateResponse) => void,
+  ): ClientUnaryCall;
+  importWorkflowTemplate(
+    request: ImportWorkflowTemplateRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ImportWorkflowTemplateResponse) => void,
   ): ClientUnaryCall;
   /** Task templates operations */
   listTaskTemplates(

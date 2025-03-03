@@ -95,6 +95,7 @@ service AgentStudio {
   rpc AddWorkflowTemplate (AddWorkflowTemplateRequest) returns (AddWorkflowTemplateResponse) {}
   rpc RemoveWorkflowTemplate (RemoveWorkflowTemplateRequest) returns (RemoveWorkflowTemplateResponse) {}
   rpc ExportWorkflowTemplate (ExportWorkflowTemplateRequest) returns (ExportWorkflowTemplateResponse) {}
+  rpc ImportWorkflowTemplate (ImportWorkflowTemplateRequest) returns (ImportWorkflowTemplateResponse) {}
 
   // Task templates operations
   rpc ListTaskTemplates (ListTaskTemplatesRequest) returns (ListTaskTemplatesResponse) {}
@@ -922,6 +923,14 @@ message ExportWorkflowTemplateResponse {
   string file_path = 1;
 }
 
+message ImportWorkflowTemplateRequest {
+  // Absolute path of the zip file to import
+  string file_path = 1;
+}
+
+message ImportWorkflowTemplateResponse {
+  string id = 1;
+}
 
 message ListTaskTemplatesRequest {
   // optional workflow id

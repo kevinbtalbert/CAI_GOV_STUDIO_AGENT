@@ -1,5 +1,8 @@
 import tempfile
 import json
+import zipfile
+import os
+import shutil
 from typing import List, Dict
 from uuid import uuid4
 from google.protobuf.json_format import MessageToDict
@@ -13,10 +16,10 @@ from studio.agents.agent_templates import remove_agent_template
 from studio.task.task_templates import remove_task_template, add_task_template
 from studio.tools.tool_template import remove_tool_template
 from studio.proto.utils import is_field_set
-from crewai import Process
+import studio.db.utils as db_utils
 import studio.consts as consts
-import os
-import shutil
+
+from crewai import Process
 
 
 def list_workflow_templates(
@@ -377,3 +380,98 @@ def export_workflow_template(
                 return ExportWorkflowTemplateResponse(file_path=zip_file_path + ".zip")
         finally:
             session.rollback()  # This is a read-only operation. Rollback any transactions.
+
+
+def import_workflow_template(
+    request: ImportWorkflowTemplateRequest, cml: CMLServiceApi = None, dao: AgentStudioDao = None
+) -> ImportWorkflowTemplateResponse:
+    abs_file_path: str = request.file_path
+
+    # Always expect absolute path
+    if not os.path.isabs(abs_file_path):
+        raise ValueError(f"File path must be absolute: {abs_file_path}")
+
+    # Check if the file exists
+    if not os.path.exists(abs_file_path):
+        raise ValueError(f"File does not exist: {abs_file_path}")
+
+    # Create a temporary directory for the export
+    os.makedirs(consts.TEMP_FILES_LOCATION, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="extracted_workflow_template_", dir=consts.TEMP_FILES_LOCATION) as temp_dir:
+        # Unzip the file
+        with zipfile.ZipFile(abs_file_path, "r") as zip_ref:
+            zip_ref.extractall(temp_dir)
+
+        # Load the JSON file
+        template_file_path = os.path.join(temp_dir, "workflow_template.json")
+        with open(template_file_path, "r") as f:
+            template_dict: Dict = json.load(f)
+
+        new_workflow_template_id: str = str(uuid4())
+
+        changed_uuids: Dict[str, str] = dict()
+        tool_templates: List[Dict] = template_dict["tool_templates"]
+        for _t in tool_templates:
+            changed_uuids[_t["id"]] = str(uuid4())
+            new_tool_template_id = changed_uuids[_t["id"]]
+            _t["id"] = new_tool_template_id
+            _t["workflow_template_id"] = new_workflow_template_id
+            tool_template_dir = os.path.join(consts.TOOL_TEMPLATE_CATALOG_LOCATION, new_tool_template_id)
+            os.rename(os.path.join(temp_dir, _t["source_folder_path"]), os.path.join(temp_dir, tool_template_dir))
+            _t["source_folder_path"] = tool_template_dir
+            if _t.get("tool_image_path"):
+                _, ext = os.path.splitext(_t["tool_image_path"])
+                ext = ext.lower()
+                new_image_path = os.path.join(consts.TOOL_TEMPLATE_ICONS_LOCATION, f"{new_tool_template_id}_icon{ext}")
+                os.rename(os.path.join(temp_dir, _t["tool_image_path"]), os.path.join(temp_dir, new_image_path))
+                _t["tool_image_path"] = new_image_path
+
+        agent_templates: List[Dict] = template_dict["agent_templates"]
+        for _a in agent_templates:
+            changed_uuids[_a["id"]] = str(uuid4())
+            _a["id"] = changed_uuids[_a["id"]]
+            _a["workflow_template_id"] = new_workflow_template_id
+            if _a.get("agent_image_path"):
+                _, ext = os.path.splitext(_a["agent_image_path"])
+                ext = ext.lower()
+                new_image_path = os.path.join(consts.AGENT_TEMPLATE_ICONS_LOCATION, f"{_a['id']}_icon{ext}")
+                os.rename(os.path.join(temp_dir, _a["agent_image_path"]), os.path.join(temp_dir, new_image_path))
+                _a["agent_image_path"] = new_image_path
+            if _a.get("tool_template_ids"):
+                _a["tool_template_ids"] = [changed_uuids[t_id] for t_id in _a["tool_template_ids"]]
+
+        task_templates: List[Dict] = template_dict["task_templates"]
+        for _t in task_templates:
+            changed_uuids[_t["id"]] = str(uuid4())
+            _t["id"] = changed_uuids[_t["id"]]
+            _t["workflow_template_id"] = new_workflow_template_id
+            if _t.get("assigned_agent_template_id"):
+                _t["assigned_agent_template_id"] = changed_uuids[_t["assigned_agent_template_id"]]
+
+        workflow_template: Dict = template_dict["workflow_template"]
+        workflow_template["id"] = new_workflow_template_id
+        if workflow_template.get("manager_agent_template_id"):
+            workflow_template["manager_agent_template_id"] = changed_uuids[
+                workflow_template["manager_agent_template_id"]
+            ]
+        if workflow_template.get("agent_template_ids"):
+            workflow_template["agent_template_ids"] = [
+                changed_uuids[a_id] for a_id in workflow_template["agent_template_ids"]
+            ]
+        if workflow_template.get("task_template_ids"):
+            workflow_template["task_template_ids"] = [
+                changed_uuids[t_id] for t_id in workflow_template["task_template_ids"]
+            ]
+        template_dict["workflow_template"] = workflow_template
+
+        # copy the .studio-data inside the temp directory to project wide .studio-data
+        shutil.copytree(
+            os.path.join(temp_dir, consts.ALL_STUDIO_DATA_LOCATION), consts.ALL_STUDIO_DATA_LOCATION, dirs_exist_ok=True
+        )
+
+        template_dict.pop("template_version", None)
+        template_dict["workflow_templates"] = [template_dict.pop("workflow_template")]
+
+        db_utils.import_from_dict(template_dict, dao)
+
+        return ImportWorkflowTemplateResponse(id=new_workflow_template_id)
