@@ -1629,16 +1629,12 @@ class CheckStudioUpgradeStatusRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class CheckStudioUpgradeStatusResponse(_message.Message):
-    __slots__ = ("local_commit", "remote_commit", "out_of_date")
-    LOCAL_COMMIT_FIELD_NUMBER: _ClassVar[int]
-    REMOTE_COMMIT_FIELD_NUMBER: _ClassVar[int]
-    OUT_OF_DATE_FIELD_NUMBER: _ClassVar[int]
-    local_commit: str
-    remote_commit: str
-    out_of_date: bool
-    def __init__(
-        self, local_commit: _Optional[str] = ..., remote_commit: _Optional[str] = ..., out_of_date: bool = ...
-    ) -> None: ...
+    __slots__ = ("local_version", "newest_version")
+    LOCAL_VERSION_FIELD_NUMBER: _ClassVar[int]
+    NEWEST_VERSION_FIELD_NUMBER: _ClassVar[int]
+    local_version: str
+    newest_version: str
+    def __init__(self, local_version: _Optional[str] = ..., newest_version: _Optional[str] = ...) -> None: ...
 
 class UpgradeStudioRequest(_message.Message):
     __slots__ = ()

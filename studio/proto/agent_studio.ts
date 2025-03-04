@@ -1059,9 +1059,8 @@ export interface CheckStudioUpgradeStatusRequest {
 }
 
 export interface CheckStudioUpgradeStatusResponse {
-  local_commit: string;
-  remote_commit: string;
-  out_of_date: boolean;
+  local_version: string;
+  newest_version: string;
 }
 
 export interface UpgradeStudioRequest {
@@ -12505,19 +12504,16 @@ export const CheckStudioUpgradeStatusRequest: MessageFns<CheckStudioUpgradeStatu
 };
 
 function createBaseCheckStudioUpgradeStatusResponse(): CheckStudioUpgradeStatusResponse {
-  return { local_commit: "", remote_commit: "", out_of_date: false };
+  return { local_version: "", newest_version: "" };
 }
 
 export const CheckStudioUpgradeStatusResponse: MessageFns<CheckStudioUpgradeStatusResponse> = {
   encode(message: CheckStudioUpgradeStatusResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.local_commit !== "") {
-      writer.uint32(10).string(message.local_commit);
+    if (message.local_version !== "") {
+      writer.uint32(10).string(message.local_version);
     }
-    if (message.remote_commit !== "") {
-      writer.uint32(18).string(message.remote_commit);
-    }
-    if (message.out_of_date !== false) {
-      writer.uint32(24).bool(message.out_of_date);
+    if (message.newest_version !== "") {
+      writer.uint32(18).string(message.newest_version);
     }
     return writer;
   },
@@ -12534,7 +12530,7 @@ export const CheckStudioUpgradeStatusResponse: MessageFns<CheckStudioUpgradeStat
             break;
           }
 
-          message.local_commit = reader.string();
+          message.local_version = reader.string();
           continue;
         }
         case 2: {
@@ -12542,15 +12538,7 @@ export const CheckStudioUpgradeStatusResponse: MessageFns<CheckStudioUpgradeStat
             break;
           }
 
-          message.remote_commit = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
-
-          message.out_of_date = reader.bool();
+          message.newest_version = reader.string();
           continue;
         }
       }
@@ -12564,22 +12552,18 @@ export const CheckStudioUpgradeStatusResponse: MessageFns<CheckStudioUpgradeStat
 
   fromJSON(object: any): CheckStudioUpgradeStatusResponse {
     return {
-      local_commit: isSet(object.local_commit) ? globalThis.String(object.local_commit) : "",
-      remote_commit: isSet(object.remote_commit) ? globalThis.String(object.remote_commit) : "",
-      out_of_date: isSet(object.out_of_date) ? globalThis.Boolean(object.out_of_date) : false,
+      local_version: isSet(object.local_version) ? globalThis.String(object.local_version) : "",
+      newest_version: isSet(object.newest_version) ? globalThis.String(object.newest_version) : "",
     };
   },
 
   toJSON(message: CheckStudioUpgradeStatusResponse): unknown {
     const obj: any = {};
-    if (message.local_commit !== "") {
-      obj.local_commit = message.local_commit;
+    if (message.local_version !== "") {
+      obj.local_version = message.local_version;
     }
-    if (message.remote_commit !== "") {
-      obj.remote_commit = message.remote_commit;
-    }
-    if (message.out_of_date !== false) {
-      obj.out_of_date = message.out_of_date;
+    if (message.newest_version !== "") {
+      obj.newest_version = message.newest_version;
     }
     return obj;
   },
@@ -12589,9 +12573,8 @@ export const CheckStudioUpgradeStatusResponse: MessageFns<CheckStudioUpgradeStat
   },
   fromPartial(object: DeepPartial<CheckStudioUpgradeStatusResponse>): CheckStudioUpgradeStatusResponse {
     const message = createBaseCheckStudioUpgradeStatusResponse();
-    message.local_commit = object.local_commit ?? "";
-    message.remote_commit = object.remote_commit ?? "";
-    message.out_of_date = object.out_of_date ?? false;
+    message.local_version = object.local_version ?? "";
+    message.newest_version = object.newest_version ?? "";
     return message;
   },
 };

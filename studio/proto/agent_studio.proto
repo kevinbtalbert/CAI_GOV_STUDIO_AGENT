@@ -983,9 +983,8 @@ message CheckStudioUpgradeStatusRequest {
 }
 
 message CheckStudioUpgradeStatusResponse {
-  string local_commit = 1;
-  string remote_commit = 2;
-  bool out_of_date = 3;
+  string local_version = 1;
+  string newest_version = 2;
 }
 
 

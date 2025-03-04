@@ -17,7 +17,13 @@ import WorkflowList from '../components/WorkflowList';
 import { useListDeployedWorkflowsQuery, useUndeployWorkflowMutation } from './deployedWorkflowsApi';
 import { resetEditor, updatedEditorStep } from './editorSlice';
 import { useAppDispatch } from '../lib/hooks/hooks';
-import { Workflow, DeployedWorkflow, WorkflowTemplateMetadata } from '@/studio/proto/agent_studio';
+import {
+  Workflow,
+  DeployedWorkflow,
+  WorkflowTemplateMetadata,
+  CheckStudioUpgradeStatusRequest,
+  CheckStudioUpgradeStatusResponse,
+} from '@/studio/proto/agent_studio';
 import DeleteDeployedWorkflowModal from '../components/DeleteDeployedWorkflowModal';
 import DeleteWorkflowModal from '../components/DeleteWorkflowModal';
 import CommonBreadCrumb from '../components/CommonBreadCrumb';
@@ -28,9 +34,15 @@ import WorkflowGetStartModal from '../components/WorkflowGetStartModal';
 import { clearedWorkflowApp } from './workflowAppSlice';
 import { useCheckStudioUpgradeStatusQuery, useUpgradeStudioMutation } from '../lib/crossCuttingApi';
 
-const { Text, Title } = Typography;
+import * as semver from 'semver';
 
-const UpgradeModal: React.FC = () => {
+const { Text, Title, Paragraph } = Typography;
+
+export interface UpgradeModalProps {
+  upgradeStatus?: CheckStudioUpgradeStatusResponse;
+}
+
+const UpgradeModal: React.FC<UpgradeModalProps> = ({ upgradeStatus }) => {
   const [upgradeStudio] = useUpgradeStudioMutation();
   const [isOpen, setIsOpen] = useState(true);
   const notificationsApi = useGlobalNotification();
@@ -44,6 +56,10 @@ const UpgradeModal: React.FC = () => {
       placement: 'topRight',
     });
     setIsOpen(false);
+  };
+
+  const isValidSemver = (version: string | undefined) => {
+    return version && Boolean(semver.valid(version));
   };
 
   return (
@@ -70,11 +86,27 @@ const UpgradeModal: React.FC = () => {
           }}
         >
           <Title level={4}>
-            Upgrade Agent Studio <SyncOutlined style={{ marginLeft: 12 }} />
+            Upgrade Agent Studio to{' '}
+            <b>
+              {isValidSemver(upgradeStatus?.local_version)
+                ? upgradeStatus?.newest_version
+                : upgradeStatus?.newest_version.substring(0, 7)}
+            </b>
+            <SyncOutlined style={{ marginLeft: 12 }} />
           </Title>
-          Your version of Agent Studio is out of date. Upgrading Agent Studio will pull down the
-          most recent version into your project, and restart the main Agent Studio application. Your
-          existing workflows will not be lost. Do you wish to continue?
+          <Text>
+            Current Version:{' '}
+            <b>
+              {isValidSemver(upgradeStatus?.local_version)
+                ? upgradeStatus?.local_version
+                : upgradeStatus?.local_version.substring(0, 7)}
+            </b>
+          </Text>
+          <Paragraph>
+            Your version of Agent Studio is out of date. Upgrading Agent Studio will pull down the
+            most recent version into your project, and restart the main Agent Studio application.
+            Your existing workflows will not be lost. Do you wish to continue?
+          </Paragraph>
         </Layout>
       </Modal>
     </>
@@ -297,6 +329,10 @@ const WorkflowsPage: React.FC = () => {
     }
   };
 
+  const isOutOfDate = (upgradeStatus: CheckStudioUpgradeStatusResponse | undefined) => {
+    return upgradeStatus && upgradeStatus.local_version !== upgradeStatus.newest_version;
+  };
+
   return (
     <Layout
       style={{
@@ -306,7 +342,7 @@ const WorkflowsPage: React.FC = () => {
         background: 'transparent',
       }}
     >
-      {upgradeStatus?.out_of_date && <UpgradeModal />}
+      {isOutOfDate(upgradeStatus) && <UpgradeModal upgradeStatus={upgradeStatus} />}
       <CommonBreadCrumb items={[{ title: 'Agentic Workflows' }]} />
       <NoDefaultModelModal />
       <Layout>
