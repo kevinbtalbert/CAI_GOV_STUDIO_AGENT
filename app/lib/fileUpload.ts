@@ -8,7 +8,16 @@ export async function uploadFile(
     // Read file as array buffer and convert to base64
     const arrayBuffer = await file.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
-    const base64Content = btoa(String.fromCharCode(...bytes));
+
+    let base64Content = '';
+    const chunkSize = 8192; // Process 8KB chunks
+
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.slice(i, i + chunkSize);
+      base64Content += String.fromCharCode.apply(null, Array.from(chunk));
+    }
+
+    base64Content = btoa(base64Content);
 
     const response = await fetch('/api/grpc/nonStreamingTemporaryFileUpload', {
       method: 'POST',

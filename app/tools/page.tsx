@@ -10,7 +10,6 @@ import {
   useRemoveToolTemplateMutation,
   useAddToolTemplateMutation,
 } from './toolTemplatesApi';
-import { ToolTemplate } from '@/studio/proto/agent_studio';
 import NoDefaultModelModal from '../components/NoDefaultModelModal';
 import CommonBreadCrumb from '../components/CommonBreadCrumb';
 import { useRouter } from 'next/navigation';
@@ -19,17 +18,11 @@ import { useGlobalNotification } from '../components/Notifications'; // Assuming
 
 const { Text } = Typography;
 
-interface ModalProps {
-  editing: boolean;
-  tool: ToolTemplate;
-}
-
 const ToolsPage = () => {
   const { data: tools } = useListGlobalToolTemplatesQuery({});
   const [removeToolTemplate] = useRemoveToolTemplateMutation();
   const [addToolTemplate] = useAddToolTemplateMutation();
 
-  const [modalProps, setModalProps] = useState<ModalProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 

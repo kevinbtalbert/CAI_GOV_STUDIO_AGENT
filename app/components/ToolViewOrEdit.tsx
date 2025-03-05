@@ -13,6 +13,7 @@ import { Editor } from '@monaco-editor/react';
 import { ToolTemplate } from '@/studio/proto/agent_studio';
 import { uploadFile } from '../lib/fileUpload';
 import { useGetParentProjectDetailsQuery } from '../lib/crossCuttingApi';
+import { useGlobalNotification } from '../components/Notifications';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -38,6 +39,7 @@ const ToolViewOrEdit: React.FC<ToolViewOrEditProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { data: parentProjectDetails } = useGetParentProjectDetailsQuery({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const notificationApi = useGlobalNotification();
 
   useEffect(() => {
     if (toolDetails) {
@@ -52,6 +54,15 @@ const ToolViewOrEdit: React.FC<ToolViewOrEditProps> = ({
     const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
     if (!validTypes.includes(file.type)) {
       message.error('Please upload a PNG or JPEG image file');
+      return;
+    }
+
+    // If file size is greater than 64KB, show a notification
+    if (file.size > 64 * 1024) {
+      notificationApi.warning({
+        message: 'File size should be less than 64KB',
+        placement: 'topRight',
+      });
       return;
     }
 

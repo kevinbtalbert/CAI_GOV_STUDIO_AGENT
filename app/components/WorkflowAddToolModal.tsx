@@ -308,6 +308,15 @@ const WorkflowAddToolModal: React.FC<WorkflowAddToolModalProps> = ({ open, onCan
       return;
     }
 
+    // If file size is greater than 64KB, show a notification
+    if (file.size > 64 * 1024) {
+      notificationApi.warning({
+        message: 'File size should be less than 64KB',
+        placement: 'topRight',
+      });
+      return;
+    }
+
     try {
       const fp = await uploadFile(file, setUploading);
       setUploadedFilePath(fp);
