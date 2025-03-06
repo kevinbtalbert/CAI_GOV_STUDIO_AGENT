@@ -2,18 +2,21 @@
 
 from typing import List, Dict, Literal, Optional, Any, Type
 from pydantic import BaseModel
-from crewai import Task, Crew, LLM as CrewAILLM, Agent
-from crewai.tools import BaseTool
 import sys
-from studio.tools.utils import extract_tool_class_name, get_tool_instance_proxy
-from studio.models.utils import get_crewai_llm_object_direct, get_crewai_llm_object_proxied
 import studio.cross_cutting.input_types as input_types
 from contextlib import contextmanager
 import os
 import importlib
 from opentelemetry.context import attach, detach, Context
 import asyncio
+from crewai import Task, Crew, LLM as CrewAILLM, Agent
+from crewai.tools import BaseTool
+
+from studio.tools.utils import extract_tool_class_name, get_tool_instance_proxy
+from studio.models.utils import get_crewai_llm_object_direct, get_crewai_llm_object_proxied
 from studio.workflow.ops_wrappers import WrappedAgent
+from studio.cross_cutting import utils as cc_utils
+from studio import consts
 
 
 def _import_module_with_isolation(module_name: str, module_path: str):
@@ -122,6 +125,10 @@ def _get_crewai_agent(
         tools=crewai_tools or list(),
         llm=llm_model,
     )
+
+
+def get_workflow_directory(workflow_name: str) -> str:
+    return f"{consts.WORKFLOWS_LOCATION}/{cc_utils.create_slug_from_name(workflow_name)}_{cc_utils.get_random_compact_string()}"
 
 
 def create_crewai_objects(

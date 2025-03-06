@@ -1,5 +1,6 @@
-from uuid import uuid4
 import os
+import shutil
+from uuid import uuid4
 from typing import List
 from sqlalchemy.exc import SQLAlchemyError
 from studio.db.dao import AgentStudioDao
@@ -11,11 +12,10 @@ from studio.task.task import remove_task
 from studio.agents.agent import remove_agent, add_agent
 from studio.tools.tool_instance import remove_tool_instance
 import studio.tools.utils as tool_utils
-from studio.consts import WORKFLOWS_LOCATION
+import studio.workflow.utils as workflow_utils
 from cmlapi import CMLServiceApi
 from typing import List, Set
 from crewai import Process
-import shutil
 
 
 def _validate_agents(metadata: CrewAIWorkflowMetadata, cml: CMLServiceApi, dao: AgentStudioDao = None) -> None:
@@ -103,24 +103,6 @@ def _validate_process(metadata: CrewAIWorkflowMetadata, cml: CMLServiceApi, dao:
     return
 
 
-def create_workflow_directory(workflow_id: str):
-    workflow_dir = os.path.join(WORKFLOWS_LOCATION, workflow_id)
-    if not os.path.exists(workflow_dir):
-        os.makedirs(workflow_dir)
-    return workflow_dir
-
-
-def remove_workflow_directory(workflow_id: str):
-    workflow_dir = os.path.join(WORKFLOWS_LOCATION, workflow_id)
-    if os.path.exists(workflow_dir):
-        shutil.rmtree(workflow_dir)
-    return
-
-
-def get_workflow_directory(workflow: db_model.Workflow) -> str:
-    return str(os.path.join(WORKFLOWS_LOCATION, workflow.id))
-
-
 def add_workflow_from_template(
     request: AddWorkflowRequest, cml: CMLServiceApi, dao: AgentStudioDao = None
 ) -> AddWorkflowResponse:
@@ -130,9 +112,6 @@ def add_workflow_from_template(
 
     # Assign a workflow id.
     workflow_id = str(uuid4())
-
-    # Create a directory for this workflow.
-    create_workflow_directory(workflow_id=workflow_id)
 
     # Grab the workflow template
     with dao.get_session() as session:
@@ -148,6 +127,9 @@ def add_workflow_from_template(
         workflow.crew_ai_process = workflow_template.process
         workflow.is_conversational = workflow_template.is_conversational
         workflow.is_draft = True
+        wf_dir = workflow_utils.get_workflow_directory(workflow.name)
+        workflow.directory = wf_dir
+        os.makedirs(wf_dir, exist_ok=True)
 
         # Create all agents
         agent_templates_to_created_agent_id: dict[str, str] = {}
@@ -244,6 +226,9 @@ def add_workflow(request: AddWorkflowRequest, cml: CMLServiceApi, dao: AgentStud
             manager_agent_id = request.crew_ai_workflow_metadata.manager_agent_id
             manager_llm_model_provider_id = request.crew_ai_workflow_metadata.manager_llm_model_provider_id
 
+            wf_dir = workflow_utils.get_workflow_directory(request.name)
+            os.makedirs(wf_dir, exist_ok=True)
+
             # Create a new workflow
             workflow = db_model.Workflow(
                 id=str(uuid4()),
@@ -255,6 +240,7 @@ def add_workflow(request: AddWorkflowRequest, cml: CMLServiceApi, dao: AgentStud
                 crew_ai_llm_provider_model_id=manager_llm_model_provider_id,
                 is_conversational=request.is_conversational,
                 is_draft=True,
+                directory=wf_dir,
             )
             session.add(workflow)
             session.commit()
@@ -484,10 +470,13 @@ def remove_workflow(
                     preexisting_db_session=session,
                 )
 
-            # Remove the workflow directory
-            remove_workflow_directory(workflow.id)
-
             # Finally, delete the workflow
+            try:
+                if os.path.exists(workflow.directory):
+                    shutil.rmtree(workflow.directory)
+                    print(f"Deleted workflow directory: {workflow.directory}")
+            except Exception as e:
+                print(f"Failed to delete workflow directory: {e}")
             session.delete(workflow)
             return RemoveWorkflowResponse()
     except SQLAlchemyError as e:

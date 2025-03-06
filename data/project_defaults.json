@@ -6,162 +6,162 @@
       "name": "Calculator Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/calculator",
+      "source_folder_path": "studio-data/tool_templates/calculator",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/calculator.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/calculator.png"
     },
     {
       "id": "dfedd1d9-6b90-4b89-98a2-6934c8dcc077",
       "name": "Jira Integration Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/jira_integration",
+      "source_folder_path": "studio-data/tool_templates/jira_integration",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/jira.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/jira.png"
     },
     {
       "id": "5d61f046-425c-4b89-b023-a9ed53b048aa",
       "name": "Web Search Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/search_internet",
+      "source_folder_path": "studio-data/tool_templates/search_internet",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/internet.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/internet.png"
     },
     {
       "id": "2cbafffb-f874-4505-a7d0-c13990be8bef",
       "name": "Webpage Scraper Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/scrape_website",
+      "source_folder_path": "studio-data/tool_templates/scrape_website",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/web-crawler.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/web-crawler.png"
     },
     {
       "id": "0d65d035-30ff-45a8-98c6-be307feba1af",
       "name": "Email Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/email_tool",
+      "source_folder_path": "studio-data/tool_templates/email_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/mail.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/mail.png"
     },
     {
       "id": "a17c9f25-4b8e-4d2b-b6e1-49dcf2a7a5d8",
       "name": "Slack Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/slack_tool",
+      "source_folder_path": "studio-data/tool_templates/slack_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/slack.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/slack.png"
     },
     {
       "id": "e6f2c85b-548a-4079-8b50-c450d5b2ccc2",
       "name": "Calendar Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/calendar_tool",
+      "source_folder_path": "studio-data/tool_templates/calendar_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/calendar_icon.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/calendar_icon.png"
     },
     {
       "id": "5759600d-a09c-4624-af42-6911f05dd817",
       "name": "Pdf Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/pdf_tool",
+      "source_folder_path": "studio-data/tool_templates/pdf_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/pdf.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/pdf.png"
     },
     {
       "id": "2159600d-p09c-5524-af42-9911e05dd017",
       "name": "File Read Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/fileread_tool",
+      "source_folder_path": "studio-data/tool_templates/fileread_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/google-docs.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/google-docs.png"
     },
     {
       "id": "2159600d-p09c-5524-af32-9922e05dd017",
       "name": "Directory Read Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/directoryread_tool",
+      "source_folder_path": "studio-data/tool_templates/directoryread_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/folder.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/folder.png"
     },
     {
       "id": "fd2caa76-ddc8-4049-b0cc-a4ca84310a78",
       "name": "CDF HuggingFace Readyflow Deploy",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/cdf_readyflow_deploy_hf_tool",
+      "source_folder_path": "studio-data/tool_templates/cdf_readyflow_deploy_hf_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/cdf_icon.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/cdf_icon.png"
     },
     {
       "id": "64d862d6-cc46-4785-bc5f-b51c4cc26f21",
       "name": "CDV Dataset Creation Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/cdv_dataset_tool",
+      "source_folder_path": "studio-data/tool_templates/cdv_dataset_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/cdv_icon.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/cdv_icon.png"
     },
     {
       "id": "948f6229-5806-443e-bee9-ab6dc31cb7fa",
       "name": "CDV Smart Visual Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/cdv_smart_visual_tool",
+      "source_folder_path": "studio-data/tool_templates/cdv_smart_visual_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/cdv_icon.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/cdv_icon.png"
     },
     {
       "id": "f142c82a-eb45-483a-95cc-56876bda8a31",
       "name": "CDW Hive Table from S3 Parquet",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/cdw_hive_from_s3_parquet",
+      "source_folder_path": "studio-data/tool_templates/cdw_hive_from_s3_parquet",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/hive_icon.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/hive_icon.png"
     },
     {
       "id": "a6d9699f-93b9-4f69-bedc-f261c171bedd",
       "name": "FSI Example: Stock Ticker History LookupTool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/fsi_timeseries_stock_tool",
+      "source_folder_path": "studio-data/tool_templates/fsi_timeseries_stock_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/yfinance.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/yfinance.png"
     },
     {
       "id": "4231985c-cd71-4ead-abfc-547fa9d596ec",
       "name": "FSI Example: Investment Portfolio Optimization Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/fsi_portfolio_optimization_tool",
+      "source_folder_path": "studio-data/tool_templates/fsi_portfolio_optimization_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/graph.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/graph.png"
     },
     {
       "id": "c5c7704b-f816-4ba1-9f10-5e532764acb8",
       "name": "FSI Example: Customer Portfolio Lookup Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/fsi_sample_portfolio_lookup_tool",
+      "source_folder_path": "studio-data/tool_templates/fsi_sample_portfolio_lookup_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/guide.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/guide.png"
     },
     {
       "id": "5f27c552-4837-4e39-9e61-9c63448cca09",
       "name": "FSI Example: Customer Profile Lookup Tool",
       "python_code_file_name": "tool.py",
       "python_requirements_file_name": "requirements.txt",
-      "source_folder_path": ".studio-data/tool_templates/fsi_customer_profile_lookup_tool",
+      "source_folder_path": "studio-data/tool_templates/fsi_customer_profile_lookup_tool",
       "pre_built": true,
-      "tool_image_path": ".studio-data/dynamic_assets/tool_template_icons/partners.png"
+      "tool_image_path": "studio-data/dynamic_assets/tool_template_icons/partners.png"
     }
   ],
   "task_templates": [
@@ -299,7 +299,7 @@
         "2cbafffb-f874-4505-a7d0-c13990be8bef"
       ],
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/internet.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/internet.png"
     },
     {
       "id": "e4195dfd-fae5-453c-8b66-5367173964ef",
@@ -317,7 +317,7 @@
         "dfedd1d9-6b90-4b89-98a2-6934c8dcc077"
       ],
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/jira.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/jira.png"
     },
     {
       "id": "5db2f37c-e36e-4fa5-95bf-3bfe8bbfc681",
@@ -479,7 +479,7 @@
       "temperature": 0.1,
       "max_iter": 1,
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cdf-agent.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/cdf-agent.png"
     },
     {
       "id": "7454f27b-9758-4b52-9c96-c8b1ae315c1e",
@@ -497,7 +497,7 @@
       "temperature": 0.1,
       "max_iter": 0,
       "pre_packaged": false,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cdw-agent.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/cdw-agent.png"
     },
     {
       "id": "3d11b7ce-cdb3-4a9a-ad77-feac1b4f196e",
@@ -516,7 +516,7 @@
       "temperature": 0.1,
       "max_iter": 0,
       "pre_packaged": false,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/communications_icon.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/communications_icon.png"
     },
     {
       "id": "5d826de3-69bf-405d-8a8a-ecbbeafcb391",
@@ -535,7 +535,7 @@
       "temperature": 0.1,
       "max_iter": 0,
       "pre_packaged": false,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/viz-agent.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/viz-agent.png"
     },
     {
       "id": "3616ba1a-b05c-47b0-a79b-c1a6ba7cea8e",
@@ -551,7 +551,7 @@
       "max_iter": 10,
       "tool_template_ids": [],
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cloudera.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/cloudera.png"
     },
     {
       "id": "3616ba1a-b05c-47b0-a79b-c1a6ba7cea8d",
@@ -567,7 +567,7 @@
       "max_iter": 10,
       "tool_template_ids": [],
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/cloudera.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/cloudera.png"
     },
     {
       "id": "5a033be9-b70c-4820-988b-0f50a0334cd9",
@@ -636,7 +636,7 @@
       "temperature": 0.1,
       "max_iter": 0,
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/profile-agent.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/profile-agent.png"
     },
     {
       "id": "879f13f2-d84a-43d3-baf3-1f41116efc18",
@@ -654,7 +654,7 @@
       "temperature": 0.1,
       "max_iter": 0,
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/research-agent.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/research-agent.png"
     },
     {
       "id": "7a0e3869-79bb-445a-a1cd-56f85727bd28",
@@ -672,7 +672,7 @@
       "temperature": 0.100000001490116,
       "max_iter": 0,
       "pre_packaged": true,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/optimizer-agent.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/optimizer-agent.png"
     },
     {
       "id": "2b53cad3-81be-447c-8819-f9cdea1310c0",
@@ -690,7 +690,7 @@
       "temperature": 0.100000001490116,
       "max_iter": 0,
       "pre_packaged": false,
-      "agent_image_path": ".studio-data/dynamic_assets/agent_template_icons/history-agent.png"
+      "agent_image_path": "studio-data/dynamic_assets/agent_template_icons/history-agent.png"
     }
   ],
   "workflow_templates": [

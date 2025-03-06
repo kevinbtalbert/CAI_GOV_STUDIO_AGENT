@@ -18,6 +18,7 @@ from studio.tools.tool_template import remove_tool_template
 from studio.proto.utils import is_field_set
 import studio.db.utils as db_utils
 import studio.consts as consts
+import studio.cross_cutting.utils as cc_utils
 
 from crewai import Process
 
@@ -133,7 +134,10 @@ def add_workflow_template_from_workflow(
 
                 tool_template_id = str(uuid4())
 
-                tool_template_dir = os.path.join(consts.TOOL_TEMPLATE_CATALOG_LOCATION, tool_template_id)
+                tool_template_dir_basename = (
+                    cc_utils.create_slug_from_name(tool_instance.name) + "_" + cc_utils.get_random_compact_string()
+                )
+                tool_template_dir = os.path.join(consts.TOOL_TEMPLATE_CATALOG_LOCATION, tool_template_dir_basename)
                 os.makedirs(tool_template_dir, exist_ok=True)
 
                 shutil.copy(
@@ -149,7 +153,9 @@ def add_workflow_template_from_workflow(
                 if tool_instance.tool_image_path:
                     _, ext = os.path.splitext(tool_instance.tool_image_path)
                     os.makedirs(consts.TOOL_TEMPLATE_ICONS_LOCATION, exist_ok=True)
-                    tool_image_path = os.path.join(consts.TOOL_TEMPLATE_ICONS_LOCATION, f"{tool_template_id}_icon{ext}")
+                    tool_image_path = os.path.join(
+                        consts.TOOL_TEMPLATE_ICONS_LOCATION, f"{tool_template_dir_basename}_icon{ext}"
+                    )
                     shutil.copy(tool_instance.tool_image_path, tool_image_path)
 
                 tool_template: db_model.ToolTemplate = db_model.ToolTemplate(
@@ -416,13 +422,18 @@ def import_workflow_template(
             new_tool_template_id = changed_uuids[_t["id"]]
             _t["id"] = new_tool_template_id
             _t["workflow_template_id"] = new_workflow_template_id
-            tool_template_dir = os.path.join(consts.TOOL_TEMPLATE_CATALOG_LOCATION, new_tool_template_id)
+            tool_template_dir_basename = (
+                cc_utils.create_slug_from_name(_t["name"]) + "_" + cc_utils.get_random_compact_string()
+            )
+            tool_template_dir = os.path.join(consts.TOOL_TEMPLATE_CATALOG_LOCATION, tool_template_dir_basename)
             os.rename(os.path.join(temp_dir, _t["source_folder_path"]), os.path.join(temp_dir, tool_template_dir))
             _t["source_folder_path"] = tool_template_dir
             if _t.get("tool_image_path"):
                 _, ext = os.path.splitext(_t["tool_image_path"])
                 ext = ext.lower()
-                new_image_path = os.path.join(consts.TOOL_TEMPLATE_ICONS_LOCATION, f"{new_tool_template_id}_icon{ext}")
+                new_image_path = os.path.join(
+                    consts.TOOL_TEMPLATE_ICONS_LOCATION, f"{tool_template_dir_basename}_icon{ext}"
+                )
                 os.rename(os.path.join(temp_dir, _t["tool_image_path"]), os.path.join(temp_dir, new_image_path))
                 _t["tool_image_path"] = new_image_path
 

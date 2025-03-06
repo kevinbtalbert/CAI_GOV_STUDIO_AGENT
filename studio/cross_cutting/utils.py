@@ -9,6 +9,21 @@ from pydantic import Field
 from studio import consts
 
 
+def create_slug_from_name(name: str) -> str:
+    """
+    Create a slug from a name.
+    """
+    return (
+        name.lower()
+        .replace(" ", "_")
+        .replace("-", "_")
+        .replace(":", "_")
+        .replace("/", "_")
+        .replace("\\", "_")
+        .replace(".", "_")
+    )
+
+
 def get_cml_project_number_and_id() -> Tuple[
     Annotated[str, Field(description="project number")], Annotated[str, Field(description="project ID")]
 ]:

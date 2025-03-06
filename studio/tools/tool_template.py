@@ -184,8 +184,11 @@ def add_tool_template(
         tool_uuid = str(uuid4())
 
         # Define directory paths
+        tool_dir_basename = (
+            cc_utils.create_slug_from_name(request.tool_template_name) + "_" + cc_utils.get_random_compact_string()
+        )
         root_tool_dir = consts.TOOL_TEMPLATE_CATALOG_LOCATION
-        tool_dir = os.path.join(root_tool_dir, "tool_" + cc_utils.get_random_compact_string())
+        tool_dir = os.path.join(root_tool_dir, tool_dir_basename)
 
         skeleton_code = consts.TOOL_PYTHON_CODE_TEMPLATE.format(
             tool_name=request.tool_template_name, tool_class_name=tool_class_name
@@ -226,7 +229,6 @@ def add_tool_template(
             ext = ext.lower()
             if ext not in [".png", ".jpg", ".jpeg"]:
                 raise ValueError(f"Tool image must be PNG, JPG or JPEG format. Got: {ext}")
-            tool_dir_basename = os.path.basename(tool_dir)
             tool_image_path = os.path.join(consts.TOOL_TEMPLATE_ICONS_LOCATION, f"{tool_dir_basename}_icon{ext}")
             shutil.copy(request.tmp_tool_image_path, tool_image_path)
             os.remove(request.tmp_tool_image_path)

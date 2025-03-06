@@ -189,6 +189,8 @@ class Workflow(Base, MappedProtobuf, MappedDict):
     is_conversational = Column(Boolean, default=False)
     # Whether or not the model is in draft mode.
     is_draft = Column(Boolean, nullable=True)
+    # directory location of the workflow
+    directory = Column(String, nullable=False)
 
     # Relationships
     deployed_workflow_instances = relationship(
