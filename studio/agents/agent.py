@@ -292,7 +292,6 @@ def _add_agent_impl(request: AddAgentRequest, cml: CMLServiceApi, session: DbSes
             agent_image_path=agent_image_path,
         )
         session.add(agent)
-        session.commit()
 
         return AddAgentResponse(agent_id=new_agent_id)
     except SQLAlchemyError as e:
@@ -311,7 +310,9 @@ def add_agent(
     try:
         if dao is not None:
             with dao.get_session() as session:
-                return _add_agent_impl(request, cml, session)
+                response = _add_agent_impl(request, cml, session)
+                session.commit()
+                return response
         else:
             session = preexisting_db_session
             return _add_agent_impl(request, cml, session)
@@ -319,9 +320,7 @@ def add_agent(
         raise RuntimeError(f"Unexpected error occurred: {str(e)}")
 
 
-def update_agent(
-    request: UpdateAgentRequest, cml: CMLServiceApi = None, dao: AgentStudioDao = None
-) -> UpdateAgentResponse:
+def _update_agent_impl(request: UpdateAgentRequest, cml: CMLServiceApi, session: DbSession) -> UpdateAgentResponse:
     """
     Update the configuration of an existing agent.
     """
@@ -329,105 +328,125 @@ def update_agent(
         if not request.agent_id:
             raise ValueError("Agent ID is required.")
 
-        with dao.get_session() as session:
-            agent = session.query(db_model.Agent).filter_by(id=request.agent_id).one_or_none()
-            if not agent:
-                raise ValueError(f"Agent with ID '{request.agent_id}' not found.")
+        agent = session.query(db_model.Agent).filter_by(id=request.agent_id).one_or_none()
+        if not agent:
+            raise ValueError(f"Agent with ID '{request.agent_id}' not found.")
 
-            # Validate if llm_provider_model_id exists
-            if request.llm_provider_model_id:
-                if not session.query(db_model.Model).filter_by(model_id=request.llm_provider_model_id).one_or_none():
-                    raise ValueError(f"Model with ID '{request.llm_provider_model_id}' does not exist.")
-                agent.llm_provider_model_id = request.llm_provider_model_id
+        # Validate if llm_provider_model_id exists
+        if request.llm_provider_model_id:
+            if not session.query(db_model.Model).filter_by(model_id=request.llm_provider_model_id).one_or_none():
+                raise ValueError(f"Model with ID '{request.llm_provider_model_id}' does not exist.")
+            agent.llm_provider_model_id = request.llm_provider_model_id
 
-            # Handle tool updates
-            if is_field_set(request, "tool_template_ids") and request.tool_template_ids:
-                # Remove existing tool instances
-                for existing_tool_instance_id in list(agent.tool_ids):
-                    remove_tool_instance(
-                        RemoveToolInstanceRequest(tool_instance_id=existing_tool_instance_id),
-                        cml=cml,
-                        dao=None,
-                        preexisting_db_session=session,
-                    )
-                # Create new tool instances from templates
-                tool_instance_ids = []
-                for tool_template_id in list(request.tool_template_ids):
-                    tool_template: db_model.ToolTemplate = (
-                        session.query(db_model.ToolTemplate).filter_by(id=tool_template_id).one()
-                    )
-                    response: CreateToolInstanceResponse = create_tool_instance(
-                        CreateToolInstanceRequest(
-                            workflow_id=agent.workflow_id, name=tool_template.name, tool_template_id=tool_template_id
-                        ),
-                        cml=cml,
-                        dao=None,
-                        preexisting_db_session=session,
-                    )
-                    tool_instance_ids.append(response.tool_instance_id)
-                agent.tool_ids = tool_instance_ids
-            # Handle tool instance updates
-            elif request.tools_id is not None:  # Handle empty lists explicitly
-                tools_ids = list(request.tools_id)
-                validated_tool_ids = []
-                for tool_id in tools_ids:
-                    try:
-                        tool_request = GetToolInstanceRequest(tool_instance_id=tool_id)
-                        tool_response = get_tool_instance(tool_request, cml, dao=None, preexisting_db_session=session)
-                        # TODO : Check if Tool Instance is valid
-                        validated_tool_ids.append(tool_id)
-                    except Exception as e:
-                        raise ValueError(f"Validation failed for tool ID '{tool_id}': {str(e)}")
-                agent.tool_ids = validated_tool_ids
+        # Handle tool updates
+        if is_field_set(request, "tool_template_ids") and request.tool_template_ids:
+            # Remove existing tool instances
+            for existing_tool_instance_id in list(agent.tool_ids):
+                remove_tool_instance(
+                    RemoveToolInstanceRequest(tool_instance_id=existing_tool_instance_id),
+                    cml=cml,
+                    delete_tool_directory=True,
+                    dao=None,
+                    preexisting_db_session=session,
+                )
+            # Create new tool instances from templates
+            tool_instance_ids = []
+            for tool_template_id in list(request.tool_template_ids):
+                tool_template: db_model.ToolTemplate = (
+                    session.query(db_model.ToolTemplate).filter_by(id=tool_template_id).one()
+                )
+                response: CreateToolInstanceResponse = create_tool_instance(
+                    CreateToolInstanceRequest(
+                        workflow_id=agent.workflow_id, name=tool_template.name, tool_template_id=tool_template_id
+                    ),
+                    cml=cml,
+                    dao=None,
+                    preexisting_db_session=session,
+                )
+                tool_instance_ids.append(response.tool_instance_id)
+            agent.tool_ids = tool_instance_ids
+        # Handle tool instance updates
+        elif request.tools_id is not None:  # Handle empty lists explicitly
+            tools_ids = list(request.tools_id)
+            validated_tool_ids = []
+            for tool_id in tools_ids:
+                try:
+                    tool_request = GetToolInstanceRequest(tool_instance_id=tool_id)
+                    tool_response = get_tool_instance(tool_request, cml, dao=None, preexisting_db_session=session)
+                    # TODO : Check if Tool Instance is valid
+                    validated_tool_ids.append(tool_id)
+                except Exception as e:
+                    raise ValueError(f"Validation failed for tool ID '{tool_id}': {str(e)}")
+            agent.tool_ids = validated_tool_ids
 
-            # Handle agent image update
-            if request.tmp_agent_image_path:
-                if not os.path.exists(request.tmp_agent_image_path):
-                    raise ValueError(f"Agent image path '{request.tmp_agent_image_path}' does not exist.")
-                _, ext = os.path.splitext(request.tmp_agent_image_path)
-                ext = ext.lower()
-                if ext not in [".png", ".jpg", ".jpeg"]:
-                    raise ValueError(f"Agent image must be PNG, JPG or JPEG format. Got: {ext}")
+        # Handle agent image update
+        if request.tmp_agent_image_path:
+            if not os.path.exists(request.tmp_agent_image_path):
+                raise ValueError(f"Agent image path '{request.tmp_agent_image_path}' does not exist.")
+            _, ext = os.path.splitext(request.tmp_agent_image_path)
+            ext = ext.lower()
+            if ext not in [".png", ".jpg", ".jpeg"]:
+                raise ValueError(f"Agent image must be PNG, JPG or JPEG format. Got: {ext}")
 
-                # Remove old image if it exists
-                if agent.agent_image_path and os.path.exists(agent.agent_image_path):
-                    os.remove(agent.agent_image_path)
+            # Remove old image if it exists
+            if agent.agent_image_path and os.path.exists(agent.agent_image_path):
+                os.remove(agent.agent_image_path)
 
-                os.makedirs(consts.AGENT_ICONS_LOCATION, exist_ok=True)
-                agent_image_path = os.path.join(consts.AGENT_ICONS_LOCATION, f"{agent.id}_icon{ext}")
-                shutil.copy(request.tmp_agent_image_path, agent_image_path)
-                os.remove(request.tmp_agent_image_path)
-                agent.agent_image_path = agent_image_path
+            os.makedirs(consts.AGENT_ICONS_LOCATION, exist_ok=True)
+            agent_image_path = os.path.join(consts.AGENT_ICONS_LOCATION, f"{agent.id}_icon{ext}")
+            shutil.copy(request.tmp_agent_image_path, agent_image_path)
+            os.remove(request.tmp_agent_image_path)
+            agent.agent_image_path = agent_image_path
 
-            # Update other fields only if provided in the request
-            if request.name:
-                agent.name = request.name
-            if request.crew_ai_agent_metadata:
-                metadata = request.crew_ai_agent_metadata
-                if metadata.role:
-                    agent.crew_ai_role = metadata.role
-                if metadata.backstory:
-                    agent.crew_ai_backstory = metadata.backstory
-                if metadata.goal:
-                    agent.crew_ai_goal = metadata.goal
-                if metadata.allow_delegation is not None:
-                    agent.crew_ai_allow_delegation = metadata.allow_delegation
-                if metadata.verbose is not None:
-                    agent.crew_ai_verbose = metadata.verbose
-                if metadata.cache is not None:
-                    agent.crew_ai_cache = metadata.cache
-                if metadata.temperature is not None:
-                    agent.crew_ai_temperature = metadata.temperature
-                if metadata.max_iter is not None:
-                    agent.crew_ai_max_iter = metadata.max_iter
+        # Update other fields only if provided in the request
+        if request.name:
+            agent.name = request.name
+        if request.crew_ai_agent_metadata:
+            metadata = request.crew_ai_agent_metadata
+            if metadata.role:
+                agent.crew_ai_role = metadata.role
+            if metadata.backstory:
+                agent.crew_ai_backstory = metadata.backstory
+            if metadata.goal:
+                agent.crew_ai_goal = metadata.goal
+            if metadata.allow_delegation is not None:
+                agent.crew_ai_allow_delegation = metadata.allow_delegation
+            if metadata.verbose is not None:
+                agent.crew_ai_verbose = metadata.verbose
+            if metadata.cache is not None:
+                agent.crew_ai_cache = metadata.cache
+            if metadata.temperature is not None:
+                agent.crew_ai_temperature = metadata.temperature
+            if metadata.max_iter is not None:
+                agent.crew_ai_max_iter = metadata.max_iter
 
-            invalidate_workflow(dao, db_model.Workflow.crew_ai_agents.contains([agent.id]))
-
-            session.commit()
+        invalidate_workflow(session, db_model.Workflow.crew_ai_agents.contains([agent.id]))
 
         return UpdateAgentResponse()
     except SQLAlchemyError as e:
         raise RuntimeError(f"Failed to update agent: {str(e)}")
+
+
+def update_agent(
+    request: UpdateAgentRequest,
+    cml: CMLServiceApi = None,
+    dao: Optional[AgentStudioDao] = None,
+    preexisting_db_session: Optional[DbSession] = None,
+) -> UpdateAgentResponse:
+    """
+    Update the configuration of an existing agent.
+    """
+    try:
+        if dao is not None:
+            with dao.get_session() as session:
+                response = _update_agent_impl(request, cml, session)
+                session.commit()
+                return response
+        else:
+            session = preexisting_db_session
+            return _update_agent_impl(request, cml, session)
+    except Exception as e:
+        raise RuntimeError(f"Unexpected error occurred: {str(e)}")
 
 
 def remove_agent(
@@ -445,7 +464,7 @@ def remove_agent(
             if not agent:
                 raise ValueError(f"Agent with ID '{request.agent_id}' not found.")
 
-            invalidate_workflow(dao, db_model.Workflow.crew_ai_agents.contains([agent.id]))
+            invalidate_workflow(session, db_model.Workflow.crew_ai_agents.contains([agent.id]))
 
             # Try to remove tool instances but continue even if they fail
             for tool_instance_id in agent.tool_ids:
@@ -453,6 +472,7 @@ def remove_agent(
                     remove_tool_instance(
                         RemoveToolInstanceRequest(tool_instance_id=tool_instance_id),
                         cml,
+                        delete_tool_directory=False,
                         dao=None,
                         preexisting_db_session=session,
                     )

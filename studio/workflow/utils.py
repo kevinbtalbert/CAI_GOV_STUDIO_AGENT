@@ -127,7 +127,7 @@ def _get_crewai_agent(
     )
 
 
-def get_workflow_directory(workflow_name: str) -> str:
+def get_fresh_workflow_directory(workflow_name: str) -> str:
     return f"{consts.WORKFLOWS_LOCATION}/{cc_utils.create_slug_from_name(workflow_name)}_{cc_utils.get_random_compact_string()}"
 
 
@@ -193,21 +193,22 @@ def create_crewai_objects(
     )
 
 
-def invalidate_workflow(dao, condition) -> None:
+def invalidate_workflow(preexisting_db_session, condition) -> None:
     """
     Move dependent workflows to draft mode and mark any dependent deployed workflows as stale.
     """
-    from studio.db import model as db_model
+    from studio.db import model as db_model, DbSession
 
-    with dao.get_session() as session:
-        dependent_workflows = session.query(db_model.Workflow).filter(condition).all()
-        for workflow in dependent_workflows:
-            workflow.is_draft = True
-            deployed_workflows: List[db_model.DeployedWorkflowInstance] = (
-                session.query(db_model.DeployedWorkflowInstance).filter_by(workflow_id=workflow.id).all()
-            )
-            for deployed_workflow in deployed_workflows:
-                deployed_workflow.is_stale = True
+    session: DbSession = preexisting_db_session
+
+    dependent_workflows = session.query(db_model.Workflow).filter(condition).all()
+    for workflow in dependent_workflows:
+        workflow.is_draft = True
+        deployed_workflows: List[db_model.DeployedWorkflowInstance] = (
+            session.query(db_model.DeployedWorkflowInstance).filter_by(workflow_id=workflow.id).all()
+        )
+        for deployed_workflow in deployed_workflows:
+            deployed_workflow.is_stale = True
     return
 
 

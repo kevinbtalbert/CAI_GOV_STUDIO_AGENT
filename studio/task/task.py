@@ -77,7 +77,7 @@ def update_task(request: UpdateTaskRequest, cml: CMLServiceApi, dao: AgentStudio
                 task.assigned_agent_id = request.UpdateCrewAITaskRequest.assigned_agent_id or None
 
             # Move dependent workflows to draft mode and mark any dependent deployed workflows as stale.
-            invalidate_workflow(dao, db_model.Workflow.crew_ai_tasks.contains([request.task_id]))
+            invalidate_workflow(session, db_model.Workflow.crew_ai_tasks.contains([request.task_id]))
 
             session.commit()
             return UpdateTaskResponse()
@@ -175,7 +175,7 @@ def remove_task(request: RemoveTaskRequest, cml: CMLServiceApi, dao: AgentStudio
                 raise ValueError(f"Task with ID '{request.task_id}' not found.")
 
             # Move dependent workflows to draft mode and mark any dependent deployed workflows as stale.
-            invalidate_workflow(dao, db_model.Workflow.crew_ai_tasks.contains([task.id]))
+            invalidate_workflow(session, db_model.Workflow.crew_ai_tasks.contains([task.id]))
 
             session.delete(task)
             session.commit()

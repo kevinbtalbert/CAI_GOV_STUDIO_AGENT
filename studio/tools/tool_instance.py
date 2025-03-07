@@ -10,6 +10,7 @@ import os
 import studio.tools.utils as tool_utils
 from studio.cross_cutting.global_thread_pool import get_thread_pool
 import studio.consts as consts
+import studio.cross_cutting.utils as cc_utils
 
 
 def create_tool_instance(
@@ -24,7 +25,9 @@ def create_tool_instance(
     try:
         if dao is not None:
             with dao.get_session() as session:
-                return _create_tool_instance_impl(request, session)
+                response = _create_tool_instance_impl(request, session)
+                session.commit()
+                return response
         else:
             session = preexisting_db_session
             return _create_tool_instance_impl(request, session)
@@ -43,9 +46,20 @@ def _create_tool_instance_impl(request: CreateToolInstanceRequest, session: DbSe
         if not associated_tool_template:
             raise ValueError(f"ToolTemplate with id {request.tool_template_id} not found")
 
+    workflow_obj = session.query(db_model.Workflow).filter_by(id=request.workflow_id).first()
+    if not workflow_obj:
+        raise ValueError(f"Workflow with id {request.workflow_id} not found")
+    workflow_dir = workflow_obj.directory
+
     instance_uuid = str(uuid4())
-    tool_instance_name = ""
-    tool_instance_dir = os.path.join(consts.TOOL_INSTANCE_CATALOG_LOCATION, instance_uuid)
+    tool_instance_name = request.name or (
+        associated_tool_template.name if associated_tool_template else "Tool Instance"
+    )
+    tool_instance_dir = os.path.join(
+        workflow_dir,
+        "tools",
+        cc_utils.create_slug_from_name(tool_instance_name) + "_" + cc_utils.get_random_compact_string(),
+    )
     os.makedirs(tool_instance_dir, exist_ok=True)
 
     if associated_tool_template:
@@ -67,8 +81,6 @@ def _create_tool_instance_impl(request: CreateToolInstanceRequest, session: DbSe
             tool_image_path = os.path.join(consts.TOOL_INSTANCE_ICONS_LOCATION, f"{instance_uuid}_icon{ext}")
             shutil.copy(associated_tool_template.tool_image_path, tool_image_path)
 
-        tool_instance_name = request.name or associated_tool_template.name
-
         tool_instance = db_model.ToolInstance(
             id=instance_uuid,
             workflow_id=request.workflow_id,
@@ -80,7 +92,6 @@ def _create_tool_instance_impl(request: CreateToolInstanceRequest, session: DbSe
         )
         session.add(tool_instance)
     else:
-        tool_instance_name = request.name or "Tool Instance"
         skeleton_code = consts.TOOL_PYTHON_CODE_TEMPLATE.format(
             tool_class_name="ToolInstance", tool_name="Tool Instance"
         )
@@ -123,7 +134,9 @@ def update_tool_instance(
     try:
         if dao is not None:
             with dao.get_session() as session:
-                return _update_tool_instance_impl(request, session)
+                response = _update_tool_instance_impl(request, session)
+                session.commit()
+                return response
         else:
             session = preexisting_db_session
             return _update_tool_instance_impl(request, session)
@@ -153,7 +166,6 @@ def _update_tool_instance_impl(request: UpdateToolInstanceRequest, session: DbSe
         shutil.copy(request.tmp_tool_image_path, tool_image_path)
         tool_instance.tool_image_path = tool_image_path
         os.remove(request.tmp_tool_image_path)
-    session.commit()
     get_thread_pool().submit(
         tool_utils.prepare_virtual_env_for_tool,
         tool_instance.source_folder_path,
@@ -302,6 +314,7 @@ def _delete_tool_instance_directory(source_folder_path: str):
 def remove_tool_instance(
     request: RemoveToolInstanceRequest,
     cml: CMLServiceApi,
+    delete_tool_directory: bool = True,
     dao: Optional[AgentStudioDao] = None,
     preexisting_db_session: Optional[DbSession] = None,
 ) -> RemoveToolInstanceResponse:
@@ -311,15 +324,19 @@ def remove_tool_instance(
     try:
         if dao is not None:
             with dao.get_session() as session:
-                return _remove_tool_instance_impl(request, session)
+                response = _remove_tool_instance_impl(request, session, delete_tool_directory)
+                session.commit()
+                return response
         else:
             session = preexisting_db_session
-            return _remove_tool_instance_impl(request, session)
+            return _remove_tool_instance_impl(request, session, delete_tool_directory)
     except Exception as e:
         raise RuntimeError(f"An unexpected error occurred: {e}")
 
 
-def _remove_tool_instance_impl(request: RemoveToolInstanceRequest, session: DbSession) -> RemoveToolInstanceResponse:
+def _remove_tool_instance_impl(
+    request: RemoveToolInstanceRequest, session: DbSession, delete_tool_directory: bool
+) -> RemoveToolInstanceResponse:
     """
     Implementation of remove tool instance logic
     """
@@ -327,10 +344,11 @@ def _remove_tool_instance_impl(request: RemoveToolInstanceRequest, session: DbSe
     if not tool_instance:
         raise ValueError(f"Tool Instance with id '{request.tool_instance_id}' not found")
 
-    get_thread_pool().submit(
-        _delete_tool_instance_directory,
-        tool_instance.source_folder_path,
-    )
+    if delete_tool_directory:
+        get_thread_pool().submit(
+            _delete_tool_instance_directory,
+            tool_instance.source_folder_path,
+        )
 
     if tool_instance.tool_image_path:
         try:
@@ -339,5 +357,4 @@ def _remove_tool_instance_impl(request: RemoveToolInstanceRequest, session: DbSe
             print(f"Failed to delete tool instance image: {e}")
 
     session.delete(tool_instance)
-    session.commit()
     return RemoveToolInstanceResponse()

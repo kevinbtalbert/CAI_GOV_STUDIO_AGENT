@@ -11,6 +11,7 @@ from studio.task.task import extract_placeholders
 from studio.task.task import remove_task
 from studio.agents.agent import remove_agent, add_agent
 from studio.tools.tool_instance import remove_tool_instance
+from studio.cross_cutting.global_thread_pool import get_thread_pool
 import studio.tools.utils as tool_utils
 import studio.workflow.utils as workflow_utils
 from cmlapi import CMLServiceApi
@@ -127,9 +128,12 @@ def add_workflow_from_template(
         workflow.crew_ai_process = workflow_template.process
         workflow.is_conversational = workflow_template.is_conversational
         workflow.is_draft = True
-        wf_dir = workflow_utils.get_workflow_directory(workflow.name)
+        wf_dir = workflow_utils.get_fresh_workflow_directory(workflow.name)
         workflow.directory = wf_dir
         os.makedirs(wf_dir, exist_ok=True)
+
+        # Create workflow pre-emptively in the database.
+        session.add(workflow)
 
         # Create all agents
         agent_templates_to_created_agent_id: dict[str, str] = {}
@@ -197,8 +201,7 @@ def add_workflow_from_template(
             session.add(agent)
             workflow.crew_ai_manager_agent = agent.id
 
-        # Finally, add the workflow.
-        session.add(workflow)
+        session.commit()
 
         return AddWorkflowResponse(workflow_id=workflow.id)
 
@@ -226,7 +229,7 @@ def add_workflow(request: AddWorkflowRequest, cml: CMLServiceApi, dao: AgentStud
             manager_agent_id = request.crew_ai_workflow_metadata.manager_agent_id
             manager_llm_model_provider_id = request.crew_ai_workflow_metadata.manager_llm_model_provider_id
 
-            wf_dir = workflow_utils.get_workflow_directory(request.name)
+            wf_dir = workflow_utils.get_fresh_workflow_directory(request.name)
             os.makedirs(wf_dir, exist_ok=True)
 
             # Create a new workflow
@@ -433,6 +436,15 @@ def update_workflow(
         raise RuntimeError(f"Validation error: {str(ve)}")
 
 
+def _delete_workflow_directory(directory: str):
+    try:
+        if os.path.exists(directory):
+            shutil.rmtree(directory)
+            print(f"Deleted workflow directory: {directory}")
+    except Exception as e:
+        print(f"Failed to delete workflow directory: {e}")
+
+
 def remove_workflow(
     request: RemoveWorkflowRequest, cml: CMLServiceApi, dao: AgentStudioDao = None
 ) -> RemoveWorkflowResponse:
@@ -466,17 +478,18 @@ def remove_workflow(
                 remove_tool_instance(
                     RemoveToolInstanceRequest(tool_instance_id=tool_instance.id),
                     cml,
+                    delete_tool_directory=False,
                     dao=None,
                     preexisting_db_session=session,
                 )
 
             # Finally, delete the workflow
-            try:
-                if os.path.exists(workflow.directory):
-                    shutil.rmtree(workflow.directory)
-                    print(f"Deleted workflow directory: {workflow.directory}")
-            except Exception as e:
-                print(f"Failed to delete workflow directory: {e}")
+
+            get_thread_pool().submit(
+                _delete_workflow_directory,
+                workflow.directory,
+            )
+
             session.delete(workflow)
             return RemoveWorkflowResponse()
     except SQLAlchemyError as e:

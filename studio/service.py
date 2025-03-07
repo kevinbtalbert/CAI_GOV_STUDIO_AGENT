@@ -231,7 +231,7 @@ class AgentStudioApp(AgentStudioServicer):
         """
         Remove a tool instance by id
         """
-        return remove_tool_instance(request, self.cml, dao=self.dao)
+        return remove_tool_instance(request, self.cml, delete_tool_directory=True, dao=self.dao)
 
     def UpdateToolInstance(self, request, context):
         """
