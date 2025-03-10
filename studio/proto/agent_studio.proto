@@ -81,6 +81,7 @@ service AgentStudio {
   rpc CheckStudioUpgradeStatus (CheckStudioUpgradeStatusRequest) returns (CheckStudioUpgradeStatusResponse) {}
   rpc UpgradeStudio (UpgradeStudioRequest) returns (UpgradeStudioResponse) {}
   rpc RestartStudioApplication (RestartStudioApplicationRequest) returns (RestartStudioApplicationResponse) {}
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse) {}
 
   // Agent templates operations
   rpc ListAgentTemplates (ListAgentTemplatesRequest) returns (ListAgentTemplatesResponse) {}
@@ -988,14 +989,16 @@ message CheckStudioUpgradeStatusResponse {
 }
 
 
-message UpgradeStudioRequest {
-}
+message UpgradeStudioRequest {}
 
-message UpgradeStudioResponse {
-}
+message UpgradeStudioResponse {}
 
-message RestartStudioApplicationRequest {
-}
+message RestartStudioApplicationRequest {}
 
-message RestartStudioApplicationResponse {
+message RestartStudioApplicationResponse {}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string message = 1;
 }

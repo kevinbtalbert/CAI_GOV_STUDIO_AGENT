@@ -5,6 +5,7 @@ import {
   GetParentProjectDetailsRequest,
   GetParentProjectDetailsResponse,
   DownloadTemporaryFileRequest,
+  HealthCheckResponse,
 } from '@/studio/proto/agent_studio';
 
 import { apiSlice } from '../api/apiSlice';
@@ -49,6 +50,20 @@ export const crossCuttingApi = apiSlice.injectEndpoints({
         body: {},
       }),
     }),
+    healthCheck: builder.query<boolean, void>({
+      query: () => ({
+        url: '/grpc/healthCheck',
+        method: 'POST',
+        body: {},
+        timeout: 500,
+      }),
+      transformResponse: (response: HealthCheckResponse) => {
+        return response.message?.length > 0;
+      },
+      transformErrorResponse: () => {
+        return false;
+      },
+    }),
   }),
 });
 
@@ -58,4 +73,5 @@ export const {
   useCheckStudioUpgradeStatusQuery,
   useUpgradeStudioMutation,
   useRestartStudioApplicationMutation,
+  useHealthCheckQuery,
 } = crossCuttingApi;

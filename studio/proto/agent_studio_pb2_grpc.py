@@ -323,6 +323,12 @@ class AgentStudioStub(object):
             response_deserializer=studio_dot_proto_dot_agent__studio__pb2.RestartStudioApplicationResponse.FromString,
             _registered_method=True,
         )
+        self.HealthCheck = channel.unary_unary(
+            "/agent_studio.AgentStudio/HealthCheck",
+            request_serializer=studio_dot_proto_dot_agent__studio__pb2.HealthCheckRequest.SerializeToString,
+            response_deserializer=studio_dot_proto_dot_agent__studio__pb2.HealthCheckResponse.FromString,
+            _registered_method=True,
+        )
         self.ListAgentTemplates = channel.unary_unary(
             "/agent_studio.AgentStudio/ListAgentTemplates",
             request_serializer=studio_dot_proto_dot_agent__studio__pb2.ListAgentTemplatesRequest.SerializeToString,
@@ -700,6 +706,12 @@ class AgentStudioServicer(object):
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
+    def HealthCheck(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details("Method not implemented!")
+        raise NotImplementedError("Method not implemented!")
+
     def ListAgentTemplates(self, request, context):
         """Agent templates operations"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -1022,6 +1034,11 @@ def add_AgentStudioServicer_to_server(servicer, server):
             servicer.RestartStudioApplication,
             request_deserializer=studio_dot_proto_dot_agent__studio__pb2.RestartStudioApplicationRequest.FromString,
             response_serializer=studio_dot_proto_dot_agent__studio__pb2.RestartStudioApplicationResponse.SerializeToString,
+        ),
+        "HealthCheck": grpc.unary_unary_rpc_method_handler(
+            servicer.HealthCheck,
+            request_deserializer=studio_dot_proto_dot_agent__studio__pb2.HealthCheckRequest.FromString,
+            response_serializer=studio_dot_proto_dot_agent__studio__pb2.HealthCheckResponse.SerializeToString,
         ),
         "ListAgentTemplates": grpc.unary_unary_rpc_method_handler(
             servicer.ListAgentTemplates,
@@ -2483,6 +2500,36 @@ class AgentStudio(object):
             "/agent_studio.AgentStudio/RestartStudioApplication",
             studio_dot_proto_dot_agent__studio__pb2.RestartStudioApplicationRequest.SerializeToString,
             studio_dot_proto_dot_agent__studio__pb2.RestartStudioApplicationResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True,
+        )
+
+    @staticmethod
+    def HealthCheck(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            "/agent_studio.AgentStudio/HealthCheck",
+            studio_dot_proto_dot_agent__studio__pb2.HealthCheckRequest.SerializeToString,
+            studio_dot_proto_dot_agent__studio__pb2.HealthCheckResponse.FromString,
             options,
             channel_credentials,
             insecure,

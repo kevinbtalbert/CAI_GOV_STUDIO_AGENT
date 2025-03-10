@@ -1651,3 +1651,13 @@ class RestartStudioApplicationRequest(_message.Message):
 class RestartStudioApplicationResponse(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
+
+class HealthCheckRequest(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...
+
+class HealthCheckResponse(_message.Message):
+    __slots__ = ("message",)
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    def __init__(self, message: _Optional[str] = ...) -> None: ...

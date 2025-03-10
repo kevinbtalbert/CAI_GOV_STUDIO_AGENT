@@ -34,6 +34,7 @@ from studio.cross_cutting.methods import (
     download_temporary_file,
     get_asset_data,
     get_parent_project_details,
+    health_check,
 )
 from studio.cross_cutting.global_thread_pool import initialize_thread_pool, cleanup_thread_pool
 from studio.agents.test_agents import (
@@ -322,6 +323,12 @@ class AgentStudioApp(AgentStudioServicer):
         Restart Agent Studio application.
         """
         return restart_studio_application(request, self.cml, dao=self.dao)
+
+    def HealthCheck(self, request, context):
+        """
+        Check the health of the studio.
+        """
+        return health_check(request, self.cml, dao=self.dao)
 
     def ListTasks(self, request, context):
         """

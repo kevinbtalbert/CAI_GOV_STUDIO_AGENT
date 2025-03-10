@@ -1075,6 +1075,13 @@ export interface RestartStudioApplicationRequest {
 export interface RestartStudioApplicationResponse {
 }
 
+export interface HealthCheckRequest {
+}
+
+export interface HealthCheckResponse {
+  message: string;
+}
+
 function createBaseModel(): Model {
   return { model_id: "", model_name: "", provider_model: "", model_type: "", api_base: "", is_studio_default: false };
 }
@@ -12751,6 +12758,107 @@ export const RestartStudioApplicationResponse: MessageFns<RestartStudioApplicati
   },
 };
 
+function createBaseHealthCheckRequest(): HealthCheckRequest {
+  return {};
+}
+
+export const HealthCheckRequest: MessageFns<HealthCheckRequest> = {
+  encode(_: HealthCheckRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): HealthCheckRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseHealthCheckRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): HealthCheckRequest {
+    return {};
+  },
+
+  toJSON(_: HealthCheckRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<HealthCheckRequest>): HealthCheckRequest {
+    return HealthCheckRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<HealthCheckRequest>): HealthCheckRequest {
+    const message = createBaseHealthCheckRequest();
+    return message;
+  },
+};
+
+function createBaseHealthCheckResponse(): HealthCheckResponse {
+  return { message: "" };
+}
+
+export const HealthCheckResponse: MessageFns<HealthCheckResponse> = {
+  encode(message: HealthCheckResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): HealthCheckResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseHealthCheckResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): HealthCheckResponse {
+    return { message: isSet(object.message) ? globalThis.String(object.message) : "" };
+  },
+
+  toJSON(message: HealthCheckResponse): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<HealthCheckResponse>): HealthCheckResponse {
+    return HealthCheckResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<HealthCheckResponse>): HealthCheckResponse {
+    const message = createBaseHealthCheckResponse();
+    message.message = object.message ?? "";
+    return message;
+  },
+};
+
 /** gRPC service for basic Agent Studio operations. */
 export type AgentStudioService = typeof AgentStudioService;
 export const AgentStudioService = {
@@ -13204,6 +13312,15 @@ export const AgentStudioService = {
       Buffer.from(RestartStudioApplicationResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer) => RestartStudioApplicationResponse.decode(value),
   },
+  healthCheck: {
+    path: "/agent_studio.AgentStudio/HealthCheck",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: HealthCheckRequest) => Buffer.from(HealthCheckRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => HealthCheckRequest.decode(value),
+    responseSerialize: (value: HealthCheckResponse) => Buffer.from(HealthCheckResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => HealthCheckResponse.decode(value),
+  },
   /** Agent templates operations */
   listAgentTemplates: {
     path: "/agent_studio.AgentStudio/ListAgentTemplates",
@@ -13423,6 +13540,7 @@ export interface AgentStudioServer extends UntypedServiceImplementation {
   checkStudioUpgradeStatus: handleUnaryCall<CheckStudioUpgradeStatusRequest, CheckStudioUpgradeStatusResponse>;
   upgradeStudio: handleUnaryCall<UpgradeStudioRequest, UpgradeStudioResponse>;
   restartStudioApplication: handleUnaryCall<RestartStudioApplicationRequest, RestartStudioApplicationResponse>;
+  healthCheck: handleUnaryCall<HealthCheckRequest, HealthCheckResponse>;
   /** Agent templates operations */
   listAgentTemplates: handleUnaryCall<ListAgentTemplatesRequest, ListAgentTemplatesResponse>;
   getAgentTemplate: handleUnaryCall<GetAgentTemplateRequest, GetAgentTemplateResponse>;
@@ -14137,6 +14255,21 @@ export interface AgentStudioClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: RestartStudioApplicationResponse) => void,
+  ): ClientUnaryCall;
+  healthCheck(
+    request: HealthCheckRequest,
+    callback: (error: ServiceError | null, response: HealthCheckResponse) => void,
+  ): ClientUnaryCall;
+  healthCheck(
+    request: HealthCheckRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: HealthCheckResponse) => void,
+  ): ClientUnaryCall;
+  healthCheck(
+    request: HealthCheckRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: HealthCheckResponse) => void,
   ): ClientUnaryCall;
   /** Agent templates operations */
   listAgentTemplates(

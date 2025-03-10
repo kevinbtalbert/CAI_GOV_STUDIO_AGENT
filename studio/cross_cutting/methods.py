@@ -8,6 +8,12 @@ from studio import consts
 import os
 
 
+def health_check(
+    request: HealthCheckRequest, cml: CMLServiceApi = None, dao: AgentStudioDao = None
+) -> HealthCheckResponse:
+    return HealthCheckResponse(message="Studio is healthy")
+
+
 def non_streaming_temporary_file_upload(
     request: NonStreamingTemporaryFileUploadRequest, cml: CMLServiceApi = None, dao: AgentStudioDao = None
 ) -> FileUploadResponse:
