@@ -19,6 +19,7 @@ The usual process of using the studio is as follows:
  2. Create new tools or go through our existing set of tools. *This step is optional.* ([Tools User Guide](./docs/user_guide/tools.md))
  3. Create, test, deploy and manage workflows. ([Workflows User Guide](./docs/user_guide/workflows.md))
  4. Monitor your workflows. ([Monitoring User Guide](./docs/user_guide/monitoring.md))
+ 5. Build custom UIs and [Applications](https://docs.cloudera.com/machine-learning/cloud/applications/topics/ml-applications-c.html) on top of your deployed workflows. ([Custom Applications Guide](./docs/user_guide/custom_workflow_application.md))
 
 ## High Level Features
 - Agent Studio ships with a set of pre-built tools and workflows (called "templates"). Use these to get started quickly.
