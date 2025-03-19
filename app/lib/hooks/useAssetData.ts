@@ -2,13 +2,15 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useGetAssetDataQuery } from '../crossCuttingApi';
 import axios from 'axios';
 import { useAppSelector } from './hooks';
-import { selectRenderMode, selectWorkflowModelUrl } from '../globalSettingsSlice';
+import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
 
 export const useImageAssetsData = (uris: (string | undefined)[]) => {
-  const renderMode = useAppSelector(selectRenderMode);
-  const workflowModelUrl = useAppSelector(selectWorkflowModelUrl);
   const [imageData, setImageData] = useState<{ [key: string]: string }>({});
   const [workflowRenderModeError, setWorkflowRenderModeError] = useState(false);
+
+  const { data: workflowData, isLoading } = useGetWorkflowDataQuery();
+  const renderMode = workflowData?.renderMode;
+  const workflowModelUrl = workflowData?.workflowModelUrl;
 
   // Get unique, non-empty image URIs
   const urisToFetch = useMemo(

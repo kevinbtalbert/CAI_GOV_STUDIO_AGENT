@@ -55,7 +55,7 @@ export const crossCuttingApi = apiSlice.injectEndpoints({
         url: '/grpc/healthCheck',
         method: 'POST',
         body: {},
-        timeout: 500,
+        timeout: 5000,
       }),
       transformResponse: (response: HealthCheckResponse) => {
         return response.message?.length > 0;

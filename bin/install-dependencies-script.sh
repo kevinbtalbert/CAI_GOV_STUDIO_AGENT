@@ -6,13 +6,12 @@
 uv sync
 
 # Get node
-touch .bashrc
 export NVM_DIR="$(pwd)/.nvm"
 mkdir -p $NVM_DIR
 wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-nvm install 20
-nvm use 20
+nvm install 22
+nvm use 22
 echo $(which node)
 echo $(which npm)
 

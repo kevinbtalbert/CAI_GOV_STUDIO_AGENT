@@ -9,13 +9,16 @@ import { LocalStorageState, ViewSettings } from './lib/types';
 import HomeView from './components/HomeView';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from './lib/hooks/hooks';
-import { setRenderMode, setWorkflowModelUrl } from './lib/globalSettingsSlice';
-import { INITIAL_LOCAL_STORAGE_STAGE } from './lib/constants';
 import { readLocalStorageState, readViewSettingsFromLocalStorage } from './lib/localStorage';
+import ContentWithHealthCheck from './components/ContentWithHealthCheck';
 
 const { Title, Text } = Typography;
 
 const HomePage: React.FC = () => {
+
+  // Make a call to /api/wflow in the node server to get rendering information. 
+  // note that RTK will cache this and there is nothing invalidating this, so 
+  // it will only be called once.
   const { data: wflowData, isLoading } = useGetWorkflowDataQuery();
   const [viewSettings, setViewSettings] = useState<ViewSettings>();
   const router = useRouter();
@@ -40,10 +43,26 @@ const HomePage: React.FC = () => {
     );
   }
 
+  // Show loading if the render mode is not returning proper information.
+  if (!wflowData?.renderMode) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          flexDirection: 'column',
+        }}
+      >
+        <Spin size="large" />
+        <Text>Retrieving workflow and render mode...</Text>
+      </div>
+    );
+  }
+
   // Render workflow
   if (wflowData?.renderMode === 'workflow') {
-    dispatch(setRenderMode('workflow'));
-    dispatch(setWorkflowModelUrl(wflowData?.workflowModelUrl));
     return (
       <Layout
         style={{
@@ -103,6 +122,8 @@ const HomePage: React.FC = () => {
     );
   }
 
+  // If we are not displaying the intro page for the user anymore, then
+  // route to the /workflows page
   if (viewSettings.displayIntroPage === false) {
     // Show a loading spinner while we wait for workflows page.
     router.push('/workflows');
@@ -115,9 +136,14 @@ const HomePage: React.FC = () => {
     );
   }
 
-  dispatch(setRenderMode('studio'));
-  dispatch(setWorkflowModelUrl(undefined));
-  return <HomeView />;
+  // If we've made it this far, it's time to render the home page ("starting" page.)
+  // NOTE: we don't need to wrap the workflow app around the health check becuase the health
+  // check is only for the gRPC server, which the workflow app does not depend on.
+  return (<>
+    <ContentWithHealthCheck>
+      <HomeView />
+    </ContentWithHealthCheck>
+  </>);
 };
 
 export default HomePage;

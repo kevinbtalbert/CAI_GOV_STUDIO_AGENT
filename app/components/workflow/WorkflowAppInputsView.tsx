@@ -14,7 +14,6 @@ import {
   updatedCrewOutput,
 } from '@/app/workflows/workflowAppSlice';
 import { PauseCircleOutlined, SendOutlined, DownloadOutlined } from '@ant-design/icons';
-import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -25,15 +24,12 @@ import {
   Workflow,
 } from '@/studio/proto/agent_studio';
 import axios from 'axios';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import { marked } from 'marked';
 import showdown from 'showdown';
-import { selectRenderMode, selectWorkflowModelUrl } from '@/app/lib/globalSettingsSlice';
 import {
   selectWorkflowConfiguration,
   selectWorkflowGenerationConfig,
 } from '@/app/workflows/editorSlice';
+import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
 
 const { Title, Text } = Typography;
 
@@ -55,10 +51,14 @@ const WorkflowAppInputsView: React.FC<WorkflowAppInputsViewProps> = ({ workflow,
   const crewOutput = useAppSelector(selectWorkflowCrewOutput);
   const isRunning = useAppSelector(selectWorkflowIsRunning);
   const [testWorkflow] = useTestWorkflowMutation();
-  const renderMode = useAppSelector(selectRenderMode);
-  const workflowModelUrl = useAppSelector(selectWorkflowModelUrl);
   const workflowGenerationConfig = useAppSelector(selectWorkflowGenerationConfig);
   const workflowConfiguration = useAppSelector(selectWorkflowConfiguration);
+
+  // If we haven't determined our application render type, then we don't render yet!
+  const { data: workflowData, isLoading } = useGetWorkflowDataQuery();
+  const renderMode = workflowData?.renderMode;
+  const workflowModelUrl = workflowData?.workflowModelUrl;
+
 
   // Add effect to clear crew output when workflow changes
   useEffect(() => {
@@ -187,6 +187,11 @@ const WorkflowAppInputsView: React.FC<WorkflowAppInputsViewProps> = ({ workflow,
       console.error('Error generating PDF:', error);
     }
   };
+
+  // If we are not fully loaded, don't display anything
+  if (isLoading || !workflowData || !workflowData.renderMode) {
+    return (<></>)
+  }
 
   return (
     <>

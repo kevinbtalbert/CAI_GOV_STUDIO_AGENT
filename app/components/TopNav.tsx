@@ -4,7 +4,6 @@ import React from 'react';
 import { Layout } from 'antd';
 import { useGetWorkflowDataQuery } from '../workflows/workflowAppApi';
 import StudioTopNav from './StudioTopNav';
-import WorkflowTopNav from './WorkflowTopNav';
 
 const { Header } = Layout;
 
@@ -13,6 +12,11 @@ const TopNav: React.FC = () => {
 
   if (isLoading) {
     return <></>;
+  }
+
+  // Check if we have a render mode
+  if (!workflowData?.renderMode) {
+    return (<></>);
   }
 
   return workflowData?.renderMode === 'studio' ? <StudioTopNav /> : <></>;

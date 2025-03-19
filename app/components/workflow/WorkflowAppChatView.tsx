@@ -17,11 +17,6 @@ import {
   updatedIsRunning,
   clearedChatMessages,
 } from '@/app/workflows/workflowAppSlice';
-import { PauseCircleOutlined, SendOutlined } from '@ant-design/icons';
-import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
 import {
   AgentMetadata,
   CrewAITaskMetadata,
@@ -30,12 +25,11 @@ import {
 } from '@/studio/proto/agent_studio';
 import ChatMessages from '../ChatMessages';
 import axios from 'axios';
-import { selectWorkflowModelUrl } from '@/app/lib/globalSettingsSlice';
-import { selectRenderMode } from '@/app/lib/globalSettingsSlice';
 import {
   selectWorkflowConfiguration,
   selectWorkflowGenerationConfig,
 } from '@/app/workflows/editorSlice';
+import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
 
 const { Title, Text } = Typography;
 
@@ -49,11 +43,14 @@ const WorkflowAppChatView: React.FC<WorkflowAppChatViewProps> = ({ workflow, tas
   const dispatch = useAppDispatch();
   const isRunning = useAppSelector(selectWorkflowIsRunning);
   const [testWorkflow] = useTestWorkflowMutation();
-  const renderMode = useAppSelector(selectRenderMode);
-  const workflowModelUrl = useAppSelector(selectWorkflowModelUrl);
   const crewOutput = useAppSelector(selectWorkflowCrewOutput);
   const workflowGenerationConfig = useAppSelector(selectWorkflowGenerationConfig);
   const workflowConfiguration = useAppSelector(selectWorkflowConfiguration);
+
+  // If we haven't determined our application render type, then we don't render yet!
+  const { data: workflowData, isLoading } = useGetWorkflowDataQuery();
+  const renderMode = workflowData?.renderMode;
+  const workflowModelUrl = workflowData?.workflowModelUrl;
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messages = useAppSelector(selectWorkflowAppChatMessages);
@@ -148,6 +145,11 @@ const WorkflowAppChatView: React.FC<WorkflowAppChatViewProps> = ({ workflow, tas
   const handleClearMessages = () => {
     dispatch(clearedChatMessages());
   };
+  
+  // If we are not fully loaded, don't display anything
+  if (isLoading || !workflowData || !workflowData.renderMode) {
+    return (<></>)
+  }
 
   return (
     <>

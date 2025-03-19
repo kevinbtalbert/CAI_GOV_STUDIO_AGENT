@@ -35,6 +35,8 @@ import { clearedWorkflowApp } from './workflowAppSlice';
 import { useCheckStudioUpgradeStatusQuery, useUpgradeStudioMutation } from '../lib/crossCuttingApi';
 
 import * as semver from 'semver';
+import ContentWithHealthCheck from '../components/ContentWithHealthCheck';
+import TopNav from '../components/TopNav';
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -113,7 +115,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ upgradeStatus }) => {
   );
 };
 
-const WorkflowsPage: React.FC = () => {
+const WorkflowsPageContent: React.FC = () => {
   const { data: workflows, refetch: refetchWorkflows } = useListWorkflowsQuery({});
   const { data: deployedWorkflowInstances, refetch: refetchDeployedWorkflowInstances } =
     useListDeployedWorkflowsQuery({});
@@ -446,5 +448,17 @@ const WorkflowsPage: React.FC = () => {
     </Layout>
   );
 };
+
+// Explicitly run a health check on the workflows page. Technically we
+// would need a health check on every page for maximum robustness, but given
+// that the /workflows route is automatically pushed when opening the application,
+// we should ensure this page is captured for health checks.
+const WorkflowsPage: React.FC = () => {
+  return (<>
+    <ContentWithHealthCheck>
+      <WorkflowsPageContent />
+    </ContentWithHealthCheck>
+  </>)
+}
 
 export default WorkflowsPage;

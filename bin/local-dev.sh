@@ -16,6 +16,7 @@
 # Alternatively, developers can run this file directly:
 # > ./bin/local-dev.sh
 
+export AGENT_STUDIO_RENDER_MODE=studio
 export AGENT_STUDIO_GRPC_MODE=enabled
 export AGENT_STUDIO_DEPLOYMENT_CONFIG=dev 
 python startup_scripts/run-app.py

@@ -9,7 +9,6 @@ import { workflowsApi } from '../workflows/workflowsApi';
 import { agentsApi } from '../agents/agentApi';
 import { tasksApi } from '../tasks/tasksApi';
 import { toolInstancesApi } from '../tools/toolInstancesApi';
-import globalSettingsReducer from './globalSettingsSlice';
 import editorReducer from '../workflows/editorSlice';
 import workflowAppReducer from '../workflows/workflowAppSlice';
 
@@ -17,7 +16,6 @@ export const makeStore = () => {
   return configureStore({
     reducer: {
       [apiSlice.reducerPath]: apiSlice.reducer,
-      globalSettings: globalSettingsReducer,
       editor: editorReducer,
       workflowApp: workflowAppReducer,
     },

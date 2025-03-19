@@ -32,9 +32,8 @@ import {
   DashboardOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
 import { useGetDefaultModelQuery } from '@/app/models/modelsApi';
-import { selectRenderMode } from '@/app/lib/globalSettingsSlice';
+import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
 
 const { Title, Text } = Typography;
 
@@ -115,13 +114,28 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
   tasks,
   agents,
 }) => {
-  const renderMode = useAppSelector(selectRenderMode);
+
+  // TODO: pass render mode in to the workflow app directly
+  // TODO: pass model url and render mode down to child components through props
+  const { data: workflowData, isLoading } = useGetWorkflowDataQuery();
+  const renderMode = workflowData?.renderMode;
+  const workflowModelUrl = workflowData?.workflowModelUrl;
+
   const isRunning = useAppSelector(selectWorkflowIsRunning);
   const currentTraceId = useAppSelector(selectWorkflowCurrentTraceId);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const workflowPollingRef = useRef<NodeJS.Timeout | null>(null);
   const dispatch = useAppDispatch();
   const currentEvents = useAppSelector(selectCurrentEvents);
+
+  // NOTE: because we also run our workflow app in "standalone" mode, his
+  // specific query may fail. Becuase of this, we also check our workflow
+  // data to see if we are rendering in studio model. Making this actual api
+  // call is acceptable from the frontend (but will show up as an error 
+  // in the logs), but we need to make sure we don't do anything with
+  // the results of this api call if we are rendering in workflow app mode.
+  // TODO: pull this out to either a prop to the component or maybe even
+  // set somewhere in redux state.
   const { data: defaultModel } = useGetDefaultModelQuery();
 
   const [sliderValue, setSliderValue] = useState<number>(0);
@@ -317,10 +331,10 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
             transition: 'width 0.3s ease',
           }}
         >
-          {!defaultModel ? (
+          {(renderMode === 'studio' && !defaultModel) ? (
             renderAlert(
               'No Default LLM Model',
-              'Please configure a default LLM model in the Models section to use workflows.',
+              'Please configure a default LLM model on the LLMs page to use workflows.',
               'warning',
             )
           ) : !workflow?.is_ready ? (
