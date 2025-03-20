@@ -261,7 +261,6 @@
       "assigned_agent_template_id": "",
       "workflow_template_id": "a77aed0a-7d43-48ec-9495-8728dd97e66d"
     }
-
   ],
   "agent_templates": [
     {
@@ -436,13 +435,16 @@
       "description": "",
       "role": "Use Case and References Agent",
       "backstory": "To systematically process and analyze customer success stories from the directory, identify relevant digital transformation initiatives that align with the report's top three use cases, and create a structured \"Use Cases & References\" section that provides concrete examples of similar implementations, regardless of company name matches.",
-      "goal":  "Retrieve the Full Report from context and ensure that the entire report from context is shown as received. After that, Read All Files in the given Directory. Use DirectoryReadTool to fetch all file paths in 'sample_data/sales_enablement_use_case_stories'. Use FileReadTool to extract content from each file one by one. Identify Relevant Use Cases & Customer Stories. Extract company names & digital transformation initiatives. Identify three companies with use cases that align with the generated report. Append the \"Use Cases & References\" Section Correctly. The final report must contain all original sections from the context + the newly appended section.",
+      "goal": "Retrieve the Full Report from context and ensure that the entire report from context is shown as received. After that, Read All Files in the given Directory. Use DirectoryReadTool to fetch all file paths in 'sample_data/sales_enablement_use_case_stories'. Use FileReadTool to extract content from each file one by one. Identify Relevant Use Cases & Customer Stories. Extract company names & digital transformation initiatives. Identify three companies with use cases that align with the generated report. Append the \"Use Cases & References\" Section Correctly. The final report must contain all original sections from the context + the newly appended section.",
       "allow_delegation": false,
       "verbose": false,
       "cache": true,
       "temperature": 0.1,
       "max_iter": 10,
-      "tool_template_ids": ["2159600d-p09c-5524-af42-9911e05dd017","2159600d-p09c-5524-af32-9922e05dd017" ],
+      "tool_template_ids": [
+        "2159600d-p09c-5524-af42-9911e05dd017",
+        "2159600d-p09c-5524-af32-9922e05dd017"
+      ],
       "pre_packaged": true,
       "agent_image_path": ""
     },
@@ -452,13 +454,16 @@
       "description": "",
       "role": "Communicator Agent",
       "backstory": "You are a communicator that coverts the markdown contents of the report to a pdf file. Ensure that the the converted report has all the sections of the report.",
-      "goal":   "Retrieve the Full Report from context and ensure that the entire report from context is shown as received. After that, send it as a raw Markdown string content to convert it to a PDF using the 'PDF Tool'. This will help convert the Markdown to a PDF. Use this Markdown content to convert to a PDF using the 'PDF Tool' with a filename strictly like companyname-uuid. \n\ncompanyname - Name of the company for which the report is being generated. \nuuid - Random unique identification of 16 characters.\n\nDo not forget to send the report as an attachment to the user via an email using the 'Email Tool'. The subject should be the company name. \n\nMake sure that the email has been sent after PDF generation. \n\nReturn the complete report, the file path for the PDF file, and the successful email message to the user. Make sure the user sees the complete report and not just a confirmation message.",
+      "goal": "Retrieve the Full Report from context and ensure that the entire report from context is shown as received. After that, send it as a raw Markdown string content to convert it to a PDF using the 'PDF Tool'. This will help convert the Markdown to a PDF. Use this Markdown content to convert to a PDF using the 'PDF Tool' with a filename strictly like companyname-uuid. \n\ncompanyname - Name of the company for which the report is being generated. \nuuid - Random unique identification of 16 characters.\n\nDo not forget to send the report as an attachment to the user via an email using the 'Email Tool'. The subject should be the company name. \n\nMake sure that the email has been sent after PDF generation. \n\nReturn the complete report, the file path for the PDF file, and the successful email message to the user. Make sure the user sees the complete report and not just a confirmation message.",
       "allow_delegation": false,
       "verbose": false,
       "cache": true,
       "temperature": 0.1,
       "max_iter": 10,
-      "tool_template_ids": [ "5759600d-a09c-4624-af42-6911f05dd817","0d65d035-30ff-45a8-98c6-be307feba1af"],
+      "tool_template_ids": [
+        "5759600d-a09c-4624-af42-6911f05dd817",
+        "0d65d035-30ff-45a8-98c6-be307feba1af"
+      ],
       "pre_packaged": true,
       "agent_image_path": ""
     },
@@ -697,13 +702,15 @@
     {
       "id": "129960de-f9aa-4c4f-9111-f9c8a931bb44",
       "name": "Jira Workflow",
-      "description": "",
+      "description": "This multi-agent workflow streamlines Jira issue management by using a Jira Manager Agent to coordinate a Jira Virtual Assistant Agent for handling Jira queries and a Web Search and Scraping Assistant Agent for gathering external insights. These agents interact with users through a conversational interface, leveraging tools like the Jira Integration Tool, Web Search Tool, and Serper-powered Webpage Scraper to enhance Jira issue tracking and resolution",
       "process": "hierarchical",
       "agent_template_ids": [
         "e4195dfd-fae5-453c-8b66-5367173964ef",
         "0ba29977-5441-49e7-a776-1b1dea0edaaf"
       ],
-      "task_template_ids": ["ee39afd9-336b-462b-b422-78111bbbe198"],
+      "task_template_ids": [
+        "ee39afd9-336b-462b-b422-78111bbbe198"
+      ],
       "manager_agent_template_id": "5db2f37c-e36e-4fa5-95bf-3bfe8bbfc681",
       "use_default_manager": false,
       "is_conversational": true,
@@ -712,17 +719,21 @@
     {
       "id": "acce204a-f085-4962-820c-131b1b7b2a40",
       "name": "Calculator Workflow",
-      "description": "",
+      "description": "This workflow uses a Calculator Agent to accurately evaluate mathematical expressions by leveraging Pydantic for input validation and performing basic arithmetic operations based on user-provided inputs",
       "process": "sequential",
-      "agent_template_ids": ["ee522707-265d-4db0-85e1-02c52ffd19c3"],
-      "task_template_ids": ["5498d885-4e4c-4ff7-b17e-e53f0e5beab1"],
+      "agent_template_ids": [
+        "ee522707-265d-4db0-85e1-02c52ffd19c3"
+      ],
+      "task_template_ids": [
+        "5498d885-4e4c-4ff7-b17e-e53f0e5beab1"
+      ],
       "is_conversational": false,
       "pre_packaged": true
     },
     {
       "id": "db79fdf2-703a-43f0-847d-e2647595dde2",
       "name": "Sales Enablement Multi Agentic Router Workflow",
-      "description": "",
+      "description": "This workflow enables a Sales Enablement Manager to generate tailored company reports by identifying the company's industry sector and selecting the appropriate sector-specific analyst agent (Manufacturing, Insurance, Public Sector, or Telecommunications) to provide research-driven actionable insights for sales teams",
       "process": "hierarchical",
       "agent_template_ids": [
         "4d84a505-430c-4d39-95e2-afe64d7cecf9",
@@ -730,7 +741,9 @@
         "a4d71bcc-094f-4870-89a1-bfcc20e78b61",
         "bc7e5cb3-815d-47a7-af05-c6da6dba94b3"
       ],
-      "task_template_ids": ["25f8bfc8-646f-460e-8872-34ce803a6152"],
+      "task_template_ids": [
+        "25f8bfc8-646f-460e-8872-34ce803a6152"
+      ],
       "manager_agent_template_id": "17013d0a-ca8c-4621-8c3f-b8c41a88ca8e",
       "use_default_manager": false,
       "is_conversational": false,
@@ -739,26 +752,32 @@
     {
       "id": "ab79fdf2-703a-43f0-847d-e2647595dde2",
       "name": "Sales Enablement Manufacturing Workflow",
-      "description": "",
+      "description": "This workflow enables an Analyst Agent to generate tailored company reports for the Manufacturing industry, delivering research-driven, actionable insights to support sales teams",
       "process": "sequential",
       "agent_template_ids": [
         "bc7e5cb3-815d-47a7-af05-c6da6dba94b3"
       ],
-      "task_template_ids": ["a5f8bfc8-646f-460e-8872-34ce803a6152"],
+      "task_template_ids": [
+        "a5f8bfc8-646f-460e-8872-34ce803a6152"
+      ],
       "is_conversational": true,
       "pre_packaged": true
     },
     {
       "id": "po90dff2-703a-43f0-847d-e2647595dde2",
       "name": "Sales Enablement Manufacturing Workflow with Use case Integration",
-      "description": "",
+      "description": "This workflow enables an Analyst Agent to generate tailored Manufacturing industry reports with research-driven insights for sales teams. A Customer Success Analysis Agent enhances the report by analyzing success stories, identifying relevant digital transformation initiatives, and creating use cases and references to be sent as a PDF over email",
       "process": "sequential",
       "agent_template_ids": [
         "cg7e5cb3-815s-47a7-af05-c6da7fba94b3",
         "29813d0a-fg8c-4621-8c3f-b8v41p88ca8e",
         "56413d0a-fg8c-4621-8f3f-b8v41p88ca8e"
       ],
-      "task_template_ids": ["f9883d00-8293-4e6f-9d8j-8156bsd87aa6","p0873d00-8293-4e6f-9d8j-8236bsd87aa6", "k2475d00-8293-5r6f-9d8j-8236bsd87aa6"],
+      "task_template_ids": [
+        "f9883d00-8293-4e6f-9d8j-8156bsd87aa6",
+        "p0873d00-8293-4e6f-9d8j-8236bsd87aa6",
+        "k2475d00-8293-5r6f-9d8j-8236bsd87aa6"
+      ],
       "is_conversational": false,
       "manager_agent_template_id": "",
       "use_default_manager": false,
@@ -767,7 +786,7 @@
     {
       "id": "13508ed8-b164-4af3-8f6e-2b91a72d1f68",
       "name": "CDP Data Ingestion(CDF) Readyflow Creation",
-      "description": "",
+      "description": "This workflow leverages Cloudera Data Flow to enable a Data Ingestion Assistant Agent to efficiently ingest external datasets from various sources, such as Hugging Face. The agent selects the appropriate tool, gathers any missing parameters from the user, and executes the ingestion process while reporting the status, file format, and destination path of the ingested data. Upon successful ingestion, it can also utilize the Email Tool to send notifications with relevant details",
       "process": "sequential",
       "agent_template_ids": [
         "7b408440-efdb-4ad2-92e3-3ce61abc50f3"
@@ -783,7 +802,7 @@
     {
       "id": "4274629b-159e-4434-b779-93442528f71e",
       "name": "CDP Visualize(CDV) from Datalake(CDW)",
-      "description": "",
+      "description": "This multi-agent workflow utilizes Cloudera Data Warehouse to create a Hive table from an S3 Parquet dataset, followed by Cloudera Data Visualization to generate meaningful visualizations that characterize the dataset. Once the visualization is created, the content is distributed via Slack or email",
       "process": "hierarchical",
       "agent_template_ids": [
         "7454f27b-9758-4b52-9c96-c8b1ae315c1e",
@@ -819,7 +838,7 @@
     {
       "id": "6eccbfa6-66f9-418a-bc6c-74516ac8219d",
       "name": "FSI Example: Portfolio Advisory Workflow",
-      "description": "",
+      "description": "This multi-agent workflow leverages customer profiles and portfolio data to research and identify stocks aligned with a portfolio strategy, optimize allocation based on risk-return objectives, and retrieve time-series data for selected tickers. By integrating these insights, the agent generates actionable recommendations to enhance a user's investment portfolio",
       "process": "hierarchical",
       "agent_template_ids": [
         "835b622c-ca33-4a6c-b1c4-ef7b86ba6c81",

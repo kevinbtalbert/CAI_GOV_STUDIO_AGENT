@@ -5,6 +5,7 @@ import {
   selectEditorWorkflowIsConversational,
   selectEditorWorkflowManagerAgentId,
   selectEditorWorkflowName,
+  selectEditorWorkflowDescription,
   selectEditorWorkflowTaskIds,
   updatedEditorAgentViewOpen,
   updatedEditorAgentViewStep,
@@ -13,6 +14,7 @@ import {
   updatedEditorWorkflowIsConversational,
   updatedEditorWorkflowManagerAgentId,
   updatedEditorWorkflowName,
+  updatedEditorWorkflowDescription,
   updatedEditorWorkflowTaskIds,
   selectEditorWorkflow,
   updatedEditorWorkflowId,
@@ -66,6 +68,7 @@ import SelectOrAddManagerAgentModal from './SelectOrAddManagerAgentModal';
 
 const WorkflowNameComponent: React.FC = () => {
   const workflowName = useAppSelector(selectEditorWorkflowName);
+  const workflowDescription = useAppSelector(selectEditorWorkflowDescription);
   const dispatch = useAppDispatch();
 
   return (
@@ -84,6 +87,13 @@ const WorkflowNameComponent: React.FC = () => {
           placeholder="Name"
           value={workflowName}
           onChange={(e) => dispatch(updatedEditorWorkflowName(e.target.value))}
+        />
+        <Text style={{ fontSize: 14, fontWeight: 400 }}>Workflow Description</Text>
+        <Input.TextArea
+          placeholder="Description"
+          value={workflowDescription}
+          onChange={(e) => dispatch(updatedEditorWorkflowDescription(e.target.value))}
+          autoSize={{ minRows: 1, maxRows: 6 }}
         />
       </Layout>
     </>

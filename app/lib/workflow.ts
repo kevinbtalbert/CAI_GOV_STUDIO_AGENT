@@ -168,6 +168,7 @@ export const createUpdateRequestFromEditor = (workflowState: WorkflowState) => {
   const updateRequest: UpdateWorkflowRequest = {
     workflow_id: workflowState.workflowId!,
     name: workflowState.name!,
+    description: workflowState.description!,
     is_conversational: workflowState.isConversational!,
     crew_ai_workflow_metadata: {
       agent_id: workflowState.workflowMetadata.agentIds || [],
@@ -189,6 +190,7 @@ export const createAddRequestFromEditor = (workflowState: WorkflowState) => {
   const addRequest: AddWorkflowRequest = {
     name: workflowState.name!,
     is_conversational: workflowState.isConversational!,
+    description: workflowState.description!,
     crew_ai_workflow_metadata: {
       agent_id: workflowState.workflowMetadata.agentIds || [],
       task_id: workflowState.workflowMetadata.taskIds || [],

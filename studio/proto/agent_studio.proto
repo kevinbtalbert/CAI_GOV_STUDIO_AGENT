@@ -463,10 +463,11 @@ message AddWorkflowRequest {
   optional CrewAIWorkflowMetadata crew_ai_workflow_metadata = 2;
   // Workflow is Conversational or not
   optional bool is_conversational = 3;
-
   // Optional template from which to create a workflow 
   // and all of its constituents
   optional string workflow_template_id = 4;
+  // Description of the workflow
+  optional string description = 5;
 }
 
 message AddWorkflowResponse {
@@ -503,6 +504,8 @@ message UpdateWorkflowRequest {
   CrewAIWorkflowMetadata crew_ai_workflow_metadata = 3;
   // Workflow is Conversational or not
   bool is_conversational = 4;
+  // Updated description of the workflow
+  string description = 5;
 }
 
 message UpdateWorkflowResponse {}
@@ -621,6 +624,8 @@ message Workflow {
   bool is_conversational = 6;
   // Workflow state
   bool is_draft = 7;
+  // Workflow description
+  string description = 8;
 }
 
 message CrewAIWorkflowMetadata {

@@ -633,21 +633,24 @@ class TestAgentResponse(_message.Message):
     def __init__(self, response: _Optional[str] = ...) -> None: ...
 
 class AddWorkflowRequest(_message.Message):
-    __slots__ = ("name", "crew_ai_workflow_metadata", "is_conversational", "workflow_template_id")
+    __slots__ = ("name", "crew_ai_workflow_metadata", "is_conversational", "workflow_template_id", "description")
     NAME_FIELD_NUMBER: _ClassVar[int]
     CREW_AI_WORKFLOW_METADATA_FIELD_NUMBER: _ClassVar[int]
     IS_CONVERSATIONAL_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_TEMPLATE_ID_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     name: str
     crew_ai_workflow_metadata: CrewAIWorkflowMetadata
     is_conversational: bool
     workflow_template_id: str
+    description: str
     def __init__(
         self,
         name: _Optional[str] = ...,
         crew_ai_workflow_metadata: _Optional[_Union[CrewAIWorkflowMetadata, _Mapping]] = ...,
         is_conversational: bool = ...,
         workflow_template_id: _Optional[str] = ...,
+        description: _Optional[str] = ...,
     ) -> None: ...
 
 class AddWorkflowResponse(_message.Message):
@@ -679,21 +682,24 @@ class GetWorkflowResponse(_message.Message):
     def __init__(self, workflow: _Optional[_Union[Workflow, _Mapping]] = ...) -> None: ...
 
 class UpdateWorkflowRequest(_message.Message):
-    __slots__ = ("workflow_id", "name", "crew_ai_workflow_metadata", "is_conversational")
+    __slots__ = ("workflow_id", "name", "crew_ai_workflow_metadata", "is_conversational", "description")
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     CREW_AI_WORKFLOW_METADATA_FIELD_NUMBER: _ClassVar[int]
     IS_CONVERSATIONAL_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     workflow_id: str
     name: str
     crew_ai_workflow_metadata: CrewAIWorkflowMetadata
     is_conversational: bool
+    description: str
     def __init__(
         self,
         workflow_id: _Optional[str] = ...,
         name: _Optional[str] = ...,
         crew_ai_workflow_metadata: _Optional[_Union[CrewAIWorkflowMetadata, _Mapping]] = ...,
         is_conversational: bool = ...,
+        description: _Optional[str] = ...,
     ) -> None: ...
 
 class UpdateWorkflowResponse(_message.Message):
@@ -904,6 +910,7 @@ class Workflow(_message.Message):
         "is_ready",
         "is_conversational",
         "is_draft",
+        "description",
     )
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -912,6 +919,7 @@ class Workflow(_message.Message):
     IS_READY_FIELD_NUMBER: _ClassVar[int]
     IS_CONVERSATIONAL_FIELD_NUMBER: _ClassVar[int]
     IS_DRAFT_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     workflow_id: str
     name: str
     crew_ai_workflow_metadata: CrewAIWorkflowMetadata
@@ -919,6 +927,7 @@ class Workflow(_message.Message):
     is_ready: bool
     is_conversational: bool
     is_draft: bool
+    description: str
     def __init__(
         self,
         workflow_id: _Optional[str] = ...,
@@ -928,6 +937,7 @@ class Workflow(_message.Message):
         is_ready: bool = ...,
         is_conversational: bool = ...,
         is_draft: bool = ...,
+        description: _Optional[str] = ...,
     ) -> None: ...
 
 class CrewAIWorkflowMetadata(_message.Message):

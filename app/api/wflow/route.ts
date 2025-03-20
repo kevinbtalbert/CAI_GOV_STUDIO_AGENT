@@ -134,6 +134,7 @@ export async function GET(request: NextRequest) {
     const workflow: Workflow = {
       workflow_id: configuration.workflow.id,
       name: configuration.workflow.name,
+      description: configuration.workflow.description,
       crew_ai_workflow_metadata: {
         agent_id: configuration.workflow.agent_ids,
         task_id: configuration.workflow.task_ids,

@@ -236,6 +236,7 @@ def add_workflow(request: AddWorkflowRequest, cml: CMLServiceApi, dao: AgentStud
             workflow = db_model.Workflow(
                 id=str(uuid4()),
                 name=request.name,
+                description=request.description,
                 crew_ai_process=request.crew_ai_workflow_metadata.process,
                 crew_ai_agents=agent_ids,  # Use converted list
                 crew_ai_tasks=task_ids,  # Use converted list
@@ -274,6 +275,7 @@ def list_workflows(
                     Workflow(
                         workflow_id=workflow.id,
                         name=workflow.name,
+                        description=workflow.description,
                         crew_ai_workflow_metadata=CrewAIWorkflowMetadata(
                             agent_id=workflow.crew_ai_agents,
                             task_id=workflow.crew_ai_tasks,
@@ -335,6 +337,7 @@ def get_workflow(request: GetWorkflowRequest, cml: CMLServiceApi, dao: AgentStud
             workflow_metadata = Workflow(
                 workflow_id=workflow.id,
                 name=workflow.name,
+                description=workflow.description,
                 crew_ai_workflow_metadata=CrewAIWorkflowMetadata(
                     agent_id=workflow.crew_ai_agents,
                     task_id=workflow.crew_ai_tasks,
@@ -370,6 +373,10 @@ def update_workflow(
             # Update workflow name if provided
             if is_field_set(request, "name"):
                 workflow.name = request.name
+
+            # Update workflow name if provided
+            if is_field_set(request, "description"):
+                workflow.description = request.description
 
             # Update is_conversational - handle both True and False values
             if hasattr(request, "is_conversational"):

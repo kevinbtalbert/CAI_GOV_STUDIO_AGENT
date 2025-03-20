@@ -25,6 +25,7 @@ export interface WorkflowMetadataState {
 export interface WorkflowState {
   workflowId?: string;
   name?: string;
+  description?: string;
   workflowMetadata: WorkflowMetadataState;
   isConversational?: boolean;
 }
@@ -98,6 +99,7 @@ export const editorSlice = createSlice({
       state.workflow = {
         workflowId: workflow.workflow_id,
         name: workflow.name,
+        description: workflow.description,
         isConversational: workflow.is_conversational,
         workflowMetadata: {
           agentIds: workflow.crew_ai_workflow_metadata?.agent_id,
@@ -119,6 +121,10 @@ export const editorSlice = createSlice({
 
     updatedEditorWorkflowName: (state, action: PayloadAction<string | undefined>) => {
       state.workflow.name = action.payload;
+    },
+
+    updatedEditorWorkflowDescription: (state, action: PayloadAction<string | undefined>) => {
+      state.workflow.description = action.payload;
     },
 
     updatedEditorWorkflowIsConversational: (state, action: PayloadAction<boolean | undefined>) => {
@@ -239,6 +245,7 @@ export const {
   updatedEditorWorkflowFromExisting,
   updatedEditorWorkflowId,
   updatedEditorWorkflowName,
+  updatedEditorWorkflowDescription,
   updatedEditorWorkflowProcess,
   updatedEditorWorkflowIsConversational,
   updatedEditorWorkflowManagerAgentId,
@@ -266,6 +273,7 @@ export const selectEditorCurrentStep = (state: RootState) => state.editor.curren
 export const selectEditorWorkflow = (state: RootState) => state.editor.workflow;
 export const selectEditorWorkflowId = (state: RootState) => state.editor.workflow.workflowId;
 export const selectEditorWorkflowName = (state: RootState) => state.editor.workflow.name;
+export const selectEditorWorkflowDescription = (state: RootState) => state.editor.workflow.description;
 export const selectEditorWorkflowManagerAgentId = (state: RootState) =>
   state.editor.workflow.workflowMetadata.managerAgentId;
 // export const selectEditorWorkflowManagerModelId = (state: RootState) =>

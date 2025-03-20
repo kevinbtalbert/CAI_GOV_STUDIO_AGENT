@@ -453,7 +453,11 @@ export interface AddWorkflowRequest {
    * Optional template from which to create a workflow
    * and all of its constituents
    */
-  workflow_template_id?: string | undefined;
+  workflow_template_id?:
+    | string
+    | undefined;
+  /** Description of the workflow */
+  description?: string | undefined;
 }
 
 export interface AddWorkflowResponse {
@@ -493,6 +497,8 @@ export interface UpdateWorkflowRequest {
     | undefined;
   /** Workflow is Conversational or not */
   is_conversational: boolean;
+  /** Updated description of the workflow */
+  description: string;
 }
 
 export interface UpdateWorkflowResponse {
@@ -650,6 +656,8 @@ export interface Workflow {
   is_conversational: boolean;
   /** Workflow state */
   is_draft: boolean;
+  /** Workflow description */
+  description: string;
 }
 
 export interface CrewAIWorkflowMetadata {
@@ -5419,6 +5427,7 @@ function createBaseAddWorkflowRequest(): AddWorkflowRequest {
     crew_ai_workflow_metadata: undefined,
     is_conversational: undefined,
     workflow_template_id: undefined,
+    description: undefined,
   };
 }
 
@@ -5435,6 +5444,9 @@ export const AddWorkflowRequest: MessageFns<AddWorkflowRequest> = {
     }
     if (message.workflow_template_id !== undefined) {
       writer.uint32(34).string(message.workflow_template_id);
+    }
+    if (message.description !== undefined) {
+      writer.uint32(42).string(message.description);
     }
     return writer;
   },
@@ -5478,6 +5490,14 @@ export const AddWorkflowRequest: MessageFns<AddWorkflowRequest> = {
           message.workflow_template_id = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5497,6 +5517,7 @@ export const AddWorkflowRequest: MessageFns<AddWorkflowRequest> = {
       workflow_template_id: isSet(object.workflow_template_id)
         ? globalThis.String(object.workflow_template_id)
         : undefined,
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
     };
   },
 
@@ -5514,6 +5535,9 @@ export const AddWorkflowRequest: MessageFns<AddWorkflowRequest> = {
     if (message.workflow_template_id !== undefined) {
       obj.workflow_template_id = message.workflow_template_id;
     }
+    if (message.description !== undefined) {
+      obj.description = message.description;
+    }
     return obj;
   },
 
@@ -5529,6 +5553,7 @@ export const AddWorkflowRequest: MessageFns<AddWorkflowRequest> = {
         : undefined;
     message.is_conversational = object.is_conversational ?? undefined;
     message.workflow_template_id = object.workflow_template_id ?? undefined;
+    message.description = object.description ?? undefined;
     return message;
   },
 };
@@ -5815,7 +5840,7 @@ export const GetWorkflowResponse: MessageFns<GetWorkflowResponse> = {
 };
 
 function createBaseUpdateWorkflowRequest(): UpdateWorkflowRequest {
-  return { workflow_id: "", name: "", crew_ai_workflow_metadata: undefined, is_conversational: false };
+  return { workflow_id: "", name: "", crew_ai_workflow_metadata: undefined, is_conversational: false, description: "" };
 }
 
 export const UpdateWorkflowRequest: MessageFns<UpdateWorkflowRequest> = {
@@ -5831,6 +5856,9 @@ export const UpdateWorkflowRequest: MessageFns<UpdateWorkflowRequest> = {
     }
     if (message.is_conversational !== false) {
       writer.uint32(32).bool(message.is_conversational);
+    }
+    if (message.description !== "") {
+      writer.uint32(42).string(message.description);
     }
     return writer;
   },
@@ -5874,6 +5902,14 @@ export const UpdateWorkflowRequest: MessageFns<UpdateWorkflowRequest> = {
           message.is_conversational = reader.bool();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5891,6 +5927,7 @@ export const UpdateWorkflowRequest: MessageFns<UpdateWorkflowRequest> = {
         ? CrewAIWorkflowMetadata.fromJSON(object.crew_ai_workflow_metadata)
         : undefined,
       is_conversational: isSet(object.is_conversational) ? globalThis.Boolean(object.is_conversational) : false,
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
     };
   },
 
@@ -5908,6 +5945,9 @@ export const UpdateWorkflowRequest: MessageFns<UpdateWorkflowRequest> = {
     if (message.is_conversational !== false) {
       obj.is_conversational = message.is_conversational;
     }
+    if (message.description !== "") {
+      obj.description = message.description;
+    }
     return obj;
   },
 
@@ -5923,6 +5963,7 @@ export const UpdateWorkflowRequest: MessageFns<UpdateWorkflowRequest> = {
         ? CrewAIWorkflowMetadata.fromPartial(object.crew_ai_workflow_metadata)
         : undefined;
     message.is_conversational = object.is_conversational ?? false;
+    message.description = object.description ?? "";
     return message;
   },
 };
@@ -7502,6 +7543,7 @@ function createBaseWorkflow(): Workflow {
     is_ready: false,
     is_conversational: false,
     is_draft: false,
+    description: "",
   };
 }
 
@@ -7527,6 +7569,9 @@ export const Workflow: MessageFns<Workflow> = {
     }
     if (message.is_draft !== false) {
       writer.uint32(56).bool(message.is_draft);
+    }
+    if (message.description !== "") {
+      writer.uint32(66).string(message.description);
     }
     return writer;
   },
@@ -7594,6 +7639,14 @@ export const Workflow: MessageFns<Workflow> = {
           message.is_draft = reader.bool();
           continue;
         }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7614,6 +7667,7 @@ export const Workflow: MessageFns<Workflow> = {
       is_ready: isSet(object.is_ready) ? globalThis.Boolean(object.is_ready) : false,
       is_conversational: isSet(object.is_conversational) ? globalThis.Boolean(object.is_conversational) : false,
       is_draft: isSet(object.is_draft) ? globalThis.Boolean(object.is_draft) : false,
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
     };
   },
 
@@ -7640,6 +7694,9 @@ export const Workflow: MessageFns<Workflow> = {
     if (message.is_draft !== false) {
       obj.is_draft = message.is_draft;
     }
+    if (message.description !== "") {
+      obj.description = message.description;
+    }
     return obj;
   },
 
@@ -7658,6 +7715,7 @@ export const Workflow: MessageFns<Workflow> = {
     message.is_ready = object.is_ready ?? false;
     message.is_conversational = object.is_conversational ?? false;
     message.is_draft = object.is_draft ?? false;
+    message.description = object.description ?? "";
     return message;
   },
 };
