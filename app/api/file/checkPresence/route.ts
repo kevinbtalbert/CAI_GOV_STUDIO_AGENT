@@ -26,8 +26,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       headers: {
         Authorization: `Bearer ${CDSW_APIV2_KEY}`,
       },
-      agent
-    })
+      agent,
+    });
     const responseData = (await response.json()) as any;
 
     if (response.status === 200) {

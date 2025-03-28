@@ -43,11 +43,7 @@ def get_project_and_trace_info(client: Client, local_trace_id: str):
     edges = result["projects"]["edges"]
 
     # Find the project whose 'trace' is not null and has an 'id'
-    project = next(
-        (edge for edge in edges
-         if edge["node"]["trace"] and edge["node"]["trace"].get("id")),
-        None
-    )
+    project = next((edge for edge in edges if edge["node"]["trace"] and edge["node"]["trace"].get("id")), None)
 
     if not project:
         raise ValueError(f"No project found for traceId={local_trace_id}")
@@ -55,10 +51,7 @@ def get_project_and_trace_info(client: Client, local_trace_id: str):
     global_trace_id = project["node"]["trace"]["id"]
     project_id = project["node"]["id"]
 
-    return {
-        "projectId": project_id,
-        "globalTraceId": global_trace_id
-    }
+    return {"projectId": project_id, "globalTraceId": global_trace_id}
 
 
 def get_crew_events(client: Client, local_trace_id: str) -> dict:
@@ -98,7 +91,7 @@ def get_crew_events(client: Client, local_trace_id: str) -> dict:
         }}
     }}
     """
-    
+
     # Execute the query with the global trace ID
     result = client.execute(gql(query_str))
 
@@ -134,8 +127,4 @@ def get_crew_events(client: Client, local_trace_id: str) -> dict:
 
     filtered_events.sort(key=parse_time)
 
-    return {
-        "projectId": project_id,
-        "events": filtered_events
-    }
-    
+    return {"projectId": project_id, "events": filtered_events}

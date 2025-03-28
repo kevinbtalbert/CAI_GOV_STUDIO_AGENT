@@ -46,6 +46,7 @@ def deploy_cml_model(
     function_name: str,
     runtime_identifier: str,
     deployment_config: cmlapi.ShortCreateModelDeployment,
+    model_root_dir: str,
 ) -> Tuple[Annotated[str, Field(description="Model ID")], Annotated[str, Field(description="Model Build ID")]]:
     """
     Deploy a model to CML and create a model build with deployment.
@@ -79,9 +80,9 @@ def deploy_cml_model(
             runtime_identifier=runtime_identifier,
             auto_deployment_config=deployment_config,
             auto_deploy_model=True,
+            model_root_dir=model_root_dir,
         )
-        if get_studio_subdirectory():
-            create_model_build_body.model_root_dir = get_studio_subdirectory()
+
         create_build_resp = cml.create_model_build(create_model_build_body, project_id=project_id, model_id=model_id)
     except cmlapi.rest.ApiException as e:
         raise RuntimeError(f"Failed to create model build: {e.body}") from e
@@ -233,7 +234,9 @@ def get_appliction_by_name(cml: cmlapi.CMLServiceApi, name: str) -> cmlapi.Appli
     Raises:
         ValueError: If no running application is found
     """
-    applications: list[cmlapi.Application] = cml.list_applications(project_id=os.getenv("CDSW_PROJECT_ID")).applications
+    applications: list[cmlapi.Application] = cml.list_applications(
+        project_id=os.getenv("CDSW_PROJECT_ID"), page_size=5000
+    ).applications
 
     # Filter for applications that:
     # 1. Match the base name
@@ -284,3 +287,10 @@ def get_studio_subdirectory() -> str:
     if relative_path.endswith("/"):
         relative_path = relative_path[:-1]
     return relative_path
+
+
+def get_agent_studio_install_path() -> str:
+    if os.getenv("IS_COMPOSABLE", "false").lower() == "true":
+        return "/home/cdsw/agent-studio"
+    else:
+        return "/home/cdsw"

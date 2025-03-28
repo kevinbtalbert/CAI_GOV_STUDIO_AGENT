@@ -38,7 +38,7 @@ export const useImageAssetsData = (uris: (string | undefined)[]) => {
               action_type: 'get-asset-data',
               get_asset_data_inputs: urisToActuallyFetch,
             },
-          })
+          }),
         });
         const responseData = (await response.json()) as any;
         const asset_data = responseData.response?.asset_data;

@@ -454,11 +454,13 @@ const WorkflowsPageContent: React.FC = () => {
 // that the /workflows route is automatically pushed when opening the application,
 // we should ensure this page is captured for health checks.
 const WorkflowsPage: React.FC = () => {
-  return (<>
-    <ContentWithHealthCheck>
-      <WorkflowsPageContent />
-    </ContentWithHealthCheck>
-  </>)
-}
+  return (
+    <>
+      <ContentWithHealthCheck>
+        <WorkflowsPageContent />
+      </ContentWithHealthCheck>
+    </>
+  );
+};
 
 export default WorkflowsPage;

@@ -287,6 +287,7 @@ def list_workflows(
                         is_ready=False,
                         is_conversational=workflow.is_conversational,
                         is_draft=workflow.is_draft,
+                        directory=workflow.directory,
                     )
                 )
             return ListWorkflowsResponse(workflows=workflow_list)
@@ -348,6 +349,7 @@ def get_workflow(request: GetWorkflowRequest, cml: CMLServiceApi, dao: AgentStud
                 is_ready=are_all_tools_ready,
                 is_conversational=workflow.is_conversational,
                 is_draft=workflow.is_draft,
+                directory=workflow.directory,
             )
             return GetWorkflowResponse(workflow=workflow_metadata)
     except SQLAlchemyError as e:

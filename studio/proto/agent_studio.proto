@@ -626,6 +626,8 @@ message Workflow {
   bool is_draft = 7;
   // Workflow description
   string description = 8;
+  // Directory
+  optional string directory = 9;
 }
 
 message CrewAIWorkflowMetadata {

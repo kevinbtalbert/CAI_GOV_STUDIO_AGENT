@@ -39,8 +39,8 @@ const fetchModelUrl = async (cml_model_id: string): Promise<string | null> => {
       headers: {
         authorization: `Bearer ${CDSW_APIV2_KEY}`,
       },
-      agent
-    })
+      agent,
+    });
     const responseData = (await response.json()) as ListModelsResponse;
 
     const model = responseData.models.find((model: CMLModel) => model.id === cml_model_id);
@@ -75,10 +75,10 @@ export async function GET(request: NextRequest) {
       body: JSON.stringify({
         request: {
           action_type: 'get-configuration',
-        }
+        },
       }),
-      agent
-    })
+      agent,
+    });
     const getConfigurationResponseData = (await getConfigurationResponse.json()) as any;
     const configuration = getConfigurationResponseData.response?.configuration;
 

@@ -3,7 +3,8 @@ import sys
 import subprocess
 
 # Extract workflow parameters from the environment
-WORKFLOW_CONFIG = os.getenv("AGENT_STUDIO_WORKFLOW_CONFIG")
+WORKFLOW_ARTIFACT_TYPE = os.environ.get("AGENT_STUDIO_WORKFLOW_ARTIFACT_TYPE", "config_file")
+WORFKLOW_ARTIFACT = os.environ.get("AGENT_STUDIO_WORKFLOW_ARTIFACT", "/home/cdsw/workflow/config.json")
 WORKFLOW_NAME = os.getenv("AGENT_STUDIO_WORKFLOW_NAME")
 CDSW_DOMAIN = os.getenv("CDSW_DOMAIN")
 
@@ -15,28 +16,24 @@ subprocess.call(["pip", "install", f"https://{CDSW_DOMAIN}/api/v2/python.tar.gz"
 __import__("pysqlite3")
 sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
-# Rest of the imports
-
 import asyncio
 from opentelemetry.context import get_current
-from studio import consts
-from studio.ops import instrument_workflow
-import studio.cross_cutting.input_types as input_types
-import studio.workflow.utils as wf_utils
-import cml.models_v1 as cml_models
 from datetime import datetime
 from typing import Dict, Optional, Union
 from pydantic import ValidationError
 import json
 import base64
 
+import engine.types as input_types
+from engine import consts
+from engine.ops import instrument_workflow
+from engine.crewai.run import run_workflow_async
 
-# Instrument our workflow given a specific workflow name and
-# set up the instrumentation.
-tracer_provider = instrument_workflow(f"{WORKFLOW_NAME}")
-tracer = tracer_provider.get_tracer("opentelemetry.agentstudio.workflow.model")
+import cml.models_v1 as cml_models
 
 
+# Currently the only artifact type supported for import is directory.
+# the collated input requirements are all relative to the workflow import path.
 def _install_python_requirements(collated_input: input_types.CollatedInput):
     requirement_files = set()
     for tool_instance in collated_input.tool_instances:
@@ -47,9 +44,18 @@ def _install_python_requirements(collated_input: input_types.CollatedInput):
         subprocess.call(["pip", "install", "-r", requirement_file])
 
 
-collated_input_dict = json.load(open(WORKFLOW_CONFIG, "r"))
-collated_input = input_types.CollatedInput.model_validate(collated_input_dict)
-_install_python_requirements(collated_input)
+if WORKFLOW_ARTIFACT_TYPE == "config_file":
+    collated_input_dict = json.load(open(WORFKLOW_ARTIFACT, "r"))
+    collated_input = input_types.CollatedInput.model_validate(collated_input_dict)
+    _install_python_requirements(collated_input)
+else:
+    raise ValueError("currently only AGENT_STUDIO_WORKFLOW_ARTIFACT_TYPE=config_file is supported.")
+
+
+# Instrument our workflow given a specific workflow name and
+# set up the instrumentation.
+tracer_provider = instrument_workflow(f"{WORKFLOW_NAME}")
+tracer = tracer_provider.get_tracer("opentelemetry.agentstudio.workflow.model")
 
 
 def base64_decode(encoded_str: str):
@@ -107,9 +113,7 @@ def api_wrapper(args: Union[dict, str]) -> str:
             parent_context = get_current()
 
             # Start the workflow in the background using the parent context
-            asyncio.create_task(
-                wf_utils.run_workflow_task(collated_input_copy, tool_user_params, inputs, parent_context)
-            )
+            asyncio.create_task(run_workflow_async(collated_input_copy, tool_user_params, inputs, parent_context))
 
         return {"trace_id": str(trace_id)}
     elif serve_workflow_parameters.action_type == input_types.DeployedWorkflowActions.GET_CONFIGURATION.value:

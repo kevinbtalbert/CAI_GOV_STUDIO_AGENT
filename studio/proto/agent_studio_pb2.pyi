@@ -911,6 +911,7 @@ class Workflow(_message.Message):
         "is_conversational",
         "is_draft",
         "description",
+        "directory",
     )
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -920,6 +921,7 @@ class Workflow(_message.Message):
     IS_CONVERSATIONAL_FIELD_NUMBER: _ClassVar[int]
     IS_DRAFT_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    DIRECTORY_FIELD_NUMBER: _ClassVar[int]
     workflow_id: str
     name: str
     crew_ai_workflow_metadata: CrewAIWorkflowMetadata
@@ -928,6 +930,7 @@ class Workflow(_message.Message):
     is_conversational: bool
     is_draft: bool
     description: str
+    directory: str
     def __init__(
         self,
         workflow_id: _Optional[str] = ...,
@@ -938,6 +941,7 @@ class Workflow(_message.Message):
         is_conversational: bool = ...,
         is_draft: bool = ...,
         description: _Optional[str] = ...,
+        directory: _Optional[str] = ...,
     ) -> None: ...
 
 class CrewAIWorkflowMetadata(_message.Message):

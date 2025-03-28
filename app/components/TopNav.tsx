@@ -16,7 +16,7 @@ const TopNav: React.FC = () => {
 
   // Check if we have a render mode
   if (!workflowData?.renderMode) {
-    return (<></>);
+    return <></>;
   }
 
   return workflowData?.renderMode === 'studio' ? <StudioTopNav /> : <></>;

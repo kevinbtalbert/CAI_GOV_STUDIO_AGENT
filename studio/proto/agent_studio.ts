@@ -658,6 +658,8 @@ export interface Workflow {
   is_draft: boolean;
   /** Workflow description */
   description: string;
+  /** Directory */
+  directory?: string | undefined;
 }
 
 export interface CrewAIWorkflowMetadata {
@@ -7544,6 +7546,7 @@ function createBaseWorkflow(): Workflow {
     is_conversational: false,
     is_draft: false,
     description: "",
+    directory: undefined,
   };
 }
 
@@ -7572,6 +7575,9 @@ export const Workflow: MessageFns<Workflow> = {
     }
     if (message.description !== "") {
       writer.uint32(66).string(message.description);
+    }
+    if (message.directory !== undefined) {
+      writer.uint32(74).string(message.directory);
     }
     return writer;
   },
@@ -7647,6 +7653,14 @@ export const Workflow: MessageFns<Workflow> = {
           message.description = reader.string();
           continue;
         }
+        case 9: {
+          if (tag !== 74) {
+            break;
+          }
+
+          message.directory = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7668,6 +7682,7 @@ export const Workflow: MessageFns<Workflow> = {
       is_conversational: isSet(object.is_conversational) ? globalThis.Boolean(object.is_conversational) : false,
       is_draft: isSet(object.is_draft) ? globalThis.Boolean(object.is_draft) : false,
       description: isSet(object.description) ? globalThis.String(object.description) : "",
+      directory: isSet(object.directory) ? globalThis.String(object.directory) : undefined,
     };
   },
 
@@ -7697,6 +7712,9 @@ export const Workflow: MessageFns<Workflow> = {
     if (message.description !== "") {
       obj.description = message.description;
     }
+    if (message.directory !== undefined) {
+      obj.directory = message.directory;
+    }
     return obj;
   },
 
@@ -7716,6 +7734,7 @@ export const Workflow: MessageFns<Workflow> = {
     message.is_conversational = object.is_conversational ?? false;
     message.is_draft = object.is_draft ?? false;
     message.description = object.description ?? "";
+    message.directory = object.directory ?? undefined;
     return message;
   },
 };

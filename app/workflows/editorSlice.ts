@@ -273,7 +273,8 @@ export const selectEditorCurrentStep = (state: RootState) => state.editor.curren
 export const selectEditorWorkflow = (state: RootState) => state.editor.workflow;
 export const selectEditorWorkflowId = (state: RootState) => state.editor.workflow.workflowId;
 export const selectEditorWorkflowName = (state: RootState) => state.editor.workflow.name;
-export const selectEditorWorkflowDescription = (state: RootState) => state.editor.workflow.description;
+export const selectEditorWorkflowDescription = (state: RootState) =>
+  state.editor.workflow.description;
 export const selectEditorWorkflowManagerAgentId = (state: RootState) =>
   state.editor.workflow.workflowMetadata.managerAgentId;
 // export const selectEditorWorkflowManagerModelId = (state: RootState) =>

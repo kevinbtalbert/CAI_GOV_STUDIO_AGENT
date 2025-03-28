@@ -115,7 +115,6 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
   tasks,
   agents,
 }) => {
-
   // TODO: pass render mode in to the workflow app directly
   // TODO: pass model url and render mode down to child components through props
   const { data: workflowData, isLoading } = useGetWorkflowDataQuery();
@@ -129,12 +128,12 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
   const dispatch = useAppDispatch();
   const currentEvents = useAppSelector(selectCurrentEvents);
 
-  const [ getEvents ] = useGetEventsMutation();
+  const [getEvents] = useGetEventsMutation();
 
   // NOTE: because we also run our workflow app in "standalone" mode, his
   // specific query may fail. Becuase of this, we also check our workflow
   // data to see if we are rendering in studio model. Making this actual api
-  // call is acceptable from the frontend (but will show up as an error 
+  // call is acceptable from the frontend (but will show up as an error
   // in the logs), but we need to make sure we don't do anything with
   // the results of this api call if we are rendering in workflow app mode.
   // TODO: pull this out to either a prop to the component or maybe even
@@ -175,7 +174,9 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
     // Set the interval function
     const fetchEvents = async () => {
       try {
-        const { projectId, events: allEvents } = await getEvents({traceId: currentTraceId}).unwrap();
+        const { projectId, events: allEvents } = await getEvents({
+          traceId: currentTraceId,
+        }).unwrap();
         dispatch(updatedCurrentEvents(allEvents));
         dispatch(updatedCurrentEventIndex(allEvents.length - 1));
         dispatch(updatedCurrentPhoenixProjectId(projectId)); // TODO: there's a more graceful place for this
@@ -332,7 +333,7 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
             transition: 'width 0.3s ease',
           }}
         >
-          {(renderMode === 'studio' && !defaultModel) ? (
+          {renderMode === 'studio' && !defaultModel ? (
             renderAlert(
               'No Default LLM Model',
               'Please configure a default LLM model on the LLMs page to use workflows.',
@@ -469,12 +470,13 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
               <Title level={5}>Playback</Title>
               <Slider
                 min={0}
-                max={(!currentEvents || currentEvents.length == 0) ? 0 : currentEvents.length - 1}
+                max={!currentEvents || currentEvents.length == 0 ? 0 : currentEvents.length - 1}
                 value={sliderValue}
                 onChange={handleSliderChange}
                 marks={{
                   0: 'Start',
-                  [(!currentEvents || currentEvents.length == 0) ? 0 : currentEvents.length - 1]: 'End',
+                  [!currentEvents || currentEvents.length == 0 ? 0 : currentEvents.length - 1]:
+                    'End',
                 }}
                 tooltip={{ formatter: (val) => `Event ${val}` }}
               />

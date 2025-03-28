@@ -58,7 +58,6 @@ const WorkflowAppInputsView: React.FC<WorkflowAppInputsViewProps> = ({ workflow,
   const renderMode = workflowData?.renderMode;
   const workflowModelUrl = workflowData?.workflowModelUrl;
 
-
   // Add effect to clear crew output when workflow changes
   useEffect(() => {
     dispatch(updatedCrewOutput(undefined));
@@ -100,15 +99,15 @@ const WorkflowAppInputsView: React.FC<WorkflowAppInputsViewProps> = ({ workflow,
     } else {
       const kickoffResponse = await fetch(`${workflowModelUrl}`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json' 
+        headers: {
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           request: {
             action_type: 'kickoff',
             kickoff_inputs: base64Encode(finalInputs), // Use finalInputs instead of inputs
           },
-        })
+        }),
       });
       const kickoffResponseData = (await kickoffResponse.json()) as any;
       traceId = kickoffResponseData.response.trace_id;
@@ -192,7 +191,7 @@ const WorkflowAppInputsView: React.FC<WorkflowAppInputsViewProps> = ({ workflow,
 
   // If we are not fully loaded, don't display anything
   if (isLoading || !workflowData || !workflowData.renderMode) {
-    return (<></>)
+    return <></>;
   }
 
   return (

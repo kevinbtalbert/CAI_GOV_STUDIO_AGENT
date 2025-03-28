@@ -15,6 +15,7 @@ from studio.models.utils import get_studio_default_model_id
 import studio.cross_cutting.utils as cc_utils
 from studio.cross_cutting.global_thread_pool import get_thread_pool
 from studio.proto.utils import is_field_set
+from studio.cross_cutting.utils import get_studio_subdirectory
 import studio.workflow.utils as workflow_utils
 import studio.consts as consts
 from studio.ops import get_ops_endpoint
@@ -279,7 +280,7 @@ def get_application_for_deployed_workflow(
     """
     Get the CML application tied to a specific workflow.
     """
-    resp: cmlapi.ListApplicationsResponse = cml.list_applications(os.getenv("CDSW_PROJECT_ID"))
+    resp: cmlapi.ListApplicationsResponse = cml.list_applications(os.getenv("CDSW_PROJECT_ID"), page_size=5000)
     applications: list[cmlapi.Application] = resp.applications
     applications = list(
         filter(lambda x: x.name == get_application_name_for_deployed_workflow(deployed_workflow), applications)
@@ -340,6 +341,9 @@ def deploy_workflow(
     cml_model_id, model_build_id = None, None
     workflow_frontend_application: Optional[cmlapi.Application] = None
     try:
+        # Create a unique ID for this deployed workflow
+        deployed_workflow_id = str(uuid4())
+
         with dao.get_session() as session:
             workflow = session.query(db_model.Workflow).filter(db_model.Workflow.id == request.workflow_id).first()
             if not workflow:
@@ -349,6 +353,7 @@ def deploy_workflow(
             #         f"Workflow '{workflow.name}' can't be deployed in draft state. Publish your workflow first."
             #     )
             workflow_id = workflow.id
+            workflow_directory = workflow.directory
         collated_input = _create_collated_input(request, cml, dao)
 
         # k8s service labels are limited to 63 characters in length. the service that serves this
@@ -371,7 +376,8 @@ def deploy_workflow(
 
         deployed_workflow_instance_name = f"{collated_input.workflow.name}_{collated_input.workflow.deployment_id}"
 
-        deployable_workflow_dir = os.path.join(consts.DEPLOYABLE_WORKFLOWS_LOCATION, deployed_workflow_instance_name)
+        # Create the deployed workflow directory
+        deployable_workflow_dir = os.path.join(consts.DEPLOYABLE_WORKFLOWS_LOCATION, deployed_workflow_id)
         if not os.path.exists(deployable_workflow_dir):
             os.makedirs(deployable_workflow_dir)
 
@@ -386,14 +392,36 @@ def deploy_workflow(
             env_vars_for_cml_model.update({env_var_key_name: json.dumps(lm.config.model_dump())})
             lm.config = None  # Remove the model config before serializing to JSON and saving it in a file.
 
-        workflow_config_config_file_path = os.path.join(deployable_workflow_dir, "config.json")
+        # Create a workflow config object for the deployed workflow and write it to our new deployed
+        # workflow directory
+        os.makedirs(os.path.join(deployable_workflow_dir, "workflow"), exist_ok=True)
+        workflow_config_config_file_path = os.path.join(deployable_workflow_dir, "workflow", "config.json")
         with open(workflow_config_config_file_path, "w") as config_file:
             json.dump(collated_input.model_dump(), config_file, indent=2)
+
+        # Copy over our workflow engine code into our deployed workflow directory
+        # NOTE: this will go away once we move to a dedicated repo for workflow engines
+        shutil.copytree(os.path.join("studio", "workflow_engine"), deployable_workflow_dir, dirs_exist_ok=True)
+
+        # Copy over the workflow directory into the deployed workflow directory.
+        # we keep the "studio-data/" upper-level directory for consistency.
+        def studio_data_workflow_ignore(src, names):
+            if os.path.basename(src) == "studio-data":
+                return {"deployable_workflows", "tool_templates", "temp_files"}
+            elif os.path.basename(src) == "workflows":
+                return {name for name in names if name != os.path.basename(workflow_directory)}
+            else:
+                return {".venv", ".next", "node_modules", ".nvm"}
+
+        shutil.copytree(
+            "studio-data", os.path.join(deployable_workflow_dir, "studio-data"), ignore=studio_data_workflow_ignore
+        )
 
         env_vars_for_cml_model.update(
             {
                 "AGENT_STUDIO_OPS_ENDPOINT": get_ops_endpoint(),
-                "AGENT_STUDIO_WORKFLOW_CONFIG": workflow_config_config_file_path,
+                "AGENT_STUDIO_WORKFLOW_ARTIFACT_TYPE": "config_file",
+                "AGENT_STUDIO_WORKFLOW_ARTIFACT_LOCATION": "/home/cdsw/workflow/config.json",
                 "AGENT_STUDIO_WORKFLOW_NAME": deployed_workflow_instance_name,
                 "CDSW_APIV2_KEY": os.getenv("CDSW_APIV2_KEY"),
             }
@@ -405,7 +433,8 @@ def deploy_workflow(
             model_name=cml_model_name,
             model_description=f"Model for workflow {deployed_workflow_instance_name}",
             model_build_comment=f"Build for workflow {deployed_workflow_instance_name}",
-            model_file_path=consts.WORKFLOW_MODEL_FILE_PATH,
+            model_root_dir=os.path.join(get_studio_subdirectory(), deployable_workflow_dir),
+            model_file_path="src/engine/entry/workbench.py",
             function_name="api_wrapper",
             runtime_identifier=cc_utils.get_deployed_workflow_runtime_identifier(cml),
             deployment_config=cmlapi.ShortCreateModelDeployment(
@@ -418,7 +447,6 @@ def deploy_workflow(
         )
 
         # Save deployed workflow details to the database
-        deployed_workflow_id = str(uuid4())
         deployed_workflow_instance = db_model.DeployedWorkflowInstance(
             id=deployed_workflow_id,
             name=deployed_workflow_instance_name,
@@ -475,16 +503,22 @@ def undeploy_workflow(
             cml_model_id = deployed_workflow_instance.cml_deployed_model_id
             cc_utils.stop_all_cml_model_deployments(cml, cml_model_id)
             cc_utils.delete_cml_model(cml, cml_model_id)
-            application: Optional[cmlapi.Application] = get_application_for_deployed_workflow(
-                deployed_workflow_instance, cml
-            )
-            if application:  # Only try to cleanup if application exists
-                cleanup_deployed_workflow_application(cml, application)
+
+            # There may be cases where the deployed workflow application has already been
+            # tampered with. We don't want to fail undeploying the workflow at this point,
+            # even if the application went missing.
+            try:
+                application: Optional[cmlapi.Application] = get_application_for_deployed_workflow(
+                    deployed_workflow_instance, cml
+                )
+                if application:  # Only try to cleanup if application exists
+                    cleanup_deployed_workflow_application(cml, application)
+            except Exception as e:
+                print(f"Could not delete deployed workflow application: {e}")
+
             session.delete(deployed_workflow_instance)
             session.commit()
-            deployable_workflow_dir = os.path.join(
-                consts.DEPLOYABLE_WORKFLOWS_LOCATION, deployed_workflow_instance_name
-            )
+            deployable_workflow_dir = os.path.join(consts.DEPLOYABLE_WORKFLOWS_LOCATION, deployed_workflow_instance.id)
             if os.path.exists(deployable_workflow_dir):
                 shutil.rmtree(deployable_workflow_dir)
         return UndeployWorkflowResponse()

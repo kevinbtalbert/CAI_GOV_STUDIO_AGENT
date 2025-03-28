@@ -619,7 +619,9 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
                       'warning',
                     )
                   : null}
-      <Text style={{ fontSize: 14, fontWeight: 400, background: 'transparent', fontStyle: 'italic' }}>
+      <Text
+        style={{ fontSize: 14, fontWeight: 400, background: 'transparent', fontStyle: 'italic' }}
+      >
         {workflow.description}
       </Text>
       {workflowDeployments.length > 0 && (

@@ -13,22 +13,20 @@ def get_deployed_workflow_endpoint(deployed_workflow: DeployedWorkflow):
     Returns:
         str: the Workbench model endpoint that can be used to send requests.
     """
-    
+
     # Read these values from your environment or define them directly:
     CDSW_DOMAIN = os.environ.get("CDSW_DOMAIN")
     CDSW_APIV2_KEY = os.environ.get("CDSW_APIV2_KEY")
 
     try:
         # 1. Send GET request to /api/v2/models with page_size=10000
-        # TODO: we should really be using a search_filter here, but there is 
+        # TODO: we should really be using a search_filter here, but there is
         # no search filter available on the cml model id, and the cml model name
         # is not being stored in our db. So this is very much not performant
         # but is sufficient for now to unblock workflow app development.
         url = f"https://{CDSW_DOMAIN}/api/v2/models"
-        params = { "page_size": 10000 }
-        headers = {
-            "authorization": f"Bearer {CDSW_APIV2_KEY}"
-        }
+        params = {"page_size": 10000}
+        headers = {"authorization": f"Bearer {CDSW_APIV2_KEY}"}
 
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()  # Raises an exception if 4xx/5xx

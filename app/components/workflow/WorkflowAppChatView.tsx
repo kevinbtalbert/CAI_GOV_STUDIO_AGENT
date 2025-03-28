@@ -114,8 +114,8 @@ const WorkflowAppChatView: React.FC<WorkflowAppChatViewProps> = ({ workflow, tas
       });
       const kickoffResponse = await fetch(`${workflowModelUrl}`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json' 
+        headers: {
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           request: {
@@ -125,8 +125,8 @@ const WorkflowAppChatView: React.FC<WorkflowAppChatViewProps> = ({ workflow, tas
               context: JSON.stringify(context),
             }),
           },
-        })
-      })
+        }),
+      });
       const kickoffResponseData = (await kickoffResponse.json()) as any;
       traceId = kickoffResponseData.response.trace_id;
     }
@@ -147,10 +147,10 @@ const WorkflowAppChatView: React.FC<WorkflowAppChatViewProps> = ({ workflow, tas
   const handleClearMessages = () => {
     dispatch(clearedChatMessages());
   };
-  
+
   // If we are not fully loaded, don't display anything
   if (isLoading || !workflowData || !workflowData.renderMode) {
-    return (<></>)
+    return <></>;
   }
 
   return (

@@ -31,12 +31,9 @@ export const opsApi = apiSlice.injectEndpoints({
         url: `/ops/events?traceId=${request.traceId}`,
         method: 'GET',
       }),
-    })
+    }),
   }),
   overrideExisting: true,
 });
 
-export const { 
-  useGetOpsDataQuery,
-  useGetEventsMutation,
-} = opsApi;
+export const { useGetOpsDataQuery, useGetEventsMutation } = opsApi;
