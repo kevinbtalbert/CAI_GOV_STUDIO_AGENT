@@ -20,6 +20,45 @@ from studio.cross_cutting import utils as cc_utils
 from studio import consts
 
 
+#  Compare two different versions of Cloudera AI Workbench. Workbench
+#  gitShas follow semantic versioning, and this verion checker
+#  only checks out to the patch version (i.e., '2.0.47' and '2.0.47-b450'
+#  will evalute to being equal).
+#
+#  if verion a is greater than version b, returns 1.
+#  if version a is less than b, returns 0.
+#  returns 0 if both versions evaluate to the same patch version.
+def compare_workbench_versions(a: str, b: str) -> int:
+    # Split on the dash and take the first part
+    sanitized_a = a.split("-")[0]
+    sanitized_b = b.split("-")[0]
+
+    # Extract numeric parts
+    a_major, a_minor, a_patch = map(int, sanitized_a.split("."))
+    b_major, b_minor, b_patch = map(int, sanitized_b.split("."))
+
+    # Compare major
+    if a_major > b_major:
+        return 1
+    if a_major < b_major:
+        return -1
+
+    # Compare minor
+    if a_minor > b_minor:
+        return 1
+    if a_minor < b_minor:
+        return -1
+
+    # Compare patch
+    if a_patch > b_patch:
+        return 1
+    if a_patch < b_patch:
+        return -1
+
+    # Versions are the same
+    return 0
+
+
 def is_custom_model_root_dir_feature_enabled() -> bool:
     """
     Currently custom model root dirs for Workbench models are hidden behind
@@ -34,7 +73,10 @@ def is_custom_model_root_dir_feature_enabled() -> bool:
     # and default this to false (for older workbenches). "enable_ai_studios"
     # is translated upstream from ML_ENABLE_COMPOSABLE_AMPS, which is the
     # entitlement that blocks the model root dir feature.
-    return bootstrap_data.get("enable_ai_studios", False)
+    composable_amp_entitlement_enabled = bootstrap_data.get("enable_ai_studios", False)
+    workbench_gteq_2_0_47 = compare_workbench_versions(bootstrap_data.get("gitSha", "0.0.0"), "2.0.47") >= 0
+
+    return composable_amp_entitlement_enabled and workbench_gteq_2_0_47
 
 
 def _import_module_with_isolation(module_name: str, module_path: str):
