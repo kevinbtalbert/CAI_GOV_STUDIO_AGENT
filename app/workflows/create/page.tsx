@@ -27,7 +27,6 @@ import WorkflowEditorTaskView from '@/app/components/WorkflowEditorTaskView';
 import WorkflowOverview from '@/app/components/WorkflowOverview';
 import CommonBreadCrumb from '@/app/components/CommonBreadCrumb';
 import WorkflowEditorConfigureView from '@/app/components/WorkflowEditorConfigureView';
-import NoDefaultModelModal from '@/app/components/NoDefaultModelModal';
 import { useListToolInstancesQuery } from '@/app/tools/toolInstancesApi';
 import { useListTasksQuery } from '@/app/tasks/tasksApi';
 import { useListAgentsQuery } from '@/app/agents/agentApi';
@@ -110,7 +109,6 @@ const CreateWorkflowContent: React.FC = () => {
           { title: workflowId ? 'Edit Workflow' : 'Create Workflow' },
         ]}
       />
-      <NoDefaultModelModal />
       <Title level={5} style={{ paddingTop: 4, fontSize: '18px', fontWeight: 600 }}>
         {workflowId ? 'Workflow: ' + workflowName : 'Create Workflow'}
       </Title>

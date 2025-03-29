@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import AgentList from '../components/AgentList';
 import { useListGlobalAgentTemplatesQuery, useRemoveAgentTemplateMutation } from './agentApi';
 import CommonBreadCrumb from '../components/CommonBreadCrumb';
-import NoDefaultModelModal from '../components/NoDefaultModelModal';
 import { useGlobalNotification } from '../components/Notifications';
 
 const { Content } = Layout;
@@ -62,7 +61,6 @@ const AgentsPage: React.FC = () => {
   return (
     <Layout style={{ flex: 1, padding: '16px 24px 22px', flexDirection: 'column' }}>
       <CommonBreadCrumb items={[{ title: 'Agent Template Catalog' }]} />
-      <NoDefaultModelModal />
       {submitError && (
         <Alert
           message="Error"

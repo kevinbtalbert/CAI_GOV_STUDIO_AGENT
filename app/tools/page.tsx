@@ -10,7 +10,6 @@ import {
   useRemoveToolTemplateMutation,
   useAddToolTemplateMutation,
 } from './toolTemplatesApi';
-import NoDefaultModelModal from '../components/NoDefaultModelModal';
 import CommonBreadCrumb from '../components/CommonBreadCrumb';
 import { useRouter } from 'next/navigation';
 import CreateToolTemplateModal from '../components/CreateToolTemplateModal';
@@ -113,7 +112,6 @@ const ToolsPage = () => {
     <>
       <Layout style={{ flex: 1, padding: '16px 24px 22px', flexDirection: 'column' }}>
         <CommonBreadCrumb items={[{ title: 'Tools Catalog' }]} />
-        <NoDefaultModelModal />
         <Layout
           style={{
             background: '#fff',

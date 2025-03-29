@@ -15,7 +15,6 @@ import {
   useSetDefaultModelMutation,
 } from './modelsApi';
 import { useSearchParams } from 'next/navigation';
-import NoDefaultModelModal from '../components/NoDefaultModelModal';
 import CommonBreadCrumb from '../components/CommonBreadCrumb';
 import ModelActionsDrawer from '../components/ModelActionsDrawer';
 
@@ -263,7 +262,6 @@ const ModelsPageContent = () => {
       />
       <Layout style={{ flex: 1, padding: '16px 24px 22px', flexDirection: 'column' }}>
         <CommonBreadCrumb items={[{ title: 'Language Models' }]} />
-        <NoDefaultModelModal />
         <Title level={2} style={{ marginTop: '16px' }}>
           Models
         </Title>

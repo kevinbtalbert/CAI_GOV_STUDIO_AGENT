@@ -1,16 +1,16 @@
 import React from 'react';
 import { Typography, Layout } from 'antd';
 import { WarningOutlined } from '@ant-design/icons';
-import { Model } from '@/studio/proto/agent_studio';
-import Link from 'next/link';
-import { useGetDefaultModelQuery } from '../models/modelsApi';
 
 const { Text } = Typography;
 
-const NoDefaultModelModal: React.FC = () => {
-  const { data: defaultModel } = useGetDefaultModelQuery();
+interface WarningMessageBoxProps {
+  messageTrigger: boolean;
+  message: React.ReactNode;
+}
 
-  if (defaultModel) {
+const WarningMessageBox: React.FC<WarningMessageBoxProps> = ({ messageTrigger, message }) => {
+  if (!messageTrigger) {
     return null;
   }
 
@@ -26,7 +26,6 @@ const NoDefaultModelModal: React.FC = () => {
         justifyContent: 'space-between',
         flexGrow: 0,
         padding: '10px 16px',
-        marginBottom: '16px',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', flex: 1 }}>
@@ -42,18 +41,11 @@ const NoDefaultModelModal: React.FC = () => {
             color: '#434343',
           }}
         >
-          The studio needs a default LLM model to work properly. Please{' '}
-          <Link
-            href="/models?promptNewModelRegistration=true"
-            style={{ textDecoration: 'underline' }}
-          >
-            register a model
-          </Link>{' '}
-          to get started.
+          {message}
         </Text>
       </div>
     </Layout>
   );
 };
 
-export default NoDefaultModelModal;
+export default WarningMessageBox;

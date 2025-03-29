@@ -9,8 +9,8 @@ import './globals.css';
 import StoreProvider from './components/StoreProvider';
 import TopNav from './components/TopNav';
 import { NotificationProvider } from './components/Notifications';
-import { useHealthCheckQuery } from './lib/crossCuttingApi';
 import { Spin, Typography } from 'antd';
+import MessageBoxes from './components/MessageBoxes';
 
 const { Text } = Typography;
 
@@ -24,7 +24,17 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
               <NotificationProvider>
                 <Layout style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <TopNav />
-                  {children}
+                  <MessageBoxes />
+                  <Layout
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100%',
+                      flexGrow: 1,
+                    }}
+                  >
+                    {children}
+                  </Layout>
                 </Layout>
               </NotificationProvider>
             </StoreProvider>

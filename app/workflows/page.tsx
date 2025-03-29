@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Typography, Layout, Image, Modal } from 'antd';
 import { ArrowRightOutlined, SyncOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation'; // Use Next.js router
@@ -28,15 +28,19 @@ import DeleteDeployedWorkflowModal from '../components/DeleteDeployedWorkflowMod
 import DeleteWorkflowModal from '../components/DeleteWorkflowModal';
 import CommonBreadCrumb from '../components/CommonBreadCrumb';
 import { useListAgentsQuery, useListGlobalAgentTemplatesQuery } from '../agents/agentApi';
-import NoDefaultModelModal from '../components/NoDefaultModelModal';
-import { useGlobalNotification } from '../components/Notifications';
+import { useGlobalMessage, useGlobalNotification } from '../components/Notifications';
 import WorkflowGetStartModal from '../components/WorkflowGetStartModal';
 import { clearedWorkflowApp } from './workflowAppSlice';
-import { useCheckStudioUpgradeStatusQuery, useUpgradeStudioMutation } from '../lib/crossCuttingApi';
+import {
+  useCheckStudioUpgradeStatusQuery,
+  useUpgradeStudioMutation,
+  useWorkbenchDetailsQuery,
+} from '../lib/crossCuttingApi';
 
 import * as semver from 'semver';
 import ContentWithHealthCheck from '../components/ContentWithHealthCheck';
 import TopNav from '../components/TopNav';
+import { compareWorkbenchVersions } from '../lib/workbench';
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -139,8 +143,10 @@ const WorkflowsPageContent: React.FC = () => {
   const [getWorkflow] = useGetWorkflowMutation();
   const [addWorkflow] = useAddWorkflowMutation();
   const notificationApi = useGlobalNotification();
+  const messagesApi = useGlobalMessage();
   const [isGetStartModalVisible, setGetStartModalVisible] = useState(false);
   const { data: upgradeStatus } = useCheckStudioUpgradeStatusQuery();
+  const { data: workbenchDetails } = useWorkbenchDetailsQuery();
 
   const handleGetStarted = () => {
     setGetStartModalVisible(true);
@@ -346,7 +352,6 @@ const WorkflowsPageContent: React.FC = () => {
     >
       {isOutOfDate(upgradeStatus) && <UpgradeModal upgradeStatus={upgradeStatus} />}
       <CommonBreadCrumb items={[{ title: 'Agentic Workflows' }]} />
-      <NoDefaultModelModal />
       <Layout>
         <Layout
           style={{
