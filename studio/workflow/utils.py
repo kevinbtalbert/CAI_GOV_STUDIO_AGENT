@@ -172,9 +172,11 @@ def _get_crewai_agent(
     agent: input_types.Input__Agent,
     crewai_tools: Optional[List[BaseTool]] = None,
     llm_model: Optional[CrewAILLM] = None,
+    tracer=None,
 ) -> Agent:
     return WrappedAgent(
         agent_studio_id=agent.id,
+        tracer=tracer,
         role=agent.crew_ai_role,
         backstory=agent.crew_ai_backstory,
         goal=agent.crew_ai_goal,
@@ -196,6 +198,7 @@ def create_crewai_objects(
     tool_user_params: Dict[str, Dict[str, str]],
     for_: Literal["test", "deploy"],
     preexisting_db_session=None,
+    tracer=None,
 ) -> input_types.CrewAIObjects:
     language_models: Dict[str, CrewAILLM] = {}
     for language_model in collated_input.language_models:
@@ -219,7 +222,7 @@ def create_crewai_objects(
         model_id = agent.llm_provider_model_id
         if not model_id:
             model_id = collated_input.default_language_model_id
-        agents[agent.id] = _get_crewai_agent(agent, crewai_tools, language_models[model_id])
+        agents[agent.id] = _get_crewai_agent(agent, crewai_tools, language_models[model_id], tracer)
 
     tasks: Dict[str, Task] = {}
     for task_input in collated_input.tasks:

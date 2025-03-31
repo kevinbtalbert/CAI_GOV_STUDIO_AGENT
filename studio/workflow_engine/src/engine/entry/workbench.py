@@ -26,7 +26,7 @@ import base64
 
 import engine.types as input_types
 from engine import consts
-from engine.ops import instrument_workflow
+from engine.ops import instrument_workflow, reset_instrumentation
 from engine.crewai.run import run_workflow_async
 
 import cml.models_v1 as cml_models
@@ -52,12 +52,6 @@ else:
     raise ValueError("currently only AGENT_STUDIO_WORKFLOW_ARTIFACT_TYPE=config_file is supported.")
 
 
-# Instrument our workflow given a specific workflow name and
-# set up the instrumentation.
-tracer_provider = instrument_workflow(f"{WORKFLOW_NAME}")
-tracer = tracer_provider.get_tracer("opentelemetry.agentstudio.workflow.model")
-
-
 def base64_decode(encoded_str: str):
     decoded_bytes = base64.b64decode(encoded_str)
     return json.loads(decoded_bytes.decode("utf-8"))
@@ -74,6 +68,12 @@ def api_wrapper(args: Union[dict, str]) -> str:
             base64_decode(serve_workflow_parameters.kickoff_inputs) if serve_workflow_parameters.kickoff_inputs else {}
         )
         collated_input_copy = collated_input.model_copy(deep=True)
+
+        # Instrument our workflow given a specific workflow name and
+        # set up the instrumentation.
+        reset_instrumentation()
+        tracer_provider = instrument_workflow(f"{WORKFLOW_NAME}")
+        tracer = tracer_provider.get_tracer("opentelemetry.agentstudio.workflow.model")
 
         tool_user_params: Dict[str, Dict[str, str]] = {}
         for tool_instance in collated_input_copy.tool_instances:
@@ -113,7 +113,9 @@ def api_wrapper(args: Union[dict, str]) -> str:
             parent_context = get_current()
 
             # Start the workflow in the background using the parent context
-            asyncio.create_task(run_workflow_async(collated_input_copy, tool_user_params, inputs, parent_context))
+            asyncio.create_task(
+                run_workflow_async(collated_input_copy, tool_user_params, inputs, parent_context, tracer)
+            )
 
         return {"trace_id": str(trace_id)}
     elif serve_workflow_parameters.action_type == input_types.DeployedWorkflowActions.GET_CONFIGURATION.value:

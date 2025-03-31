@@ -206,7 +206,9 @@ def test_workflow(
             span_name = f"Workflow Run: {formatted_time}"
             tracer = tracer_provider.get_tracer("opentelemetry.agentstudio.workflow.test")
 
-            crewai_objects = workflow_utils.create_crewai_objects(collated_input, tool_user_params_kv, "test", session)
+            crewai_objects = workflow_utils.create_crewai_objects(
+                collated_input, tool_user_params_kv, "test", session, tracer
+            )
             crew = list(crewai_objects.crews.values())[0]
 
             with tracer.start_as_current_span(span_name) as parent_span:

@@ -15,7 +15,6 @@ To get around this, we follow this pattern:
 # Manual patch required for CrewAI compatability
 from crewai.tools import BaseTool
 from opentelemetry.trace import SpanKind
-from opentelemetry import trace
 from typing import Any, Optional, List
 from crewai import Agent
 from openinference.semconv.trace import (
@@ -375,10 +374,12 @@ LLM_TOKEN_COUNT_TOTAL = SpanAttributes.LLM_TOKEN_COUNT_TOTAL
 
 class WrappedAgent(Agent):
     agent_studio_id: Optional[str] = None
+    _tracer = None
 
-    def __init__(self, agent_studio_id: str, *args, **kwargs):
+    def __init__(self, agent_studio_id: str, tracer, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.agent_studio_id = agent_studio_id
+        self._tracer = tracer
 
     def execute_task(
         self,
@@ -386,11 +387,10 @@ class WrappedAgent(Agent):
         context: Optional[str] = None,
         tools: Optional[List[BaseTool]] = None,
     ) -> str:
-        # Get the tracer for the current module
-        tracer = trace.get_tracer(__name__)
+        print("HELLO THERE I AM DOING SOMETHING")
 
         # Start a parent span for the task execution
-        with tracer.start_as_current_span(
+        with self._tracer.start_as_current_span(
             name="Agent._start_task",
             kind=SpanKind.INTERNAL,
             attributes={
@@ -412,7 +412,7 @@ class WrappedAgent(Agent):
                 raise
 
         # Start a parent span for the task execution
-        with tracer.start_as_current_span(
+        with self._tracer.start_as_current_span(
             name="Agent._end_task",
             kind=SpanKind.INTERNAL,
             attributes={

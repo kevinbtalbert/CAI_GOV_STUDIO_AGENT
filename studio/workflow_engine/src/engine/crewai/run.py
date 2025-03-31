@@ -110,9 +110,11 @@ def _get_crewai_agent(
     agent: input_types.Input__Agent,
     crewai_tools: Optional[List[BaseTool]] = None,
     llm_model: Optional[CrewAILLM] = None,
+    tracer=None,
 ) -> Agent:
     return WrappedAgent(
         agent_studio_id=agent.id,
+        tracer=tracer,
         role=agent.crew_ai_role,
         backstory=agent.crew_ai_backstory,
         goal=agent.crew_ai_goal,
@@ -128,6 +130,7 @@ def _get_crewai_agent(
 def create_crewai_objects(
     collated_input: input_types.CollatedInput,
     tool_user_params: Dict[str, Dict[str, str]],
+    tracer=None,
 ) -> input_types.CrewAIObjects:
     language_models: Dict[str, CrewAILLM] = {}
     for language_model in collated_input.language_models:
@@ -143,7 +146,7 @@ def create_crewai_objects(
         model_id = agent.llm_provider_model_id
         if not model_id:
             model_id = collated_input.default_language_model_id
-        agents[agent.id] = _get_crewai_agent(agent, crewai_tools, language_models[model_id])
+        agents[agent.id] = _get_crewai_agent(agent, crewai_tools, language_models[model_id], tracer)
 
     tasks: Dict[str, Task] = {}
     for task_input in collated_input.tasks:
@@ -182,6 +185,7 @@ async def run_workflow_async(
     tool_user_params: Dict[str, Dict[str, str]],
     inputs: Dict[str, Any],
     parent_context: Any,  # Use the parent context
+    tracer=None,
 ) -> None:
     """
     Run the workflow task in the background using the parent context.
@@ -193,7 +197,7 @@ async def run_workflow_async(
 
         try:
             # Run the actual workflow logic within the propagated context
-            crewai_objects = create_crewai_objects(collated_input, tool_user_params)
+            crewai_objects = create_crewai_objects(collated_input, tool_user_params, tracer)
             crew = crewai_objects.crews[collated_input.workflow.id]
 
             # Perform the kickoff

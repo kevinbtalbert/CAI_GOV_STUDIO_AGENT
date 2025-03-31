@@ -4,14 +4,15 @@ version = "0.0.1"
 description = "Agent Studio Workflow Engine"
 requires-python = ">=3.10"
 dependencies = [
-    "arize-phoenix==7.12.0",
-    "arize-phoenix-otel==0.7.1",
-    "crewai==0.100.0",
+    "arize-phoenix==8.20.0",
+    "arize-phoenix-otel==0.9.0",
+    "crewai==0.108.0",
+    "crewai-tools==0.38.1",
     "gql==3.5.0",
-    "openinference-instrumentation-crewai==0.1.4",
-    "openinference-instrumentation-litellm==0.1.9",
-    "opentelemetry-api==1.28.2",
-    "pydantic==2.10.6",
+    "openinference-instrumentation-crewai==0.1.7",
+    "openinference-instrumentation-litellm==0.1.14",
+    "opentelemetry-api==1.31.1",
+    "pydantic==2.11.1",
     "pysqlite3-binary==0.5.4",
 ]
 

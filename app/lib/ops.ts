@@ -70,19 +70,23 @@ query MyQuery {
     ... on Trace {
       rootSpan {
         name
-        descendants {
-          id
-          name
-          startTime
-          cumulativeTokenCountTotal
-          cumulativeTokenCountPrompt
-          cumulativeTokenCountCompletion
-          endTime
-          attributes
-          events {
-            message
-            name
-            timestamp
+        descendants(maxDepth: 100, first: 10000) {
+          edges {
+            node {
+              id
+              name
+              startTime
+              cumulativeTokenCountTotal
+              cumulativeTokenCountPrompt
+              cumulativeTokenCountCompletion
+              endTime
+              attributes
+              events {
+                message
+                name
+                timestamp
+              }
+            }
           }
         }
       }
@@ -92,12 +96,13 @@ query MyQuery {
   `;
   const data: any = await client.request(query);
   const events: any[] = [];
-  data.node.rootSpan.descendants.map((descendant: any) => {
-    if (eventTypes.includes(descendant.name)) {
+
+  data.node.rootSpan.descendants.edges.map((edge: any) => {
+    if (eventTypes.includes(edge.node.name)) {
       events.push({
-        ...descendant,
-        attributes: JSON.parse(descendant.attributes),
-        events: descendant.events || [],
+        ...edge.node,
+        attributes: JSON.parse(edge.node.attributes),
+        events: edge.node.events || [],
       });
     }
     return;
