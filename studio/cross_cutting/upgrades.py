@@ -2,7 +2,11 @@ from cmlapi import CMLServiceApi
 import cmlapi
 
 from studio.consts import AGENT_STUDIO_UPGRADE_JOB_NAME
-from studio.cross_cutting.utils import get_job_by_name, get_deployed_workflow_runtime_identifier
+from studio.cross_cutting.utils import (
+    get_job_by_name,
+    get_deployed_workflow_runtime_identifier,
+    get_studio_subdirectory,
+)
 from studio.db.dao import AgentStudioDao
 from studio.api import *
 
@@ -212,8 +216,8 @@ def upgrade_studio(
             {
                 "name": AGENT_STUDIO_UPGRADE_JOB_NAME,
                 "project_id": os.getenv("CDSW_PROJECT_ID"),
-                "script": "bin/upgrade-studio.py",
-                "cpu": 4,
+                "script": os.path.join(get_studio_subdirectory(), "bin", "upgrade-studio.py"),
+                "cpu": 2,
                 "memory": 8,
                 "nvidia_gpu": 0,
                 "runtime_identifier": get_deployed_workflow_runtime_identifier(cml),
