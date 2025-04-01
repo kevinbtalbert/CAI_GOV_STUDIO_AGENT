@@ -2,7 +2,7 @@
 
 // app/contact/page.tsx
 import React, { Suspense, useEffect, useState } from 'react';
-import { Layout, Spin } from 'antd';
+import { Button, Input, Layout, Spin } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import WorkflowEditorAgentView from '@/app/components/WorkflowEditorAgentView';
 import { Typography } from 'antd/lib';
@@ -13,6 +13,7 @@ import {
   selectEditorWorkflowId,
   selectEditorWorkflowName,
   updatedWorkflowConfiguration,
+  updatedEditorWorkflowName,
 } from '../editorSlice';
 import WorkflowApp from '@/app/components/workflow/WorkflowApp';
 import WorkflowStepView from '@/app/components/WorkflowStepView';
@@ -32,6 +33,7 @@ import { useListTasksQuery } from '@/app/tasks/tasksApi';
 import { useListAgentsQuery } from '@/app/agents/agentApi';
 import { clearedWorkflowApp } from '../workflowAppSlice';
 import { readWorkflowConfigurationFromLocalStorage } from '@/app/lib/localStorage';
+import { EditOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
@@ -53,6 +55,7 @@ const CreateWorkflowContent: React.FC = () => {
   const { data: toolInstances } = useListToolInstancesQuery({});
   const { data: tasks } = useListTasksQuery({});
   const { data: agents } = useListAgentsQuery({});
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   // Clear the existing workflow app upon first load. Note: the "Workflow App"
   // in the context of the workflow editor is just the Test page (for now, until
@@ -84,6 +87,16 @@ const CreateWorkflowContent: React.FC = () => {
     }
   }, [searchParams.get('workflowId')]);
 
+  const handleBlur = () => {
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setIsEditing(false);
+    }
+  };
+
   if (!workflowId) {
     // TODO: gracefully handle not selecting a workflow
     return (
@@ -109,9 +122,31 @@ const CreateWorkflowContent: React.FC = () => {
           { title: workflowId ? 'Edit Workflow' : 'Create Workflow' },
         ]}
       />
-      <Title level={5} style={{ paddingTop: 4, fontSize: '18px', fontWeight: 600 }}>
-        {workflowId ? 'Workflow: ' + workflowName : 'Create Workflow'}
-      </Title>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {isEditing ? (
+          <Input
+            size="large"
+            value={workflowName}
+            onChange={(e) => {
+              dispatch(updatedEditorWorkflowName(e.target.value));
+            }}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            style={{ marginRight: '8px' }}
+          />
+        ) : (
+          <Title level={5} style={{ paddingTop: 4, fontSize: '18px', fontWeight: 600 }}>
+            {workflowId ? 'Workflow: ' + workflowName : 'Create Workflow'}
+          </Title>
+        )}
+        <Button
+          icon={<EditOutlined />}
+          type="text"
+          style={{ marginLeft: '8px' }}
+          onClick={() => setIsEditing(true)}
+        />
+      </div>
+      <div style={{ marginBottom: '8px' }} />
       <Layout
         style={{
           flex: 1,

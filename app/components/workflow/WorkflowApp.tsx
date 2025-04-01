@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Layout, Spin, Typography, Slider, Alert, Button, Tooltip } from 'antd';
+import { Layout, Spin, Typography, Slider, Alert, Button, Tooltip, Input, Collapse } from 'antd';
 import WorkflowAppInputsView from './WorkflowAppInputsView';
 import { useAppDispatch, useAppSelector } from '@/app/lib/hooks/hooks';
 import {
@@ -15,6 +15,7 @@ import {
   updatedCurrentPhoenixProjectId,
   updatedIsRunning,
 } from '@/app/workflows/workflowAppSlice';
+import { updatedEditorWorkflowDescription, selectEditorWorkflowDescription } from '@/app/workflows/editorSlice';
 import fetch from 'node-fetch';
 import { WorkflowEvent } from '@/app/lib/workflow';
 import WorkflowDiagramView from './WorkflowDiagramView';
@@ -31,10 +32,15 @@ import {
   CloseOutlined,
   DashboardOutlined,
   LoadingOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { useGetDefaultModelQuery } from '@/app/models/modelsApi';
 import { useGetWorkflowDataQuery } from '@/app/workflows/workflowAppApi';
 import { useGetEventsMutation } from '@/app/ops/opsApi';
+import { useUpdateWorkflowMutation } from '@/app/workflows/workflowsApi';
+import { createUpdateRequestFromEditor } from '@/app/lib/workflow';
+import { useTestModelMutation } from '@/app/models/modelsApi';
+import { useGlobalNotification } from '../Notifications';
 
 const { Title, Text } = Typography;
 
@@ -140,8 +146,12 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
   // set somewhere in redux state.
   const { data: defaultModel } = useGetDefaultModelQuery();
 
+  const notificationApi = useGlobalNotification();
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [showMonitoring, setShowMonitoring] = useState(false);
+  const [updateWorkflow] = useUpdateWorkflowMutation();
+  const workflowDescription = useAppSelector(selectEditorWorkflowDescription);
+  const [testModel] = useTestModelMutation();
 
   // Track processed exception IDs
   const processedExceptionsRef = useRef<Set<string>>(new Set());
@@ -154,6 +164,118 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
   const handleSliderChange = (value: number) => {
     setSliderValue(value);
     dispatch(updatedCurrentEventIndex(value));
+  };
+
+  const handleDescriptionChange = async (value: string) => {
+    try {
+      dispatch(updatedEditorWorkflowDescription(value));
+      
+      if (workflow) {
+        const updateRequest = {
+          ...workflow,
+          description: value,
+        };
+        
+        await updateWorkflow(updateRequest).unwrap();
+      }
+    } catch (error) {
+      console.error('Error updating workflow description:', error);
+    }
+  };
+
+  const generateDescriptionPrompt = (context: any) => {
+    const agentDetails = context.agents.map((agent: any) => 
+      `- ${agent.name}: ${agent.role || 'No role'}, Goal: ${agent.goal || 'No goal'}`
+    ).join('\n');
+    
+    const taskDetails = context.tasks.map((task: any) => 
+      `- ${task.name || 'Unnamed task'}: ${task.description || 'No description'}`
+    ).join('\n');
+    
+    const managerDetails = context.managerAgent 
+      ? `Manager Agent: ${context.managerAgent.name}, Role: ${context.managerAgent.role || 'No role'}, Goal: ${context.managerAgent.goal || 'No goal'}`
+      : 'No Manager Agent';
+
+    return `Please generate a concise description for a workflow with the following details:
+    Name: ${context.name}
+    Current Description: ${context.description || 'None'}
+    
+    Agents:
+    ${agentDetails || 'No agents defined'}
+    
+    Tasks:
+    ${taskDetails || 'No tasks defined'}
+    
+    ${managerDetails}
+    
+    Process Description: ${context.process || 'None'}
+    
+    The description should be a concise and meaningful paragraph explaining what this workflow does and its main capabilities, considering the specific agents, tools, and tasks involved.`;
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!workflow) return;
+    
+    if (!defaultModel) {
+      notificationApi.error({
+        message: 'No default LLM model configured',
+        description: 'Please configure a default LLM model on the LLMs page',
+        placement: 'topRight',
+      });
+      throw new Error("No default LLM model configured. Please configure a default LLM model on the LLMs page.");
+    }
+
+    // Get the agent and task details from the workflow
+    const agentIds = workflow.crew_ai_workflow_metadata?.agent_id || [];
+    const taskIds = workflow.crew_ai_workflow_metadata?.task_id || [];
+    const managerAgentId = workflow.crew_ai_workflow_metadata?.manager_agent_id || '';
+    
+    // Find the actual agents and tasks from the available data
+    const workflowAgents = agents?.filter(agent => agentIds.includes(agent.id)) || [];
+    const workflowTasks = tasks?.filter(task => taskIds.includes(task.task_id)) || [];
+    const managerAgent = agents?.find(agent => agent.id === managerAgentId);
+
+    const context = {
+      name: workflow.name,
+      description: workflow.description,
+      agents: workflowAgents.map(agent => ({
+        name: agent.name,
+        role: agent.crew_ai_agent_metadata?.role,
+        backstory: agent.crew_ai_agent_metadata?.backstory,
+        goal: agent.crew_ai_agent_metadata?.goal
+      })),
+      tasks: workflowTasks.map(task => ({
+        description: task.description,
+        expected_output: task.expected_output
+      })),
+      managerAgent: managerAgent ? {
+        name: managerAgent.name,
+        role: managerAgent.crew_ai_agent_metadata?.role,
+        backstory: managerAgent.crew_ai_agent_metadata?.backstory,
+        goal: managerAgent.crew_ai_agent_metadata?.goal
+      } : null,
+    };
+
+    try {
+      const response = await testModel({
+        model_id: defaultModel.model_id,
+        completion_role: 'assistant',
+        completion_content: generateDescriptionPrompt(context),
+        temperature: 0.1,
+        max_tokens: 1000,
+        timeout: 10,
+      }).unwrap();
+
+      console.log('Generated Description:', response);
+      handleDescriptionChange(response.trim());
+    } catch (error) {
+      console.error('Error generating description:', error);
+      notificationApi.error({
+        message: 'Error generating description',
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+        placement: 'topRight',
+      });
+    }
   };
 
   // Handle event changes
@@ -333,7 +455,47 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
             transition: 'width 0.3s ease',
           }}
         >
-          {renderMode === 'studio' && !defaultModel ? (
+          <Collapse
+            bordered={false}
+            defaultActiveKey={['1']}
+            items={[
+              {
+                key: '1',
+                label: 'Capability Guide',
+                children: renderMode === 'studio' ? (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Input.TextArea
+                      placeholder="Description"
+                      value={workflowDescription}
+                      onChange={(e) => handleDescriptionChange(e.target.value)}
+                      autoSize={{ minRows: 1, maxRows: 6 }}
+                    />
+                    <Tooltip title="Generate description using AI">
+                      <Button
+                        type="text"
+                        icon={
+                          <img
+                            src="/ai-assistant.svg"
+                            alt="AI Assistant"
+                            style={{
+                              filter: 'invert(70%) sepia(80%) saturate(1000%) hue-rotate(360deg)',
+                              width: '20px',
+                              height: '20px',
+                            }}
+                          />
+                        }
+                        style={{ padding: '2px', marginLeft: '8px' }}
+                        onClick={handleGenerateDescription}
+                      />
+                    </Tooltip>
+                  </div>
+                ) : (
+                  <div>{workflowDescription}</div>
+                ),
+              },
+            ]}
+          />
+          {(renderMode === 'studio' && !defaultModel) ? (
             renderAlert(
               'No Default LLM Model',
               'Please configure a default LLM model on the LLMs page to use workflows.',

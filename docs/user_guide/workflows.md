@@ -38,9 +38,9 @@ A task can be configured with the following parameters:
 ## Creating a New Workflow
 
  1. You would be asked to pick a workflow name. For the sake of this example, we'll assume that you're creating a fresh workflow and not from a template.
- 2. You're presented with two checkboxes:
-    - **Is Conversational**: If checked, the workflow will be a conversational workflow.
-    - **Manager Agent**: If checked, the workflow will have a manager agent. Having a manager agent allows the workflow to delegate tasks to suitable agents. Seleting this checkbox would change the workflow type from `sequential` to `hierarchical`.
+ 2. You're presented with two switches:
+    - **Is Conversational**: If enabled, the workflow will be a conversational workflow.
+    - **Manager Agent**: If enabled, the workflow will have a manager agent. Having a manager agent allows the workflow to delegate tasks to suitable agents. Enabling this would change the workflow type from `sequential` to `hierarchical`.
  3. You can add agents to the workflow. For each agent, you can create a tool from existing tool template, or just a brand new tool.
  4. You can add tasks to the workflow. For each task, you will need to select the agent that should execute the task, if a manager agent is not selcted in the previous step.
  5. In the next step, you'll asked to conifgure the tools created in the previous step.

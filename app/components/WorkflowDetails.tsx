@@ -8,13 +8,13 @@ import {
   Space,
   Image,
   Tooltip,
-  Checkbox,
   Button,
   Tag,
   Table,
   Popconfirm,
   Avatar,
   Divider,
+  Collapse,
 } from 'antd';
 import {
   UserOutlined,
@@ -126,7 +126,7 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
   const workflowAgents = allAgents.filter((agent) => workflowAgentIds.includes(agent.id));
   const workflowTasks = tasks.filter((task) => workflowTaskIds.includes(task.task_id));
 
-  const showDefaultManagerCheckbox = !managerAgent && Boolean(process === 'hierarchical');
+  const showDefaultManagerEnablement = !managerAgent && Boolean(process === 'hierarchical');
 
   const renderAgentCard = (agent: AgentMetadata, isManager: boolean = false) => (
     <Layout
@@ -619,11 +619,23 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
                       'warning',
                     )
                   : null}
-      <Text
-        style={{ fontSize: 14, fontWeight: 400, background: 'transparent', fontStyle: 'italic' }}
-      >
-        {workflow.description}
-      </Text>
+      <Collapse
+        style={{ marginBottom: '12px' }}
+        bordered={false}
+        items={[
+          {
+            key: '1',
+            label: 'Capability Guide',
+            children: (
+              <div style={{ maxHeight: '130px', overflowY: 'auto' }}>
+                <Text style={{ fontSize: 14, fontWeight: 400, background: 'transparent', fontStyle: 'italic', display: 'block' }}>
+                  {workflow.description}
+                </Text>
+              </div>
+            ),
+          },
+        ]}
+      />
       {workflowDeployments.length > 0 && (
         <>
           <Title level={5}>Deployments</Title>
@@ -647,7 +659,7 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
         </>
       )}
 
-      {showDefaultManagerCheckbox && (
+      {showDefaultManagerEnablement && (
         <>
           <Title level={5} style={{ marginTop: '20px' }}>
             Manager Agent

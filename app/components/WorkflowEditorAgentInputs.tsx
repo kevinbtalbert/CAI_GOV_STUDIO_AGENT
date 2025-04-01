@@ -23,22 +23,21 @@ import {
 } from '../workflows/editorSlice';
 import {
   Button,
-  Checkbox,
   Divider,
   Input,
   Layout,
-  Select,
   Space,
   Tooltip,
-  Card,
   List,
   Image,
   Popconfirm,
   Avatar,
+  Collapse,
+  Switch,
 } from 'antd';
 import { Typography } from 'antd/lib';
 const { Header, Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 import {
   PlusCircleOutlined,
   QuestionCircleOutlined,
@@ -67,7 +66,6 @@ import { createUpdateRequestFromEditor, createAddRequestFromEditor } from '../li
 import SelectOrAddManagerAgentModal from './SelectOrAddManagerAgentModal';
 
 const WorkflowNameComponent: React.FC = () => {
-  const workflowName = useAppSelector(selectEditorWorkflowName);
   const workflowDescription = useAppSelector(selectEditorWorkflowDescription);
   const dispatch = useAppDispatch();
 
@@ -82,18 +80,22 @@ const WorkflowNameComponent: React.FC = () => {
           background: 'transparent',
         }}
       >
-        <Text style={{ fontSize: 14, fontWeight: 400 }}>Workflow Name</Text>
-        <Input
-          placeholder="Name"
-          value={workflowName}
-          onChange={(e) => dispatch(updatedEditorWorkflowName(e.target.value))}
-        />
-        <Text style={{ fontSize: 14, fontWeight: 400 }}>Workflow Description</Text>
-        <Input.TextArea
-          placeholder="Description"
-          value={workflowDescription}
-          onChange={(e) => dispatch(updatedEditorWorkflowDescription(e.target.value))}
-          autoSize={{ minRows: 1, maxRows: 6 }}
+        <Collapse
+          bordered={false}
+          items={[
+            {
+              key: '1',
+              label: 'Capability Guide',
+              children: (
+                <Input.TextArea
+                  placeholder="Description"
+                  value={workflowDescription}
+                  onChange={(e) => dispatch(updatedEditorWorkflowDescription(e.target.value))}
+                  autoSize={{ minRows: 1, maxRows: 6 }}
+                />
+              ),
+            },
+          ]}
         />
       </Layout>
     </>
@@ -456,19 +458,6 @@ const WorkflowManagerAgentsComponent: React.FC = () => {
       >
         <Layout
           style={{
-            background: 'transparent',
-            flexDirection: 'row',
-            gap: 4,
-          }}
-        >
-          <Text style={{ fontSize: 16, fontWeight: 600 }}>Manager Agent</Text>
-          <Tooltip title={tasksTooltip} placement="right">
-            <QuestionCircleOutlined />
-          </Tooltip>
-        </Layout>
-
-        <Layout
-          style={{
             borderRadius: '4px',
             border: 'solid 1px #f0f0f0',
             backgroundColor: '#fff',
@@ -547,7 +536,7 @@ const ManagerAgentCheckComponent: React.FC<ManagerAgentComponentProps> = ({ isDi
   const hasManagerAgent = workflowState.workflowMetadata.process === 'hierarchical';
 
   const handleManagerAgentChange = async (checked: boolean) => {
-    console.log('Checkbox changed:', checked);
+    console.log('Switch changed:', checked);
 
     try {
       // When checked, update tasks and set default model
@@ -628,13 +617,12 @@ const ManagerAgentCheckComponent: React.FC<ManagerAgentComponentProps> = ({ isDi
 
   return (
     <Space>
-      <Checkbox
+      <Switch
         disabled={isDisabled}
         checked={hasManagerAgent}
-        onChange={(e) => handleManagerAgentChange(e.target.checked)}
-      >
-        Manager Agent
-      </Checkbox>
+        onChange={(checked) => handleManagerAgentChange(checked)}
+      ></Switch>
+      <Text style={{ fontSize: 16, fontWeight: 600 }}>Manager Agent</Text>
       <Tooltip
         title="A manager agent is responsible for delegating tasks to coworkers to complete a workflow."
         placement="right"
@@ -713,12 +701,12 @@ const SettingsComponent: React.FC = () => {
         }}
       >
         <Space>
-          <Checkbox
+          <Switch
             checked={isConversational}
-            onChange={async (e) => {
-              dispatch(updatedEditorWorkflowIsConversational(e.target.checked));
+            onChange={async (checked) => {
+              dispatch(updatedEditorWorkflowIsConversational(checked));
 
-              if (e.target.checked) {
+              if (checked) {
                 // Remove existing tasks
                 await Promise.all(taskIds?.map((taskId) => removeTask({ task_id: taskId })));
                 notificationApi.info({
@@ -797,9 +785,8 @@ const SettingsComponent: React.FC = () => {
                 });
               }
             }}
-          >
-            Is Conversational
-          </Checkbox>
+          ></Switch>
+          <Text style={{ fontSize: 16, fontWeight: 600 }}>Is Conversational</Text>
           <Tooltip
             title="Enable this for workflows that involve back-and-forth conversations with users."
             placement="right"
@@ -821,18 +808,6 @@ const SettingsComponent: React.FC = () => {
               width: '50%',
             }}
           >
-            <Layout
-              style={{
-                background: 'transparent',
-                flexDirection: 'row',
-                gap: 4,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: 600 }}>Manager Agent</Text>
-              <Tooltip title="Manager agent is responsible for delegating tasks." placement="right">
-                <QuestionCircleOutlined />
-              </Tooltip>
-            </Layout>
 
             {agents
               ?.filter((agent) => agent.id === managerAgentId)
@@ -988,7 +963,7 @@ const WorkflowEditorInputs: React.FC = () => {
           width: '40%',
           height: '100%',
           background: 'transparent',
-          gap: '24px',
+          gap: '12px',
           overflow: 'auto',
         }}
       >

@@ -161,6 +161,7 @@ def _create_collated_input(
         workflow_input = input_types.Input__Workflow(
             id=workflow.id,
             name=workflow.name,
+            description=workflow.description,
             deployment_id=deployed_workflow_instance_id,
             crew_ai_process=workflow.crew_ai_process,
             agent_ids=list(workflow.crew_ai_agents) if workflow.crew_ai_agents else [],
