@@ -36,6 +36,7 @@ tasks:
     memory: 4
   - type: create_job
     name: "Agent Studio - Upgrade" 
+    entity_label: agent_studio_upgrade
     script: bin/upgrade-studio.py
     short_summary: Upgrade Agent Studio
     long_summary: Fully upgrade Agent Studio and all dependencies
