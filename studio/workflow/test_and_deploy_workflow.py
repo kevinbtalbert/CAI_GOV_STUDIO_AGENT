@@ -5,12 +5,16 @@ from uuid import uuid4
 import cmlapi
 from typing import Union, List, Optional
 from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
+from opentelemetry.context import get_current
+import requests
+from google.protobuf.json_format import MessageToDict
+import json
+from cmlapi import CMLServiceApi
+
 from studio.db.dao import AgentStudioDao
 from studio.api import *
-from cmlapi import CMLServiceApi
 from studio.db import model as db_model
-from studio.ops import instrument_workflow, reset_instrumentation
-import studio.cross_cutting.input_types as input_types
 from studio.models.utils import get_studio_default_model_id
 import studio.cross_cutting.utils as cc_utils
 from studio.cross_cutting.global_thread_pool import get_thread_pool
@@ -18,13 +22,18 @@ from studio.proto.utils import is_field_set
 from studio.cross_cutting.utils import get_studio_subdirectory
 import studio.workflow.utils as workflow_utils
 import studio.consts as consts
-from studio.ops import get_ops_endpoint
 from studio.workflow.utils import is_custom_model_root_dir_feature_enabled
-from datetime import datetime
-from opentelemetry.context import get_current
-import requests
-from google.protobuf.json_format import MessageToDict
-import json
+
+# Import engine code manually. Eventually when this code becomes
+# a separate git repo, or a custom runtime image, this path call
+# will go away and workflow engine features will be available already.
+import sys
+
+sys.path.append("studio/worfklow_engine/src")
+
+from engine.ops import get_ops_endpoint
+from engine.crewai.tracing import instrument_crewai_workflow, reset_crewai_instrumentation
+import engine.types as input_types
 
 
 def _create_collated_input(
@@ -191,8 +200,8 @@ def test_workflow(
     try:
         collated_input = _create_collated_input(request, cml, dao)
         try:
-            reset_instrumentation()
-            tracer_provider = instrument_workflow(f"Test Workflow - {collated_input.workflow.name}")
+            reset_crewai_instrumentation()
+            tracer_provider = instrument_crewai_workflow(f"Test Workflow - {collated_input.workflow.name}")
         except Exception as e:
             pass
 
@@ -207,9 +216,7 @@ def test_workflow(
             span_name = f"Workflow Run: {formatted_time}"
             tracer = tracer_provider.get_tracer("opentelemetry.agentstudio.workflow.test")
 
-            crewai_objects = workflow_utils.create_crewai_objects(
-                collated_input, tool_user_params_kv, "test", session, tracer
-            )
+            crewai_objects = workflow_utils.create_crewai_objects_for_test(collated_input, tool_user_params_kv, tracer)
             crew = list(crewai_objects.crews.values())[0]
 
             with tracer.start_as_current_span(span_name) as parent_span:

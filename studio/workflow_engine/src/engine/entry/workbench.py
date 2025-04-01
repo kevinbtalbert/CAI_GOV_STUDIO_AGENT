@@ -26,8 +26,8 @@ import base64
 
 import engine.types as input_types
 from engine import consts
-from engine.ops import instrument_workflow, reset_instrumentation
 from engine.crewai.run import run_workflow_async
+from engine.crewai.tracing import instrument_crewai_workflow, reset_crewai_instrumentation
 
 import cml.models_v1 as cml_models
 
@@ -71,8 +71,8 @@ def api_wrapper(args: Union[dict, str]) -> str:
 
         # Instrument our workflow given a specific workflow name and
         # set up the instrumentation.
-        reset_instrumentation()
-        tracer_provider = instrument_workflow(f"{WORKFLOW_NAME}")
+        reset_crewai_instrumentation()
+        tracer_provider = instrument_crewai_workflow(f"{WORKFLOW_NAME}")
         tracer = tracer_provider.get_tracer("opentelemetry.agentstudio.workflow.model")
 
         tool_user_params: Dict[str, Dict[str, str]] = {}

@@ -808,7 +808,6 @@ const SettingsComponent: React.FC = () => {
               width: '50%',
             }}
           >
-
             {agents
               ?.filter((agent) => agent.id === managerAgentId)
               .map((agent) => (

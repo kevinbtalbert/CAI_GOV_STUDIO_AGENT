@@ -4,18 +4,17 @@ from cmlapi import CMLServiceApi
 
 from studio.db.dao import AgentStudioDao
 from studio.db import model as db_model
-import studio.models.litellm_proxy_utils as litellm_utils
 from studio.api import *
-import requests
-import urllib
-from studio import consts
 
+# Import engine code manually. Eventually when this code becomes
+# a separate git repo, or a custom runtime image, this path call
+# will go away and workflow engine features will be available already.
+import sys
 
-def refresh_litellm_models(dao: AgentStudioDao = None):
-    with dao.get_session() as session:
-        all_models: List[db_model.Model] = session.query(db_model.Model).all()
-        litellm_utils.refresh_models_to_config(all_models)
-        litellm_utils.restart_litellm_server()
+sys.path.append("studio/workflow_engine/src/")
+
+from engine.crewai.llms import get_crewai_llm_object_direct
+from engine.types import Input__LanguageModel, Input__LanguageModelConfig
 
 
 def list_models(
@@ -68,9 +67,6 @@ def add_model(request: AddModelRequest, cml: CMLServiceApi = None, dao: AgentStu
         session.commit()
         model_id_generated = m_.model_id
 
-    # Refresh litellm models cache
-    refresh_litellm_models(dao)
-
     return AddModelResponse(model_id=model_id_generated)
 
 
@@ -86,7 +82,7 @@ def remove_model(
             raise ValueError(f"Model with ID '{request.model_id}' not found.")
         session.delete(m_)
         session.commit()
-    refresh_litellm_models(dao)
+
     return RemoveModelResponse()
 
 
@@ -112,7 +108,7 @@ def update_model(
             m_.api_key = request.api_key
         model_id = m_.model_id
         session.commit()
-    refresh_litellm_models(dao)
+
     return UpdateModelResponse(model_id=model_id)
 
 
@@ -134,47 +130,28 @@ def model_test(request: TestModelRequest, cml: CMLServiceApi = None, dao: AgentS
         if not model:
             raise ValueError(f"Model with ID '{request.model_id}' not found.")
 
-        # Prepare the test payload
-        completions_url = urllib.parse.urljoin(
-            f"http://0.0.0.0:{consts.DEFAULT_LITELLM_SERVER_PORT}/v1", "chat/completions"
+        llm = get_crewai_llm_object_direct(
+            Input__LanguageModel(
+                model_id=model.model_id,
+                model_name=model.model_name,
+                config=Input__LanguageModelConfig(
+                    provider_model=model.provider_model,
+                    model_type=model.model_type,
+                    api_base=model.api_base or None,
+                    api_key=model.api_key or None,
+                ),
+                generation_config={
+                    "temperature": request.temperature or None,
+                    "max_new_tokens": request.max_tokens or None,
+                },
+            )
         )
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer dummy_api_key",
-        }
-        payload = {
-            "model": model.model_name,
-            "messages": [
-                {
-                    "role": request.completion_role,
-                    "content": request.completion_content,
-                }
-            ],
-            "temperature": request.temperature,
-            "max_tokens": request.max_tokens,
-        }
 
         # Send the request to the LiteLLM server and handle the response
         try:
-            response = requests.post(
-                completions_url,
-                headers=headers,
-                json=payload,
-                timeout=float(request.timeout) if request.timeout else None,
-            )
-            if response.status_code == 200:
-                completion = (
-                    response.json().get("choices", [{}])[0].get("message", {}).get("content", "No content returned")
-                )
-                return TestModelResponse(response=completion)
-            else:
-                error_message = f"Model Test Failed with status code {response.status_code}: {response.text}"
-                return TestModelResponse(response=error_message)
-        except requests.exceptions.ConnectionError:
-            return TestModelResponse(response="Model Test Failed: Unable to connect to the server")
-        except requests.exceptions.ReadTimeout:
-            return TestModelResponse(response="Model Test Failed: Request timed out")
-        except requests.exceptions.RequestException as e:
+            response = llm.call(messages=[{"role": request.completion_role, "content": request.completion_content}])
+            return TestModelResponse(response=response)
+        except Exception as e:
             return TestModelResponse(response=f"Model Test Failed: {str(e)}")
 
 

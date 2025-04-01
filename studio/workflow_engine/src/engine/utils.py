@@ -1,7 +1,5 @@
 import os
 import cmlapi
-import ast
-from typing import Optional
 
 
 def get_appliction_by_name(cml: cmlapi.CMLServiceApi, name: str) -> cmlapi.Application:
@@ -43,20 +41,3 @@ def get_appliction_by_name(cml: cmlapi.CMLServiceApi, name: str) -> cmlapi.Appli
 
     # Return the most recent version
     return sorted(running_apps, key=lambda x: get_version(x.name))[-1]
-
-
-def extract_tool_class_name(code: str) -> str:
-    try:
-        parsed_ast = ast.parse(code)
-        tool_class_node: Optional[ast.ClassDef] = None
-        for node in ast.walk(parsed_ast):
-            if isinstance(node, ast.ClassDef):
-                for base in node.bases:
-                    if isinstance(base, ast.Name) and base.id == "StudioBaseTool":
-                        tool_class_node = node
-                        break
-        if tool_class_node is None:
-            raise ValueError("CrewAI tool class not found.")
-        return tool_class_node.name
-    except SyntaxError as e:
-        raise ValueError(f"Error parsing Python code: {e}")

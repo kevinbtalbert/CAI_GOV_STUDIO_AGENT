@@ -10,7 +10,13 @@ import hashlib
 from typing import Dict, Tuple, List, Optional, Literal
 from crewai.tools import BaseTool
 
-from studio.cross_cutting.input_types import Input__ToolInstance
+# Import engine code manually. Eventually when this code becomes
+# a separate git repo, or a custom runtime image, this path call
+# will go away and workflow engine features will be available already.
+import sys
+
+sys.path.append("studio/workflow_engine/src/")
+from engine.types import Input__ToolInstance
 
 
 def extract_user_params_from_code(code: str) -> List[str]:

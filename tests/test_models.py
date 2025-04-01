@@ -5,40 +5,9 @@ from studio.db import model as db_model
 from studio.api import *
 from studio.models.models import *
 
-# Mock requests for test_model
-
-def test_refresh_litellm_models():
-    test_dao = AgentStudioDao(engine_url="sqlite:///:memory:", echo=False)
-
-    with test_dao.get_session() as session:
-        session.add(db_model.Model(
-            model_id="m1",
-            model_name="model1",
-            provider_model="provider1",
-            model_type="type1",
-            api_base="http://api.base1",
-            api_key="api_key1"
-        ))
-        session.add(db_model.Model(
-            model_id="m2",
-            model_name="model2",
-            provider_model="provider2",
-            model_type="type2",
-            api_base="http://api.base2",
-            api_key="api_key2"
-        ))
-        session.commit()
-
-    with patch("studio.models.litellm_proxy_utils.refresh_models_to_config") as refresh_mock, \
-         patch("studio.models.litellm_proxy_utils.restart_litellm_server") as restart_mock:
-        refresh_litellm_models(test_dao)
-        refresh_mock.assert_called_once()
-        restart_mock.assert_called_once()
 
 
-@patch("studio.models.litellm_proxy_utils.refresh_models_to_config")
-@patch("studio.models.litellm_proxy_utils.restart_litellm_server")
-def test_list_models(mock_restart, mock_refresh):
+def test_list_models():
     test_dao = AgentStudioDao(engine_url="sqlite:///:memory:", echo=False)
 
     with test_dao.get_session() as session:
@@ -64,13 +33,9 @@ def test_list_models(mock_restart, mock_refresh):
     res = list_models(req, dao=test_dao)
     assert len(res.model_details) == 2
     assert res.model_details[0].model_name == "model1"
-    mock_refresh.assert_not_called()
-    mock_restart.assert_not_called()
 
 
-@patch("studio.models.litellm_proxy_utils.refresh_models_to_config")
-@patch("studio.models.litellm_proxy_utils.restart_litellm_server")
-def test_add_model(mock_restart, mock_refresh):
+def test_add_model():
     test_dao = AgentStudioDao(engine_url="sqlite:///:memory:", echo=False)
 
     req = AddModelRequest(
@@ -89,13 +54,7 @@ def test_add_model(mock_restart, mock_refresh):
         assert model is not None
         assert model.provider_model == "provider1"
 
-    mock_refresh.assert_called_once()
-    mock_restart.assert_called_once()
-
-
-@patch("studio.models.litellm_proxy_utils.refresh_models_to_config")
-@patch("studio.models.litellm_proxy_utils.restart_litellm_server")
-def test_remove_model(mock_restart, mock_refresh):
+def test_remove_model():
     test_dao = AgentStudioDao(engine_url="sqlite:///:memory:", echo=False)
 
     with test_dao.get_session() as session:
@@ -116,13 +75,8 @@ def test_remove_model(mock_restart, mock_refresh):
         model = session.query(db_model.Model).filter_by(model_id="m1").one_or_none()
         assert model is None
 
-    mock_refresh.assert_called_once()
-    mock_restart.assert_called_once()
 
-
-@patch("studio.models.litellm_proxy_utils.refresh_models_to_config")
-@patch("studio.models.litellm_proxy_utils.restart_litellm_server")
-def test_update_model(mock_restart, mock_refresh):
+def test_update_model():
     test_dao = AgentStudioDao(engine_url="sqlite:///:memory:", echo=False)
 
     with test_dao.get_session() as session:
@@ -150,13 +104,8 @@ def test_update_model(mock_restart, mock_refresh):
         assert model.model_name == "new_model"
         assert model.api_key == "new_key"
 
-    mock_refresh.assert_called_once()
-    mock_restart.assert_called_once()
 
-
-@patch("studio.models.litellm_proxy_utils.refresh_models_to_config")
-@patch("studio.models.litellm_proxy_utils.restart_litellm_server")
-def test_get_model_happy(mock_restart, mock_refresh):
+def test_get_model_happy():
     test_dao = AgentStudioDao(engine_url="sqlite:///:memory:", echo=False)
 
     with test_dao.get_session() as session:
@@ -174,13 +123,8 @@ def test_get_model_happy(mock_restart, mock_refresh):
     res = get_model(req, dao=test_dao)
     assert res.model_details.model_name == "model1"
 
-    mock_refresh.assert_not_called()
-    mock_restart.assert_not_called()
 
-
-@patch("studio.models.litellm_proxy_utils.refresh_models_to_config")
-@patch("studio.models.litellm_proxy_utils.restart_litellm_server")
-def test_get_model_not_found(mock_restart, mock_refresh):
+def test_get_model_not_found():
     test_dao = AgentStudioDao(engine_url="sqlite:///:memory:", echo=False)
 
     req = GetModelRequest(model_id="nonexistent")
@@ -188,8 +132,6 @@ def test_get_model_not_found(mock_restart, mock_refresh):
         get_model(req, dao=test_dao)
     assert "Model with ID 'nonexistent' not found" in str(excinfo.value)
 
-    mock_refresh.assert_not_called()
-    mock_restart.assert_not_called()
 
 @patch("requests.post")
 def test_test_model_happy(mock_post):

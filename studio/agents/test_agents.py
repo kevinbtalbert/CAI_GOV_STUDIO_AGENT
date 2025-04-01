@@ -6,7 +6,15 @@ from studio.db import model as db_model
 from crewai import Task, Crew
 from studio.agents.utils import get_crewai_agent_instance
 from studio.agents.agent import get_agent
-from studio.ops import instrument_workflow, reset_instrumentation
+
+# Import engine code manually. Eventually when this code becomes
+# a separate git repo, or a custom runtime image, this path call
+# will go away and workflow engine features will be available already.
+import sys
+
+sys.path.append("studio/worfklow_engine/src")
+
+from engine.crewai.tracing import instrument_crewai_workflow, reset_crewai_instrumentation
 
 
 def agent_test(request: TestAgentRequest, cml: CMLServiceApi = None, dao: AgentStudioDao = None) -> TestAgentResponse:
@@ -66,8 +74,8 @@ def studio_agent_test(request: TestAgentRequest, cml: CMLServiceApi, dao: AgentS
 
             # Retrieve the agent instance
             try:
-                reset_instrumentation()
-                instrument_workflow(f"Test Agents - {agent_response.agent.name}")
+                reset_crewai_instrumentation()
+                instrument_crewai_workflow(f"Test Agents - {agent_response.agent.name}")
             except Exception as e:
                 pass
 

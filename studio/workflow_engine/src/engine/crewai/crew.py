@@ -1,8 +1,6 @@
 # No top level studio.db imports allowed to support wokrflow model deployment
 
-from typing import Dict, Any
-from opentelemetry.context import attach, detach
-import asyncio
+from typing import Dict
 from crewai import Task, Crew, LLM as CrewAILLM, Agent
 from crewai.tools import BaseTool
 
@@ -63,35 +61,3 @@ def create_crewai_objects(
         tasks=tasks,
         crews={workflow_input.id: crew},
     )
-
-
-async def run_workflow_async(
-    collated_input: Any,
-    tool_user_params: Dict[str, Dict[str, str]],
-    inputs: Dict[str, Any],
-    parent_context: Any,  # Use the parent context
-    tracer=None,
-) -> None:
-    """
-    Run the workflow task in the background using the parent context.
-    """
-
-    def executor_task():
-        # Attach the parent context in the background thread
-        token = attach(parent_context)
-
-        try:
-            # Run the actual workflow logic within the propagated context
-            crewai_objects = create_crewai_objects(collated_input, tool_user_params, tracer)
-            crew = crewai_objects.crews[collated_input.workflow.id]
-
-            # Perform the kickoff
-            crew.kickoff(inputs=dict(inputs))
-
-        finally:
-            # Detach the context when done
-            detach(token)
-
-    # Run the task in a dedicated thread
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, executor_task)

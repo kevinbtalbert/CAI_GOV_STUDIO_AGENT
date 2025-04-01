@@ -15,7 +15,10 @@ import {
   updatedCurrentPhoenixProjectId,
   updatedIsRunning,
 } from '@/app/workflows/workflowAppSlice';
-import { updatedEditorWorkflowDescription, selectEditorWorkflowDescription } from '@/app/workflows/editorSlice';
+import {
+  updatedEditorWorkflowDescription,
+  selectEditorWorkflowDescription,
+} from '@/app/workflows/editorSlice';
 import fetch from 'node-fetch';
 import { WorkflowEvent } from '@/app/lib/workflow';
 import WorkflowDiagramView from './WorkflowDiagramView';
@@ -169,13 +172,13 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
   const handleDescriptionChange = async (value: string) => {
     try {
       dispatch(updatedEditorWorkflowDescription(value));
-      
+
       if (workflow) {
         const updateRequest = {
           ...workflow,
           description: value,
         };
-        
+
         await updateWorkflow(updateRequest).unwrap();
       }
     } catch (error) {
@@ -184,15 +187,20 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
   };
 
   const generateDescriptionPrompt = (context: any) => {
-    const agentDetails = context.agents.map((agent: any) => 
-      `- ${agent.name}: ${agent.role || 'No role'}, Goal: ${agent.goal || 'No goal'}`
-    ).join('\n');
-    
-    const taskDetails = context.tasks.map((task: any) => 
-      `- ${task.name || 'Unnamed task'}: ${task.description || 'No description'}`
-    ).join('\n');
-    
-    const managerDetails = context.managerAgent 
+    const agentDetails = context.agents
+      .map(
+        (agent: any) =>
+          `- ${agent.name}: ${agent.role || 'No role'}, Goal: ${agent.goal || 'No goal'}`,
+      )
+      .join('\n');
+
+    const taskDetails = context.tasks
+      .map(
+        (task: any) => `- ${task.name || 'Unnamed task'}: ${task.description || 'No description'}`,
+      )
+      .join('\n');
+
+    const managerDetails = context.managerAgent
       ? `Manager Agent: ${context.managerAgent.name}, Role: ${context.managerAgent.role || 'No role'}, Goal: ${context.managerAgent.goal || 'No goal'}`
       : 'No Manager Agent';
 
@@ -215,45 +223,49 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
 
   const handleGenerateDescription = async () => {
     if (!workflow) return;
-    
+
     if (!defaultModel) {
       notificationApi.error({
         message: 'No default LLM model configured',
         description: 'Please configure a default LLM model on the LLMs page',
         placement: 'topRight',
       });
-      throw new Error("No default LLM model configured. Please configure a default LLM model on the LLMs page.");
+      throw new Error(
+        'No default LLM model configured. Please configure a default LLM model on the LLMs page.',
+      );
     }
 
     // Get the agent and task details from the workflow
     const agentIds = workflow.crew_ai_workflow_metadata?.agent_id || [];
     const taskIds = workflow.crew_ai_workflow_metadata?.task_id || [];
     const managerAgentId = workflow.crew_ai_workflow_metadata?.manager_agent_id || '';
-    
+
     // Find the actual agents and tasks from the available data
-    const workflowAgents = agents?.filter(agent => agentIds.includes(agent.id)) || [];
-    const workflowTasks = tasks?.filter(task => taskIds.includes(task.task_id)) || [];
-    const managerAgent = agents?.find(agent => agent.id === managerAgentId);
+    const workflowAgents = agents?.filter((agent) => agentIds.includes(agent.id)) || [];
+    const workflowTasks = tasks?.filter((task) => taskIds.includes(task.task_id)) || [];
+    const managerAgent = agents?.find((agent) => agent.id === managerAgentId);
 
     const context = {
       name: workflow.name,
       description: workflow.description,
-      agents: workflowAgents.map(agent => ({
+      agents: workflowAgents.map((agent) => ({
         name: agent.name,
         role: agent.crew_ai_agent_metadata?.role,
         backstory: agent.crew_ai_agent_metadata?.backstory,
-        goal: agent.crew_ai_agent_metadata?.goal
+        goal: agent.crew_ai_agent_metadata?.goal,
       })),
-      tasks: workflowTasks.map(task => ({
+      tasks: workflowTasks.map((task) => ({
         description: task.description,
-        expected_output: task.expected_output
+        expected_output: task.expected_output,
       })),
-      managerAgent: managerAgent ? {
-        name: managerAgent.name,
-        role: managerAgent.crew_ai_agent_metadata?.role,
-        backstory: managerAgent.crew_ai_agent_metadata?.backstory,
-        goal: managerAgent.crew_ai_agent_metadata?.goal
-      } : null,
+      managerAgent: managerAgent
+        ? {
+            name: managerAgent.name,
+            role: managerAgent.crew_ai_agent_metadata?.role,
+            backstory: managerAgent.crew_ai_agent_metadata?.backstory,
+            goal: managerAgent.crew_ai_agent_metadata?.goal,
+          }
+        : null,
     };
 
     try {
@@ -462,40 +474,41 @@ const WorkflowApp: React.FC<WorkflowAppProps> = ({
               {
                 key: '1',
                 label: 'Capability Guide',
-                children: renderMode === 'studio' ? (
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Input.TextArea
-                      placeholder="Description"
-                      value={workflowDescription}
-                      onChange={(e) => handleDescriptionChange(e.target.value)}
-                      autoSize={{ minRows: 1, maxRows: 6 }}
-                    />
-                    <Tooltip title="Generate description using AI">
-                      <Button
-                        type="text"
-                        icon={
-                          <img
-                            src="/ai-assistant.svg"
-                            alt="AI Assistant"
-                            style={{
-                              filter: 'invert(70%) sepia(80%) saturate(1000%) hue-rotate(360deg)',
-                              width: '20px',
-                              height: '20px',
-                            }}
-                          />
-                        }
-                        style={{ padding: '2px', marginLeft: '8px' }}
-                        onClick={handleGenerateDescription}
+                children:
+                  renderMode === 'studio' ? (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <Input.TextArea
+                        placeholder="Description"
+                        value={workflowDescription}
+                        onChange={(e) => handleDescriptionChange(e.target.value)}
+                        autoSize={{ minRows: 1, maxRows: 6 }}
                       />
-                    </Tooltip>
-                  </div>
-                ) : (
-                  <div>{workflowDescription}</div>
-                ),
+                      <Tooltip title="Generate description using AI">
+                        <Button
+                          type="text"
+                          icon={
+                            <img
+                              src="/ai-assistant.svg"
+                              alt="AI Assistant"
+                              style={{
+                                filter: 'invert(70%) sepia(80%) saturate(1000%) hue-rotate(360deg)',
+                                width: '20px',
+                                height: '20px',
+                              }}
+                            />
+                          }
+                          style={{ padding: '2px', marginLeft: '8px' }}
+                          onClick={handleGenerateDescription}
+                        />
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    <div>{workflowData?.workflow?.description}</div>
+                  ),
               },
             ]}
           />
-          {(renderMode === 'studio' && !defaultModel) ? (
+          {renderMode === 'studio' && !defaultModel ? (
             renderAlert(
               'No Default LLM Model',
               'Please configure a default LLM model on the LLMs page to use workflows.',

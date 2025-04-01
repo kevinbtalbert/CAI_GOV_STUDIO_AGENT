@@ -55,14 +55,12 @@ from studio.tools.tool_template import (
     update_tool_template,
     remove_tool_template,
 )
-from studio.models.litellm_proxy_utils import stop_litellm_server
 from studio.models.models import (
     list_models,
     get_model,
     add_model,
     remove_model,
     update_model,
-    refresh_litellm_models,
     model_test,
     get_studio_default_model,
     set_studio_default_model,
@@ -72,7 +70,6 @@ from studio.cross_cutting.upgrades import check_studio_upgrade_status, upgrade_s
 import os
 import sys
 import cmlapi
-import atexit
 
 from studio.proto.agent_studio_pb2_grpc import AgentStudioServicer
 
@@ -113,10 +110,6 @@ class AgentStudioApp(AgentStudioServicer):
             )
 
             initialize_thread_pool()
-            # load up LiteLLM server
-            refresh_litellm_models(self.dao)
-
-            atexit.register(stop_litellm_server)
 
             # Load in environment variables
             self.project_id = os.getenv("CDSW_PROJECT_ID")
@@ -125,8 +118,7 @@ class AgentStudioApp(AgentStudioServicer):
             self.master_ip = os.getenv("CDSW_MASTER_IP")
             self.domain = os.getenv("CDSW_DOMAIN")
         except:
-            print("Received exception, stopping LiteLLM proxy server.")
-            stop_litellm_server()
+            print("Received exception, cleaning up.")
             cleanup_thread_pool()
 
     # Model-related gRPC methods

@@ -8,7 +8,6 @@ import cmlapi
 import os
 import json
 from typing import Dict
-from studio.models.litellm_proxy_utils import stop_litellm_server
 
 def start_server(blocking: bool = False):
     port = DEFAULT_AS_GRPC_PORT
@@ -61,8 +60,7 @@ if __name__ == "__main__":
         update_agent_studio_service_in_project(cml)
     else:
         print("Running gRPC server in dev mode.")
-    
-    stop_litellm_server()
+
     # Start the server up. If this command fails (if the port is already
     # in use), the application script bin/start-app-script.sh will continue
     # to run and the error will exit gracefully.

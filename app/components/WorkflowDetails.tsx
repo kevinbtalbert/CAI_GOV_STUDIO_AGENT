@@ -628,7 +628,15 @@ const WorkflowDetails: React.FC<WorkflowDetailsProps> = ({
             label: 'Capability Guide',
             children: (
               <div style={{ maxHeight: '130px', overflowY: 'auto' }}>
-                <Text style={{ fontSize: 14, fontWeight: 400, background: 'transparent', fontStyle: 'italic', display: 'block' }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 400,
+                    background: 'transparent',
+                    fontStyle: 'italic',
+                    display: 'block',
+                  }}
+                >
                   {workflow.description}
                 </Text>
               </div>
