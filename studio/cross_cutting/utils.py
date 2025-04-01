@@ -223,7 +223,7 @@ def is_valid_python_module_name(name: str) -> bool:
         raise ValueError(f"Error while validating module name: {str(e)}") from e
 
 
-def get_appliction_by_name(cml: cmlapi.CMLServiceApi, name: str) -> cmlapi.Application:
+def get_application_by_name(cml: cmlapi.CMLServiceApi, name: str, only_running: bool = True) -> cmlapi.Application:
     """
     Get the most recent running version of a CML application by its name.
     Args:
@@ -235,18 +235,22 @@ def get_appliction_by_name(cml: cmlapi.CMLServiceApi, name: str) -> cmlapi.Appli
         ValueError: If no running application is found
     """
     applications: list[cmlapi.Application] = cml.list_applications(
-        project_id=os.getenv("CDSW_PROJECT_ID"), page_size=5000
+        project_id=os.getenv("CDSW_PROJECT_ID"),
+        page_size=5000,
     ).applications
 
     # Filter for applications that:
     # 1. Match the base name
     # 2. Have "running" in their status
-    running_apps = [
-        app
-        for app in applications
-        if ((app.name == name) or (name + " v") in app.name)
-        and "running" in app.status.lower()  # Changed to check if "running" is in status
-    ]
+    if only_running:
+        running_apps = [
+            app
+            for app in applications
+            if ((app.name == name) or (name + " v") in app.name)
+            and "running" in app.status.lower()  # Changed to check if "running" is in status
+        ]
+    else:
+        running_apps = [app for app in applications if ((app.name == name) or (name + " v") in app.name)]
 
     if not running_apps:
         raise ValueError(f"No running applications found matching '{name}'")
@@ -263,6 +267,29 @@ def get_appliction_by_name(cml: cmlapi.CMLServiceApi, name: str) -> cmlapi.Appli
     return sorted(running_apps, key=lambda x: get_version(x.name))[-1]
 
 
+def get_job_by_name(cml: cmlapi.CMLServiceApi, name: str) -> Union[cmlapi.Job, None]:
+    jobs: list[cmlapi.Job] = cml.list_jobs(
+        project_id=os.getenv("CDSW_PROJECT_ID"),
+        page_size=5000,
+    ).jobs
+
+    jobs = [job for job in jobs if ((job.name == name) or (name + " v") in job.name)]
+
+    if len(jobs) == 0:
+        return None
+
+    # Sort by version number (assuming format "Name vX.Y")
+    def get_version(name: str) -> tuple:
+        try:
+            version = name.split("v")[-1]
+            return tuple(map(int, version.split(".")))
+        except (IndexError, ValueError):
+            return (0, 0)  # Default for apps without version
+
+    # Return the most recent version
+    return sorted(jobs, key=lambda x: get_version(x.name))[-1]
+
+
 def get_deployed_workflow_runtime_identifier(cml: cmlapi.CMLServiceApi) -> Union[Any, None]:
     """
     Get a runtime ID to be used for deployed workflow CML models. For now, we will use
@@ -271,7 +298,9 @@ def get_deployed_workflow_runtime_identifier(cml: cmlapi.CMLServiceApi) -> Union
     Right now, we actually use the same base runtime image for both the CML model tasked
     with running our deployed workflows, as well as the standalone Workflow UI application.
     """
-    application: cmlapi.Application = get_appliction_by_name(cml, consts.AGENT_STUDIO_SERVICE_APPLICATION_NAME)
+    application: cmlapi.Application = get_application_by_name(
+        cml, consts.AGENT_STUDIO_SERVICE_APPLICATION_NAME, only_running=False
+    )
     return application.runtime_identifier
 
 
