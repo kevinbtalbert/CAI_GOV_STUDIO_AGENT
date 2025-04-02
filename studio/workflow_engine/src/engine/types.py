@@ -56,7 +56,7 @@ class Input__Agent(BaseModel):
 class Input__Workflow(BaseModel):
     id: str
     name: str
-    description: str
+    description: Optional[str] = None
     deployment_id: str
     crew_ai_process: Literal[Process.sequential, Process.hierarchical]
     agent_ids: List[str] = list()
