@@ -4,12 +4,12 @@ description: |
 author: Cloudera Inc.
 specification_version: 1.0
 prototype_version: 1.0
-date: "2023-07-22"
+date: "2025-02-01"
 
 runtimes:
   - editor: PBJ Workbench
-    kernel: Python 3.10
-    edition: Standard
+    kernel: Python 3.9
+    edition: GovCloud
 
 tasks:
   - type: run_session
